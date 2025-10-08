@@ -449,38 +449,159 @@ textarea.input-field {
 }
 
 /* ========== RESPONSIVE DESIGN (Mobile friendly) ========== */
-@media (max-width: 768px) {
-    /* Styles for tablets and phones */
+/* ========================================
+   RESPONSIVE DESIGN - MOBILE SCREENS
+   These styles apply on screens smaller than 768px
+   ======================================== */
 
+@media (max-width: 768px) {
+    /* Adjust body padding for mobile */
+    body {
+        padding: 0;
+    }
+
+    /* Make pages container fit mobile */
+    #pages-container {
+        padding: 10px;
+        min-height: 100vh;
+    }
+
+    /* Make form containers responsive */
     .form-container {
-        padding: 25px;
-        /* Less padding on mobile */
+        max-width: 100%;
+        /* Change from fixed 500px to 100% */
+
+        width: calc(100% - 40px);
+        /* Full width minus small margins */
 
         margin: 20px;
-        /* Less margin on mobile */
+        /* Smaller margins on mobile */
+
+        padding: 25px;
+        /* Less padding on mobile */
     }
 
-    .center-content h1 {
-        font-size: 2rem;
+    /* Adjust form titles */
+    .form-container h1 {
+        font-size: 1.8rem;
         /* Smaller heading on mobile */
+
+        margin-bottom: 20px;
     }
 
+    /* Make input fields fit */
+    .input-field {
+        font-size: 0.95rem;
+        /* Slightly smaller text */
+
+        padding: 12px;
+        /* Adjust padding */
+    }
+
+    /* Adjust buttons */
+    .btn-primary,
+    .btn-secondary,
+    .btn-logout {
+        font-size: 1rem;
+        /* Smaller button text */
+
+        padding: 12px 20px;
+        /* Adjust padding */
+    }
+
+    /* Header adjustments */
     .header {
         padding: 10px 15px;
-        /* Less padding on mobile */
+        /* Less padding */
 
         flex-direction: column;
-        /* Stacks buttons vertically if needed */
+        /* Stack items vertically if needed */
 
         gap: 10px;
     }
 
-    .btn-primary, .btn-secondary, .btn-logout {
-        font-size: 1rem;
-        /* Slightly smaller buttons on mobile */
+    /* Center content adjustments */
+    .center-content h1 {
+        font-size: 1.8rem;
+        /* Smaller welcome message */
+
+        margin-bottom: 20px;
+        padding: 0 10px;
+        /* Add side padding */
+    }
+
+    /* Button group - stack on mobile */
+    .button-group {
+        flex-direction: column;
+        /* Stack buttons vertically */
+
+        width: 100%;
+        /* Full width */
+
+        gap: 15px;
+    }
+
+    /* Home page buttons - full width on mobile */
+    #goto-meeting-btn,
+    #goto-email-btn {
+        width: 100%;
+        /* Full width on mobile */
+
+        min-width: auto;
+        /* Remove min-width */
+
+        max-width: 300px;
+        /* But not TOO wide */
+    }
+
+    /* Form groups spacing */
+    .form-group {
+        margin-bottom: 15px;
+        /* Less space between fields */
+    }
+
+    /* Labels */
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    /* Page sections */
+    .page {
+        padding: 10px;
+        /* Less padding on mobile */
     }
 }
 
+/* ========================================
+   VERY SMALL SCREENS (phones in portrait)
+   ======================================== */
+
+@media (max-width: 480px) {
+    /* Even smaller adjustments */
+
+    .form-container {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .form-container h1 {
+        font-size: 1.5rem;
+    }
+
+    .center-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        font-size: 0.95rem;
+    }
+
+    #goto-meeting-btn,
+    #goto-email-btn {
+        max-width: 250px;
+    }
+}
 .page.hidden {
     opacity: 0;
     transform: scale(0.95);
