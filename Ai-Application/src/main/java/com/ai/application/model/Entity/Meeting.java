@@ -1,0 +1,64 @@
+package com.ai.application.model.Entity;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Document(collection = "meetings")
+public class Meeting {
+    @Id
+    private String id;
+    
+    private List<String> people;  // Changed to List for multiple attendees
+    private String location;
+    private LocalDateTime timeBegin;  // Improved: Use LocalDateTime
+    private LocalDateTime timeEnd;
+    @Indexed  // For date-based queries
+    private LocalDateTime date;  // Changed to LocalDateTime
+    private String subject;
+    private String details;
+
+    // Constructors
+    public Meeting() {}
+    public Meeting(List<String> people, String location, LocalDateTime timeBegin, LocalDateTime timeEnd,
+                   LocalDateTime date, String subject, String details) {
+        this.people = people;
+        this.location = location;
+        this.timeBegin = timeBegin;
+        this.timeEnd = timeEnd;
+        this.date = date;
+        this.subject = subject;
+        this.details = details;
+    }
+
+    // Getters and Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    
+    public List<String> getPeople() { return people; }
+    public void setPeople(List<String> people) { this.people = people; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public LocalDateTime getTimeBegin() { return timeBegin; }
+    public void setTimeBegin(LocalDateTime timeBegin) { this.timeBegin = timeBegin; }
+
+    public LocalDateTime getTimeEnd() { return timeEnd; }
+    public void setTimeEnd(LocalDateTime timeEnd) { this.timeEnd = timeEnd; }
+
+    public LocalDateTime getDate() { return date; }
+    public void setDate(LocalDateTime date) { this.date = date; }
+
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
+
+    public String getDetails() { return details; }
+    public void setDetails(String details) { this.details = details; }
+	public void setStatus(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+}
