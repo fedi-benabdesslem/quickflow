@@ -1,0 +1,40 @@
+.review-page {
+  justify-content: flex-start;
+}
+
+.review-card {
+  max-width: 800px;
+}
+
+.review-section {
+  background: rgba(59, 130, 246, 0.05);
+  border-left: 3px solid rgba(59, 130, 246, 0.5);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.review-section .form-group {
+  margin-bottom: 15px;
+}
+
+.review-section .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.btn-send {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-send:hover {
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+
+.review-page .page-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: inline-block;
+  filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+}
+
