@@ -1,23 +1,21 @@
 package com.ai.application.model.Entity;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Document(collection = "generated_outputs")
 public class GeneratedOutput {
     @Id
-    private String id;  
+    private String id;
     private String requestHash;
-    private String content; 
-    @DBRef(lazy = true)  
-    private User user; 
+    private String content;
     private LocalDateTime createdAt;
     private String modelUsed;
     private int tokensUsed;
 
-    public GeneratedOutput() {}
+    public GeneratedOutput() {
+    }
 
     public String getId() {
         return id;
@@ -41,14 +39,6 @@ public class GeneratedOutput {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public LocalDateTime getCreatedAt() {

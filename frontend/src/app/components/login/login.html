@@ -1,0 +1,13 @@
+<div class="login-container" *ngIf="!authService.isAuthenticated()">
+  <!-- Loading State -->
+  <div *ngIf="authService.loading()" class="loading-card">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Goodbye message shown briefly during logout redirect -->
+  <div *ngIf="!authService.loading()" class="login-card">
+    <h2>👋 Goodbye!</h2>
+    <p class="subtitle">Signing you out securely...</p>
+  </div>
+</div>
