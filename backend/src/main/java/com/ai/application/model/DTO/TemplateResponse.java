@@ -3,23 +3,20 @@ package com.ai.application.model.DTO;
 public class TemplateResponse {
 
     private String generatedContent;
+    private String generatedSubject;
 
-    public TemplateResponse() {}
-
-    public TemplateResponse(String generatedContent) {
+    public TemplateResponse(String generatedContent, String generatedSubject) {
         this.generatedContent = generatedContent;
+        this.generatedSubject = generatedSubject;
     }
-
     public String getGeneratedContent() {
         return generatedContent;
     }
-
     public void setGeneratedContent(String generatedContent) {
         this.generatedContent = generatedContent;
     }
 
-	public Object getSubject() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getSubject() {
+        return generatedSubject;
 	}
 }

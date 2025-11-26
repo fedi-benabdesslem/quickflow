@@ -61,7 +61,7 @@ public class EmailController {
         // Generate content
         TemplateResponse response = templateService.processTemplate(templateReq);
         String generatedContent = response.getGeneratedContent();
-        String subject = response.getSubject() != null ? (String) response.getSubject() : "Draft Email";  // Assume getSubject() exists; else parse from generatedContent
+        String subject = response.getGeneratedContent();
 
         if (generatedContent == null || generatedContent.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -86,6 +86,9 @@ public class EmailController {
     }
 
     // Example /send-final (add this if not exists; updates draft with final + generated)
+    @Autowired
+    private com.ai.application.Services.EmailSenderService emailSenderService;
+
     @PostMapping("/send-final")
     public ResponseEntity<?> sendFinalEmail(@RequestBody Map<String, Object> body) {
         String id = (String) body.get("id");
@@ -106,7 +109,22 @@ public class EmailController {
         email.setStatus("sent");
         emailRepository.save(email);
 
-        // TODO: Actually send email (e.g., via JavaMailSender)
+        // Send email to all recipients
+        try {
+            for (String recipient : email.getRecipients()) {
+                emailSenderService.sendSimpleEmail(recipient, finalSubject, finalContent);
+            }
+        } catch (org.springframework.mail.MailAuthenticationException e) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "error",
+                    "message", "Authentication failed: Check your email and app password. " + e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                    "status", "error",
+                    "message", "Failed to send email: " + e.getMessage()
+            ));
+        }
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
