@@ -60,8 +60,20 @@ public class EmailController {
 
         // Generate content
         TemplateResponse response = templateService.processTemplate(templateReq);
-        String generatedContent = response.getGeneratedContent();
-        String subject = response.getGeneratedContent();
+        String full = response.getGeneratedContent();
+
+        String subject;
+        String generatedContent;
+
+
+        int newlineIndex = full.indexOf('\n');
+        if (newlineIndex == -1) {
+            subject = full.trim();
+            generatedContent = "";
+        } else {
+            subject = full.substring(0, newlineIndex).trim();
+            generatedContent = full.substring(newlineIndex + 1).trim();
+        }
 
         if (generatedContent == null || generatedContent.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(

@@ -22,6 +22,7 @@ public class LLMService {
             Write clearly and naturally — like a person, not a machine.
 
             Style rules:
+            -ALWAYS ALWAYS write the subject in the first line of your output
             - Keep it short (no more than 500 words).
             - If details are missing, fill them simply and logically.
             - Keep it professional

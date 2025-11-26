@@ -11,7 +11,6 @@ import com.ai.application.model.DTO.TemplateResponse;
 public class TemplateController {
 
     private final TemplateService templateService;
-
     @Autowired
     public TemplateController(TemplateService templateService) {
         this.templateService = templateService;

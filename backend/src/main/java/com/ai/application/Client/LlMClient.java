@@ -21,6 +21,7 @@ public class LlMClient {
                     .user(userPrompt)
                     .call()
                     .chatResponse();
+            assert response != null;
             return response.getResult().getOutput().getText();
         } catch (Exception e) {
             throw new RuntimeException("LLM call failed", e);
