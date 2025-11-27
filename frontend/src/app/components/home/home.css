@@ -2,6 +2,34 @@
     align-items: center;
 }
 
+.header {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.btn-profile {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
 .center-content {
     width: 100%;
     max-width: 1000px;

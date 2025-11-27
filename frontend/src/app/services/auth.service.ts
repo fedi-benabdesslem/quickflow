@@ -34,6 +34,13 @@ export class AuthService {
         this._token.set(null);
     }
 
+    editProfile() {
+        // Redirect to Keycloak account management page
+        const issuer = this.oauthService.issuer;
+        const accountUrl = `${issuer}/account`;
+        window.location.href = accountUrl;
+    }
+
     private loadUserProfile() {
         const claims = this.oauthService.getIdentityClaims() as any;
         if (claims) {

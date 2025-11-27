@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class EmailController {
     private TemplateService templateService;
 
     @PostMapping("/send")
-    public ResponseEntity<?> sendEmail(@RequestBody EmailRequest templateReq) {
+    public ResponseEntity<?> sendEmail(@RequestBody EmailRequest templateReq, Principal principal) {
         if (templateReq.getRecipients() == null || templateReq.getRecipients().isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
@@ -33,12 +34,15 @@ public class EmailController {
         }
 
         String input = templateReq.getInput();
-        String userId = templateReq.getUserId();
-        if (userId == null || userId.isEmpty()) {
-            userId = "anonymous";
-        }
 
-        String senderEmail = userId + "@placeholder.com"; // TODO: Extract from token
+        // Get user info from JWT token (Principal)
+        String userId = "anonymous";
+        String senderEmail = "anonymous@quickflow.com";
+
+        if (principal != null) {
+            userId = principal.getName(); // This is the user's ID from Keycloak
+            senderEmail = userId + "@quickflow.com";
+        }
 
         // Set request fields
         templateReq.setSenderEmail(senderEmail);

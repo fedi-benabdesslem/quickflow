@@ -21,6 +21,10 @@ export class HomeComponent {
     this.router.navigate(['/login']);
   }
 
+  editProfile() {
+    this.auth.editProfile();
+  }
+
   navigateTo(path: string) {
     this.router.navigate([path]);
   }
