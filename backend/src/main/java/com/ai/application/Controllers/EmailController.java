@@ -6,6 +6,7 @@ import com.ai.application.model.TemplateType;
 import com.ai.application.model.DTO.EmailRequest;
 import com.ai.application.model.DTO.TemplateResponse;
 import com.ai.application.Services.TemplateService;
+import com.ai.application.Services.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,9 @@ public class EmailController {
 
     @Autowired
     private TemplateService templateService;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @PostMapping("/send")
     public ResponseEntity<?> sendEmail(@RequestBody EmailRequest templateReq, Principal principal) {
@@ -96,6 +100,16 @@ public class EmailController {
         email.setGeneratedContent(finalContent);
         email.setStatus("sent");
         emailRepository.save(email);
+
+        // Actually send the email via SMTP
+        try {
+            String[] recipients = email.getRecipients().toArray(new String[0]);
+            emailSenderService.sendBulkEmail(recipients, email.getSubject(), email.getGeneratedContent());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                    "status", "error",
+                    "message", "Failed to send email: " + e.getMessage()));
+        }
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
