@@ -85,7 +85,9 @@ ollama pull mistral-nemo
 curl http://localhost:11434/api/tags
 ```
 
-### 5. Start Keycloak
+### 5. Start Keycloak and Import Realm
+
+**Step 1: Start Keycloak**
 
 ```bash
 docker run -d \
@@ -97,16 +99,44 @@ docker run -d \
   start-dev
 ```
 
-**Access Keycloak Admin Console:**
-- URL: http://localhost:8180
-- Username: `admin`
-- Password: `admin`
+**Wait for Keycloak to start** (takes about 30 seconds). Check with:
+```bash
+curl http://localhost:8180
+```
 
-**Configure Keycloak:**
-See [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) for detailed instructions on:
-- Creating the `quickflow-realm`
-- Configuring the `quickflow-frontend` client
-- Setting up Google Sign-In
+**Step 2: Import Pre-configured Realm**
+
+1. **Access Keycloak Admin Console:**
+   - URL: http://localhost:8180
+   - Username: `admin`
+   - Password: `admin`
+
+2. **Import Realm:**
+   - Hover over the realm dropdown (top-left corner, currently shows "master")
+   - Click **"Create Realm"**
+   - Click **"Browse"** button
+   - Select `keycloak/quickflow-realm.json` from the project directory
+   - Click **"Create"**
+
+3. **Verify Import:**
+   - Realm `quickflow-realm` should now appear in the dropdown
+   - Select it
+   - Go to **Clients** → Verify `quickflow-frontend` exists
+   - Check **Valid redirect URIs** includes: `http://localhost:4200/*`
+
+**Step 3: Configure Google Sign-In**
+
+The realm import includes the basic structure, but you need to add YOUR OWN Google OAuth credentials:
+
+1. Follow [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) to:
+   - Create your Google Cloud project
+   - Get your Client ID and Client Secret
+   
+2. In Keycloak:
+   - Go to **Identity Providers** → Click **"Add provider"** → Select **"Google"**
+   - Configure with your credentials (see GOOGLE_OAUTH_SETUP.md Step 5)
+
+**Note:** Each developer must use their own Google OAuth credentials for security reasons.
 
 ### 6. Start Backend
 
