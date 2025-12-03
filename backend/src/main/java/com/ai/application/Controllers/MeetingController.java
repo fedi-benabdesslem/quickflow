@@ -31,15 +31,14 @@ public class MeetingController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generateMeeting(@RequestBody MeetingRequest request) {
-        if (request.getPeople() == null || request.getPeople().isEmpty() || 
-            request.getLocation() == null || request.getLocation().isEmpty() ||
-            request.getTimeBegin() == null || request.getTimeEnd() == null || 
-            request.getDate() == null || request.getSubject() == null || request.getSubject().isEmpty()) {
+    public ResponseEntity<?> generateMeeting(@RequestBody MeetingRequest request, java.security.Principal principal) {
+        if (request.getPeople() == null || request.getPeople().isEmpty() ||
+                request.getLocation() == null || request.getLocation().isEmpty() ||
+                request.getTimeBegin() == null || request.getTimeEnd() == null ||
+                request.getDate() == null || request.getSubject() == null || request.getSubject().isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
-                    "message", "All fields are required"
-            ));
+                    "message", "All fields are required"));
         }
 
         LocalDateTime timeBegin, timeEnd;
@@ -52,20 +51,19 @@ public class MeetingController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
-                    "message", "Invalid date/time format. Date: YYYY-MM-DD, Time: HH:mm"
-            ));
+                    "message", "Invalid date/time format. Date: YYYY-MM-DD, Time: HH:mm"));
         }
 
         if (timeEnd.isBefore(timeBegin)) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
-                    "message", "End time must be after start time"
-            ));
+                    "message", "End time must be after start time"));
         }
 
-        request.setUserId("anonymous");
-        request.setSenderId("anonymous");
-        request.setSenderEmail("anonymous@example.com");
+        String userId = principal != null ? principal.getName() : "anonymous";
+        request.setUserId(userId);
+        request.setSenderId(userId);
+        request.setSenderEmail(userId + "@placeholder.com");
         request.setTemplateType(TemplateType.PV);
         if (request.getBulletPoints() == null) {
             request.setBulletPoints(List.of());
@@ -79,8 +77,7 @@ public class MeetingController {
         if (generatedContent == null || generatedContent.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
-                    "message", "Failed to generate meeting summary"
-            ));
+                    "message", "Failed to generate meeting summary"));
         }
 
         Meeting draft = new Meeting(
@@ -90,8 +87,7 @@ public class MeetingController {
                 timeEnd,
                 LocalDateTime.of(LocalDate.parse(request.getDate()), LocalTime.parse("00:00")),
                 request.getSubject(),
-                request.getDetails()
-        );
+                request.getDetails());
         draft.setStatus("draft");
         Meeting saved = meetingRepository.save(draft);
 
@@ -100,8 +96,7 @@ public class MeetingController {
                 "message", "Meeting generated and saved successfully",
                 "meetingId", saved.getId(),
                 "generatedContent", generatedContent,
-                "subject", response.getSubject() != null ? response.getSubject() : request.getSubject()
-        ));
+                "subject", response.getSubject() != null ? response.getSubject() : request.getSubject()));
     }
 
     @PostMapping("/send-final")
@@ -143,11 +138,8 @@ public class MeetingController {
         meeting.setStatus("sent");
         meetingRepository.save(meeting);
 
-        // TODO: Actually send meeting summary (e.g., via email or notification)
-
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "message", "Meeting summary sent successfully"
-        ));
+                "message", "Meeting summary sent successfully"));
     }
 }

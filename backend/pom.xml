@@ -51,7 +51,6 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-data-mongodb</artifactId>
       </dependency>
-
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-test</artifactId>
@@ -62,6 +61,22 @@
       <dependency>
           <groupId>org.springframework.ai</groupId>
           <artifactId>spring-ai-starter-model-ollama</artifactId>
+      </dependency>
+
+      <!-- Security -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-security</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+      </dependency>
+
+      <!-- Email -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-mail</artifactId>
       </dependency>
   </dependencies>
 

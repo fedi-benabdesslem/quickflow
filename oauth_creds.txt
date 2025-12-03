@@ -1,0 +1,4 @@
+ Client ID   499878614656-mlfblgfbu3st7a10hu2lruap8443h8mm.apps.googleusercontent.com
+ Client secret   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
+ Creation date
+November 26, 2025, 12:53:41 PM GMT+1

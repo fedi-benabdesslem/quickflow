@@ -4,9 +4,7 @@ import com.ai.application.model.TemplateType;
 import com.ai.application.model.DTO.TemplateRequest;
 import com.ai.application.model.DTO.TemplateResponse;
 import com.ai.application.model.Entity.GeneratedOutput;
-import com.ai.application.model.Entity.User;
 import com.ai.application.Repositories.GeneratedOutputRepository;
-import com.ai.application.Repositories.UserRepository;
 import com.ai.application.model.DTO.MeetingRequest;
 import com.ai.application.model.DTO.EmailRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,16 +22,12 @@ import java.nio.charset.StandardCharsets;
 public class TemplateService {
 
     private final LLMService llmService;
-    
     private final GeneratedOutputRepository generatedOutputRepo;
-    
-    private final UserRepository userRepository;
 
     @Autowired
-    public TemplateService(LLMService llmService, GeneratedOutputRepository generatedOutputRepo, UserRepository userRepository) {
+    public TemplateService(LLMService llmService, GeneratedOutputRepository generatedOutputRepo) {
         this.llmService = llmService;
         this.generatedOutputRepo = generatedOutputRepo;
-        this.userRepository = userRepository;
     }
 
     public TemplateResponse processTemplate(TemplateRequest request) {
@@ -51,12 +45,12 @@ public class TemplateService {
         genOut.setContent(output);
 
         if (request.getUserId() != null) {
-            Optional<User> userOpt = userRepository.findById(request.getUserId());
-            userOpt.ifPresent(genOut::setUser);
+            // Optional: Store userId in GeneratedOutput if needed, but User entity is gone
+            // genOut.setUserId(request.getUserId());
         }
         genOut.setCreatedAt(java.time.LocalDateTime.now());
         genOut.setModelUsed("llama3.2");
-        genOut.setTokensUsed(0); 
+        genOut.setTokensUsed(0);
         generatedOutputRepo.save(genOut);
 
         return new TemplateResponse(output);
@@ -82,18 +76,13 @@ public class TemplateService {
         TemplateType type = request.getTemplateType();
         StringBuilder userPrompt = new StringBuilder();
 
-        String senderUsername = "Anonymous User";
-        if (request.getUserId() != null) {
-            Optional<User> userOpt = userRepository.findById(request.getUserId());
-            if (userOpt.isPresent()) {
-                senderUsername = userOpt.get().getUsername();
-            }
-        }
+        String senderUsername = request.getUserId() != null ? request.getUserId() : "Anonymous User";
         userPrompt.append(String.format("Sender Username: %s\n", senderUsername));
 
         if (type == TemplateType.email && request instanceof EmailRequest) {
             EmailRequest emailReq = (EmailRequest) request;
-            String senderEmail = emailReq.getSenderEmail() != null ? emailReq.getSenderEmail() : "anonymous@example.com";
+            String senderEmail = emailReq.getSenderEmail() != null ? emailReq.getSenderEmail()
+                    : "anonymous@example.com";
             userPrompt.append(String.format("Sender Email: %s\n\n", senderEmail));
 
             String recipientsText = "Unknown Recipients";
@@ -122,13 +111,15 @@ public class TemplateService {
             if (meetingReq.getTimeBegin() != null && meetingReq.getTimeEnd() != null) {
                 timeRange = String.format("%s to %s", meetingReq.getTimeBegin(), meetingReq.getTimeEnd());
             }
-            userPrompt.append(String.format("Date & Time: %s %s\n", meetingReq.getDate() != null ? meetingReq.getDate() : "TBD", timeRange));
+            userPrompt.append(String.format("Date & Time: %s %s\n",
+                    meetingReq.getDate() != null ? meetingReq.getDate() : "TBD", timeRange));
 
             String subject = meetingReq.getSubject() != null ? meetingReq.getSubject() : "Meeting Summary";
             userPrompt.append(String.format("Subject: %s\n\n", subject));
 
             String details = meetingReq.getDetails() != null ? meetingReq.getDetails() : "";
-            userPrompt.append("Additional Details:\n").append(details.isEmpty() ? "None provided." : details).append("\n\n");
+            userPrompt.append("Additional Details:\n").append(details.isEmpty() ? "None provided." : details)
+                    .append("\n\n");
 
             List<String> bullets = getBulletsOrInput(request);
             if (!bullets.isEmpty()) {
@@ -136,7 +127,8 @@ public class TemplateService {
                 userPrompt.append("Agenda Items:\n").append(bulletText);
             }
         } else {
-            throw new IllegalArgumentException("Unsupported template type or request instance: " + type + " (" + request.getClass().getSimpleName() + ")");
+            throw new IllegalArgumentException("Unsupported template type or request instance: " + type + " ("
+                    + request.getClass().getSimpleName() + ")");
         }
 
         return userPrompt.toString();

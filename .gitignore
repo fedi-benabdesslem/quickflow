@@ -1,1 +1,18 @@
 /.metadata/
+.idea/
+.vscode/
+frontend-react-backup/
+frontend/node_modules/
+frontend/dist/
+backend/target/
+
+# Sensitive configuration files
+oauth_creds.txt
+**/application-local.properties
+**/application-secret.properties
+**/.env
+**/.env.local
+
+# Keycloak exports (may contain user data)
+*realm-export*.json
+keycloak-data/

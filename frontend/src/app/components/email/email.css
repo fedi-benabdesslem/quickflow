@@ -1,0 +1,14 @@
+.email-page {
+    justify-content: flex-start;
+}
+
+.email-page .form-card {
+    max-width: 600px;
+}
+
+.page-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: inline-block;
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+}
