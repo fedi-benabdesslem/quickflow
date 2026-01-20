@@ -47,6 +47,19 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
+// Root redirect logic
+function RootRedirect() {
+    const { user, loading } = useAuth()
+    if (loading) {
+        return (
+            <div className="loading-screen">
+                <div className="spinner spinner-large" />
+            </div>
+        )
+    }
+    return user ? <Navigate to="/home" replace /> : <Navigate to="/auth" replace />
+}
+
 function App() {
     const { session } = useAuth()
 
@@ -59,7 +72,7 @@ function App() {
         <>
             <NebulaBackground />
             <Routes>
-                <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/" element={<RootRedirect />} />
                 <Route
                     path="/auth"
                     element={

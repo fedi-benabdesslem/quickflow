@@ -19,7 +19,7 @@ export default function MeetingPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
-    const { user, signOut } = useAuth()
+    const { signOut } = useAuth()
     const { reviewData, setReviewData } = useReview()
     const navigate = useNavigate()
 

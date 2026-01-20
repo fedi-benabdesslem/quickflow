@@ -89,6 +89,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    const signInWithGoogle = async (): Promise<AuthResult> => {
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/`,
+                },
+            })
+
+            if (error) {
+                return { success: false, error: error.message }
+            }
+
+            return { success: true }
+        } catch (err) {
+            return { success: false, error: 'An unexpected error occurred' }
+        }
+    }
+
+
+
+    const signInWithMicrosoft = async (): Promise<AuthResult> => {
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'azure',
+                options: {
+                    redirectTo: `${window.location.origin}/`,
+                    scopes: 'email',
+                },
+            })
+
+            if (error) {
+                return { success: false, error: error.message }
+            }
+
+            return { success: true }
+        } catch (err) {
+            return { success: false, error: 'An unexpected error occurred' }
+        }
+    }
+
     const signOut = async (): Promise<void> => {
         await supabase.auth.signOut()
         setUser(null)
@@ -112,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, resetPassword }}>
+        <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signInWithGoogle, signInWithMicrosoft, signOut, resetPassword }}>
             {children}
         </AuthContext.Provider>
     )

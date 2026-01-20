@@ -16,7 +16,7 @@ export default function AuthPage() {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
-    const { signIn, signUp, resetPassword } = useAuth()
+    const { signIn, signUp, signInWithGoogle, signInWithMicrosoft, resetPassword } = useAuth()
 
     const validateEmail = (email: string): boolean => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -87,6 +87,26 @@ export default function AuthPage() {
         }
 
         setLoading(false)
+    }
+
+    const handleGoogleSignIn = async () => {
+        setLoading(true)
+        setError('')
+        const result = await signInWithGoogle()
+        if (!result.success) {
+            setError(result.error || 'Google sign in failed')
+            setLoading(false)
+        }
+    }
+
+    const handleMicrosoftSignIn = async () => {
+        setLoading(true)
+        setError('')
+        const result = await signInWithMicrosoft()
+        if (!result.success) {
+            setError(result.error || 'Microsoft sign in failed')
+            setLoading(false)
+        }
     }
 
     const passwordStrength = getPasswordStrength(password)
@@ -293,7 +313,7 @@ export default function AuthPage() {
                             <button
                                 type="button"
                                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-600 transition-all duration-200"
-                                onClick={() => alert('Google OAuth coming soon!')}
+                                onClick={handleGoogleSignIn}
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                                     <path
@@ -318,7 +338,7 @@ export default function AuthPage() {
                             <button
                                 type="button"
                                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 hover:border-slate-600 transition-all duration-200"
-                                onClick={() => alert('Microsoft OAuth coming soon!')}
+                                onClick={handleMicrosoftSignIn}
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 23 23">
                                     <path fill="#f35325" d="M1 1h10v10H1z" />

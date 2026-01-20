@@ -10,6 +10,8 @@ export interface AuthContextType {
     loading: boolean;
     signIn: (email: string, password: string) => Promise<AuthResult>;
     signUp: (email: string, password: string, username: string) => Promise<AuthResult>;
+    signInWithGoogle: () => Promise<AuthResult>;
+    signInWithMicrosoft: () => Promise<AuthResult>;
     signOut: () => Promise<void>;
     resetPassword: (email: string) => Promise<AuthResult>;
 }
