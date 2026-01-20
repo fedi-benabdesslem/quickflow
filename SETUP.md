@@ -1,4 +1,4 @@
-# Chronoshift - Development Setup Guide
+# QuickFlow - Development Setup Guide
 
 ## Prerequisites
 
@@ -40,7 +40,7 @@ The application uses Gmail SMTP for sending emails. You need to configure your G
 **Get Gmail App Password:**
 1. Go to https://myaccount.google.com/apppasswords
 2. Sign in with your Gmail account
-3. App name: `Chronoshift`
+3. App name: `QuickFlow`
 4. Click **Create**
 5. Copy the 16-character password (format: `xxxx xxxx xxxx xxxx`)
 6. Use this as `MAIL_PASSWORD` (remove spaces)

@@ -40,4 +40,5 @@
     "@angular/compiler-cli": "^21.0.0",
     "typescript": "~5.9.2"
   }
+
 }

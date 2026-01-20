@@ -1,4 +1,4 @@
-package com.example.Ai.application;
+package com.ai.application;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,5 +9,4 @@ class AiApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

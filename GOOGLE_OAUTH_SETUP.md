@@ -20,7 +20,7 @@ This guide provides step-by-step instructions for setting up Google Sign-In with
 2. **Create a new project**
    - Click the project dropdown at the top
    - Click **"New Project"**
-   - Project name: `Chronoshift` (or any name you prefer)
+   - Project name: `QuickFllow` (or any name you prefer)
    - Organization: Leave as default or select your organization
    - Click **"Create"**
 
