@@ -1,104 +1,37 @@
 # QuickFlow
 
-AI-powered meeting summaries and email drafting application.
+> **Intelligent Meetings, Effortless Emails.**
+> Transform your workflow with AI-powered meeting summaries and instant email drafting.
+
+![QuickFlow Banner](https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=2564&ixlib=rb-4.0.3)
+<!-- Placeholder image for now, user can replace later -->
+
+## Overview
+
+**QuickFlow** is a modern productivity suite designed to reclaim your time. Leveraging the power of local LLMs and a sleek, mesmerizing UI, it acts as your personal executive assistant.
+
+Key capabilities include:
+- **🎙️ Smart Summaries**: Automatically digest meeting notes into actionable insights.
+- **✉️ Instant Drafts**: Generate professional emails in seconds based on brief prompts.
+- **🛡️ Privacy First**: Built with Supabase Auth and strictly local AI processing options (Ollama).
+- **🌌 Immersive UX**: A deep "Dark Nebula" aesthetic that makes work feel like play.
 
 ## Tech Stack
 
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **Backend**: Spring Boot 3.3 + MongoDB + Spring AI (Ollama)
-- **Authentication**: Supabase Auth
+Built with cutting-edge technologies for performance and scalability:
 
-## Prerequisites
+- **Frontend**: [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/)
+- **Backend**: [Spring Boot 3.3](https://spring.io/projects/spring-boot), [Spring AI](https://spring.io/projects/spring-ai)
+- **Database**: [MongoDB](https://www.mongodb.com/)
+- **AI Engine**: [Ollama](https://ollama.ai/) (Mistral-Nemo)
+- **Auth**: [Supabase](https://supabase.com/)
 
-- Node.js 18+
-- Java 17+
-- MongoDB (running on `localhost:27017`)
-- Ollama with `mistral-nemo` model
+## Getting Started
 
-## Quick Start
+We've made setup as straightforward as possible. Whether you're a contributor or just spinning it up locally, follow our detailed guide.
 
-### 1. Configure Supabase
-
-Create a Supabase project at [supabase.com](https://supabase.com) and get your credentials.
-
-**Frontend** (`frontend/src/lib/supabase.ts`):
-```typescript
-const supabaseUrl = 'YOUR_SUPABASE_URL'
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY'
-```
-
-**Backend** - Set environment variable:
-```bash
-export SUPABASE_JWT_SECRET=your_jwt_secret
-```
-
-Or update `backend/src/main/resources/application.properties`:
-```properties
-supabase.jwt.secret=your_jwt_secret
-```
-
-### 2. Configure Email (Optional)
-
-Set environment variables for SMTP:
-```bash
-export MAIL_USERNAME=your_email@gmail.com
-export MAIL_PASSWORD=your_app_password
-```
-
-### 3. Start Backend
-
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-
-### 4. Start Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open [http://localhost:5173](http://localhost:5173)
-
-## Project Structure
-
-```
-quickflow/
-├── frontend/           # React + Vite application
-│   ├── src/
-│   │   ├── components/ # Reusable components
-│   │   ├── contexts/   # Auth & Review contexts
-│   │   ├── lib/        # Supabase client & API service
-│   │   ├── pages/      # Page components
-│   │   └── types/      # TypeScript interfaces
-│   └── ...
-├── backend/            # Spring Boot application
-│   └── src/main/java/com/ai/application/
-│       ├── Config/     # Security & JWT filter
-│       ├── Controllers/
-│       ├── Services/
-│       └── model/
-└── README.md
-```
-
-## Features
-
-- 🔐 Secure authentication with Supabase
-- 📝 AI-generated meeting summaries
-- ✉️ AI-powered email drafting
-- 🎨 Modern "Dark Nebula" theme with glassmorphism
-- ✨ Smooth animations with Framer Motion
-
-## Configuration Placeholders
-
-| Variable | Location | Description |
-|----------|----------|-------------|
-| `SUPABASE_URL` | Frontend | Your Supabase project URL |
-| `SUPABASE_ANON_KEY` | Frontend | Supabase anonymous/public key |
-| `SUPABASE_JWT_SECRET` | Backend | JWT secret from Supabase settings |
+👉 **[Read the Setup Guide](./SETUP.md)**
 
 ## License
 
-MIT
+[MIT](./LICENSE)

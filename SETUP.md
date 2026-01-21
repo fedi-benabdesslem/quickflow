@@ -1,254 +1,144 @@
-# QuickFlow - Development Setup Guide
+# QuickFlow Setup Guide
 
-## Prerequisites
+Welcome to the QuickFlow developer setup. Follow these instructions to get the full stack running on your local machine.
 
-- **Java 17** or higher
-- **Node.js 18+** and npm
-- **Docker Desktop** (for Keycloak)
-- **MongoDB** (local or Docker)
-- **Ollama** (for AI features)
+## 📋 Prerequisites
+
+Ensure you have the following installed:
+
+1.  **Node.js**: v18 or higher ([Download](https://nodejs.org/))
+2.  **Java**: JDK 17 or higher ([Download](https://adoptium.net/))
+3.  **MongoDB**: Local instance or Docker container ([Download](https://www.mongodb.com/try/download/community))
+4.  **Ollama**: For AI capabilities ([Download](https://ollama.ai/))
+5.  **Git**: For version control
 
 ---
 
-## Quick Start
-
-### 1. Clone the Repository
+## 🛠️ Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/TaherBenAfia/quickflow.git
 cd quickflow
 ```
 
-### 2. Set Up Environment Variables
+---
 
-#### Backend Email Configuration
+## ☁️ Step 2: Configure Supabase (Auth)
 
-The application uses Gmail SMTP for sending emails. You need to configure your Gmail credentials as environment variables.
+You have two options for authentication:
 
-**IntelliJ IDEA:**
-1. Open Run/Debug Configurations (top right dropdown → Edit Configurations)
-2. Select your Spring Boot application
-3. Find "Environment variables" field
-4. Click the folder icon 📁
-5. Add these variables:
-   ```
-   MAIL_USERNAME=your-email@gmail.com
-   MAIL_PASSWORD=your-gmail-app-password
-   ```
-6. Click OK
+### Option A: Quick Start (Use Defaults)
+The project comes pre-configured with a demo Supabase project. **You can skip this step** and run the application immediately. 
+*   **Pros**: Instant setup, no configuration needed.
+*   **Cons**: Shared data environment with other developers.
 
-**Get Gmail App Password:**
-1. Go to https://myaccount.google.com/apppasswords
-2. Sign in with your Gmail account
-3. App name: `QuickFlow`
-4. Click **Create**
-5. Copy the 16-character password (format: `xxxx xxxx xxxx xxxx`)
-6. Use this as `MAIL_PASSWORD` (remove spaces)
+### Option B: Custom Setup (Recommended)
+To have your own private data and user management, follow these steps:
 
-**Alternative (System Environment Variables):**
-
-Windows PowerShell:
-```powershell
-$env:MAIL_USERNAME="your-email@gmail.com"
-$env:MAIL_PASSWORD="your-gmail-app-password"
-```
-
-Linux/Mac:
-```bash
-export MAIL_USERNAME="your-email@gmail.com"
-export MAIL_PASSWORD="your-gmail-app-password"
-```
-
-### 3. Start MongoDB
-
-**Option A: Local MongoDB**
-```bash
-mongod --dbpath /path/to/data
-```
-
-**Option B: Docker**
-```bash
-docker run -d -p 27017:27017 --name mongodb mongo:latest
-```
-
-### 4. Start Ollama (AI Service)
-
-**Download and install:** https://ollama.ai
-
-**Pull the model:**
-```bash
-ollama pull mistral-nemo
-```
-
-**Verify it's running:**
-```bash
-curl http://localhost:11434/api/tags
-```
-
-### 5. Start Keycloak and Import Realm
-
-**Step 1: Start Keycloak**
-
-```bash
-docker run -d \
-  --name keycloak \
-  -p 8180:8080 \
-  -e KEYCLOAK_ADMIN=admin \
-  -e KEYCLOAK_ADMIN_PASSWORD=admin \
-  quay.io/keycloak/keycloak:latest \
-  start-dev
-```
-
-**Wait for Keycloak to start** (takes about 30 seconds). Check with:
-```bash
-curl http://localhost:8180
-```
-
-**Step 2: Import Pre-configured Realm**
-
-1. **Access Keycloak Admin Console:**
-   - URL: http://localhost:8180
-   - Username: `admin`
-   - Password: `admin`
-
-2. **Import Realm:**
-   - Hover over the realm dropdown (top-left corner, currently shows "master")
-   - Click **"Create Realm"**
-   - Click **"Browse"** button
-   - Select `keycloak/quickflow-realm.json` from the project directory
-   - Click **"Create"**
-
-3. **Verify Import:**
-   - Realm `quickflow-realm` should now appear in the dropdown
-   - Select it
-   - Go to **Clients** → Verify `quickflow-frontend` exists
-   - Check **Valid redirect URIs** includes: `http://localhost:4200/*`
-
-**Step 3: Configure Google Sign-In**
-
-The realm import includes the basic structure, but you need to add YOUR OWN Google OAuth credentials:
-
-1. Follow [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) to:
-   - Create your Google Cloud project
-   - Get your Client ID and Client Secret
-   
-2. In Keycloak:
-   - Go to **Identity Providers** → Click **"Add provider"** → Select **"Google"**
-   - Configure with your credentials (see GOOGLE_OAUTH_SETUP.md Step 5)
-
-**Note:** Each developer must use their own Google OAuth credentials for security reasons.
-
-### 6. Start Backend
-
-```bash
-cd backend
-mvn clean install
-mvn spring-boot:run
-```
-
-**Verify backend is running:**
-```bash
-curl http://localhost:8080/api/health
-```
-
-### 7. Start Frontend
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-**Access the application:**
-- URL: http://localhost:4200
-- The app will automatically redirect to Keycloak for login
+1.  **Create Project**: Go to [supabase.com](https://supabase.com) and create a new project.
+2.  **Get Credentials**:
+    *   Go to **Project Settings > API**.
+    *   Copy: `Project URL`, `anon public` key, and `service_role` secret (JWT).
+3.  **Configure Frontend**:
+    *   Create a `.env` file in the `frontend/` directory.
+    *   Add your keys:
+        ```env
+        VITE_SUPABASE_URL=your_project_url
+        VITE_SUPABASE_ANON_KEY=your_anon_key
+        ```
+4.  **Configure Backend**:
+    *   The backend needs the JWT secret to verify tokens.
+    *   Set the `SUPABASE_JWT_SECRET` environment variable (see Step 4).
+5.  **Configure Redirects**:
+    *   Go to **Authentication > URL Configuration** in Supabase.
+    *   Add `http://localhost:5173` to your **Site URL** and **Redirect URLs**.
 
 ---
 
-## Development Modes
+## 🤖 Step 3: Configure Ollama (AI)
 
-### Keycloak Mode (Default)
-- Full authentication with Keycloak
-- Google Sign-In enabled
-- JWT token-based security
+QuickFlow relies on the `mistral-nemo` model for generating summaries.
 
-### Dev Mode (No Auth)
-To disable Keycloak for local development:
-
-1. Backend: Use `dev` profile
-   ```bash
-   mvn spring-boot:run -Dspring-boot.run.profiles=dev
-   ```
-
-2. Frontend: Use `environment.ts` instead of `environment.keycloak.ts`
+1.  Start the Ollama application.
+2.  Pull the required model:
+    ```bash
+    ollama pull mistral-nemo
+    ```
+3.  Verify it's running:
+    ```bash
+    curl http://localhost:11434/api/tags
+    ```
 
 ---
 
-## Project Structure
+## ⚙️ Step 4: Backend Setup (Spring Boot)
 
-```
-quickflow/
-├── backend/                 # Spring Boot application
-│   ├── src/main/java/
-│   │   └── com/ai/application/
-│   │       ├── Controllers/  # REST API endpoints
-│   │       ├── Services/     # Business logic
-│   │       ├── Config/       # Security & app config
-│   │       └── model/        # Entities & DTOs
-│   └── src/main/resources/
-│       └── application.properties
-│
-├── frontend/                # Angular application
-│   ├── src/app/
-│   │   ├── components/      # UI components
-│   │   ├── services/        # API & auth services
-│   │   └── auth.config.ts   # Keycloak configuration
-│   └── src/environments/    # Environment configs
-│
-└── GOOGLE_OAUTH_SETUP.md   # Google OAuth setup guide
-```
+The backend requires several environment variables to function correctly.
 
----
+### Environment Variables
 
-## Troubleshooting
+You can set these in your IDE (IntelliJ/Eclipse) or export them in your terminal session before running the app.
 
-### Backend won't start - Email configuration error
-**Error:** `Could not resolve placeholder 'MAIL_PASSWORD'`
+| Variable | Description | Example |
+| :--- | :--- | :--- |
+| `SUPABASE_JWT_SECRET` | Secret to verify Supabase tokens. Found in Supabase **Project Settings > API > JWT Settings**. | `your-super-long-jwt-secret` |
+| `MAIL_USERNAME` | (Optional) Gmail address for sending emails. | `user@gmail.com` |
+| `MAIL_PASSWORD` | (Optional) App Password for the Gmail account. | `xxxx xxxx xxxx xxxx` |
 
-**Solution:** Make sure you've set the environment variables `MAIL_USERNAME` and `MAIL_PASSWORD`
+### Running the Backend
 
-### Frontend shows "Invalid redirect URI"
-**Solution:** Check that Keycloak client redirect URIs include:
-- `http://localhost:4200/*`
-- `http://localhost:4200`
+1.  Navigate to the backend directory:
+    ```bash
+    cd backend
+    ```
+2.  Run with Maven wrapper:
+    ```bash
+    ./mvnw spring-boot:run
+    ```
+    *(Note: On Windows, you can just use `mvnw spring-boot:run` or open the project in IntelliJ IDEA).*
 
-### Google Sign-In doesn't work
-**Solution:** 
-1. Verify Google OAuth credentials are correctly configured in Keycloak
-2. Check redirect URI in Google Cloud Console matches Keycloak's
-3. See [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md) for detailed troubleshooting
-
-### MongoDB connection failed
-**Solution:** 
-- Verify MongoDB is running: `mongosh` or check Docker container
-- Check connection string in `application.properties`
-
-### Ollama not responding
-**Solution:**
-- Verify Ollama is running: `ollama list`
-- Check if model is pulled: `ollama pull mistral-nemo`
-- Restart Ollama service
+The server will start on `http://localhost:8080`.
 
 ---
 
-## Additional Resources
+## 💻 Step 5: Frontend Setup (React/Vite)
 
-- [Keycloak Documentation](https://www.keycloak.org/documentation)
-- [Angular OAuth2 OIDC](https://github.com/manfredsteyer/angular-oauth2-oidc)
-- [Spring Security OAuth2](https://spring.io/guides/tutorials/spring-boot-oauth2/)
+1.  Navigate to the frontend directory:
+    ```bash
+    cd frontend
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Create a `.env` file in the `frontend` root (or copy `.env.example` if it exists) and add your Supabase keys:
+    ```env
+    VITE_SUPABASE_URL=your_project_url_from_step_2
+    VITE_SUPABASE_ANON_KEY=your_anon_key_from_step_2
+    ```
+    *Note: If you don't create a .env file, you may need to manually update `src/lib/supabase.ts`.*
+
+4.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+
+The app will be available at [`http://localhost:5173`](http://localhost:5173).
 
 ---
 
-## Support
+## 🔧 Troubleshooting
 
-For issues or questions, please contact the development team or create an issue in the repository.
+### Backend fails to start with `Could not resolve placeholder`
+This means you are missing required environment variables. Ensure `SUPABASE_JWT_SECRET` is set. If you don't need email functionality immediately, you can temporarily set dummy values for `MAIL_USERNAME` and `MAIL_PASSWORD`.
+
+### "Ollama connection refused"
+Ensure Ollama is running in the background. You should see an Ollama icon in your system tray. By default, it runs on port `11434`.
+
+### Login redirects to a 404 or fails
+Check your Supabase **Redirect URLs**. It MUST match exactly where your frontend is running (usually `http://localhost:5173` or `http://localhost:5173/auth/callback` depending on implementation).
+
+### MongoDB Connection Error
+Ensure your local MongoDB service is active.
+- **Windows**: Check Services (`services.msc`) -> MongoDB Server.
+- **Docker**: Run `docker ps` to ensure the container is up.
