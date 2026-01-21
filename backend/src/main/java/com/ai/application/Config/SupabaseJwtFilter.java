@@ -1,37 +1,44 @@
 package com.ai.application.Config;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.JWTVerifier;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * JWT Filter for validating Supabase authentication tokens.
  * 
+ * This filter verifies tokens by calling the Supabase Auth API,
+ * which is the recommended approach by Supabase documentation.
+ * 
  * Configuration:
- * Set the SUPABASE_JWT_SECRET environment variable with your Supabase project's
- * JWT secret.
- * Get it from: https://supabase.com/dashboard/project/_/settings/api
+ * Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables.
  */
 @Component
 public class SupabaseJwtFilter extends OncePerRequestFilter {
 
-    @Value("${supabase.jwt.secret:23e314f6-014f-48d0-98e7-ef6a75bf1e6c}")
-    private String jwtSecret;
+    @Value("${supabase.url:https://qemqauonfieivgqzhwiz.supabase.co}")
+    private String supabaseUrl;
+
+    @Value("${supabase.anon.key:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlbXFhdW9uZmllaXZncXpod2l6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjU2ODcsImV4cCI6MjA4NDUwMTY4N30._drP_O9gzRsdtJJqByyiekHCbppH3ac5C5Uiq-6bE0A}")
+    private String supabaseAnonKey;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -44,34 +51,45 @@ public class SupabaseJwtFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
 
             try {
-                // Verify the JWT token
-                Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
-                JWTVerifier verifier = JWT.require(algorithm)
-                        .acceptLeeway(60) // Accept 60 seconds of clock skew
-                        .build();
+                // Verify the JWT token by calling Supabase Auth API
+                // This is the recommended approach per Supabase docs
+                String authUrl = supabaseUrl + "/auth/v1/user";
 
-                DecodedJWT jwt = verifier.verify(token);
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("apikey", supabaseAnonKey);
+                headers.set("Authorization", "Bearer " + token);
 
-                // Extract user info from JWT claims
-                String userId = jwt.getSubject(); // Supabase user ID
-                String email = jwt.getClaim("email").asString();
+                HttpEntity<String> entity = new HttpEntity<>(headers);
 
-                // Create authentication token
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userId,
-                        null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+                ResponseEntity<Map> authResponse = restTemplate.exchange(
+                        authUrl,
+                        HttpMethod.GET,
+                        entity,
+                        Map.class);
 
-                // Store additional user info in authentication details
-                authentication.setDetails(new SupabaseUserDetails(userId, email));
+                if (authResponse.getStatusCode().is2xxSuccessful() && authResponse.getBody() != null) {
+                    Map<String, Object> userData = authResponse.getBody();
+                    String userId = (String) userData.get("id");
+                    String email = (String) userData.get("email");
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // Create authentication token
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userId,
+                            null,
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
-            } catch (JWTVerificationException e) {
+                    // Store additional user info in authentication details
+                    authentication.setDetails(new SupabaseUserDetails(userId, email));
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    logger.debug("JWT verified successfully for user: " + userId);
+                } else {
+                    SecurityContextHolder.clearContext();
+                    logger.debug("JWT verification failed: Invalid response from Supabase");
+                }
+            } catch (Exception e) {
                 // Token is invalid - clear security context
                 SecurityContextHolder.clearContext();
-                // Log the error but continue with filter chain
-                // The security config will handle unauthorized access
                 logger.debug("JWT verification failed: " + e.getMessage());
             }
         }

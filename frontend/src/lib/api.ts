@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { ApiResponse, MeetingFormData } from '../types'
+import { supabase } from './supabase'
 
 const api = axios.create({
     baseURL: '/api',
@@ -8,7 +9,25 @@ const api = axios.create({
     },
 })
 
-// Add auth token to requests
+// Request interceptor to automatically add auth token from Supabase session
+api.interceptors.request.use(
+    async (config) => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session?.access_token) {
+                config.headers.Authorization = `Bearer ${session.access_token}`
+            }
+        } catch (error) {
+            console.warn('Failed to get session for API request:', error)
+        }
+        return config
+    },
+    (error) => {
+        return Promise.reject(error)
+    }
+)
+
+// Add auth token to requests (kept for backwards compatibility)
 export const setAuthToken = (token: string | null) => {
     if (token) {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`
