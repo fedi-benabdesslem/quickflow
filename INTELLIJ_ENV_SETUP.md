@@ -1,6 +1,6 @@
 # IntelliJ IDEA - Environment Variables Setup
 
-This guide shows you how to set up environment variables in IntelliJ IDEA for the Chronoshift backend.
+This guide shows you how to set up environment variables in IntelliJ IDEA for the QuickFlow backend.
 
 ---
 

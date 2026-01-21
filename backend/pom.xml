@@ -6,18 +6,19 @@
   <parent>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
-      <version>3.5.6</version>
-      <relativePath/>
+      <version>3.3.0</version>
+      <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
-  <groupId>com.example</groupId>
-  <artifactId>Ai-application</artifactId>
+  <groupId>com.ai</groupId>
+  <artifactId>ai-application</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Ai-application</name>
+  <description>Demo project for Spring Boot</description>
 
   <properties>
       <java.version>17</java.version>
-      <spring-ai.version>1.0.3</spring-ai.version>
+      <spring-ai.version>1.0.0-M6</spring-ai.version>
   </properties>
 
   <repositories>
@@ -25,6 +26,9 @@
           <id>spring-milestones</id>
           <name>Spring Milestones</name>
           <url>https://repo.spring.io/milestone</url>
+          <snapshots>
+              <enabled>false</enabled>
+          </snapshots>
       </repository>
   </repositories>
 
@@ -41,7 +45,6 @@
   </dependencyManagement>
 
   <dependencies>
-      <!-- Spring Boot dependencies -->
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-web</artifactId>
@@ -51,29 +54,30 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-data-mongodb</artifactId>
       </dependency>
+
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-test</artifactId>
           <scope>test</scope>
       </dependency>
 
-      <!-- Spring AI Ollama -->
       <dependency>
           <groupId>org.springframework.ai</groupId>
-          <artifactId>spring-ai-starter-model-ollama</artifactId>
+          <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
       </dependency>
 
-      <!-- Security -->
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-security</artifactId>
       </dependency>
+
+      <!-- JWT Library for Supabase token validation -->
       <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+          <groupId>com.auth0</groupId>
+          <artifactId>java-jwt</artifactId>
+          <version>4.4.0</version>
       </dependency>
 
-      <!-- Email -->
       <dependency>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-mail</artifactId>

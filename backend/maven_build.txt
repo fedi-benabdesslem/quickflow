@@ -1,0 +1,2232 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.ai:ai-application >------------------------
+[INFO] Building Ai-application 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ ai-application ---
+[INFO] Deleting C:\Users\pc\Desktop\Work\quickflow\backend\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ai-application ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ ai-application ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 27 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ai-application ---
+[INFO] skip non existing resourceDirectory C:\Users\pc\Desktop\Work\quickflow\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ ai-application ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ ai-application ---
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-booter/3.2.5/surefire-booter-3.2.5.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/maven-surefire-common/3.2.5/maven-surefire-common-3.2.5.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-api/3.2.5/surefire-api-3.2.5.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-extensions-api/3.2.5/surefire-extensions-api-3.2.5.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-logger-api/3.2.5/surefire-logger-api-3.2.5.jar
+Progress (1): 0.9/118 kB
+Progress (1): 2.3/118 kB
+Progress (1): 3.6/118 kB
+Progress (1): 5.0/118 kB
+Progress (1): 6.4/118 kB
+Progress (1): 7.7/118 kB
+Progress (1): 9.1/118 kB
+Progress (1): 10/118 kB 
+Progress (1): 12/118 kB
+Progress (1): 13/118 kB
+Progress (1): 15/118 kB
+Progress (1): 16/118 kB
+Progress (1): 17/118 kB
+Progress (1): 19/118 kB
+Progress (1): 20/118 kB
+Progress (1): 21/118 kB
+Progress (1): 23/118 kB
+Progress (1): 24/118 kB
+Progress (1): 26/118 kB
+Progress (1): 27/118 kB
+Progress (1): 28/118 kB
+Progress (1): 30/118 kB
+Progress (1): 31/118 kB
+Progress (1): 32/118 kB
+Progress (1): 33/118 kB
+Progress (1): 35/118 kB
+Progress (1): 36/118 kB
+Progress (1): 38/118 kB
+Progress (1): 39/118 kB
+Progress (1): 40/118 kB
+Progress (1): 42/118 kB
+Progress (1): 43/118 kB
+Progress (1): 44/118 kB
+Progress (1): 46/118 kB
+Progress (1): 47/118 kB
+Progress (1): 48/118 kB
+Progress (1): 50/118 kB
+Progress (1): 51/118 kB
+Progress (1): 53/118 kB
+Progress (1): 54/118 kB
+Progress (1): 55/118 kB
+Progress (1): 60/118 kB
+Progress (2): 60/118 kB | 0.9/14 kB
+Progress (2): 60/118 kB | 2.3/14 kB
+Progress (2): 60/118 kB | 3.6/14 kB
+Progress (2): 60/118 kB | 5.0/14 kB
+Progress (2): 60/118 kB | 6.4/14 kB
+Progress (2): 60/118 kB | 7.7/14 kB
+Progress (2): 60/118 kB | 9.1/14 kB
+Progress (2): 60/118 kB | 10/14 kB 
+Progress (2): 60/118 kB | 12/14 kB
+Progress (2): 60/118 kB | 13/14 kB
+Progress (2): 60/118 kB | 14 kB   
+Progress (3): 60/118 kB | 14 kB | 0.9/171 kB
+Progress (3): 60/118 kB | 14 kB | 2.3/171 kB
+Progress (3): 60/118 kB | 14 kB | 3.6/171 kB
+Progress (3): 60/118 kB | 14 kB | 5.0/171 kB
+Progress (3): 60/118 kB | 14 kB | 6.4/171 kB
+Progress (3): 60/118 kB | 14 kB | 7.7/171 kB
+Progress (3): 60/118 kB | 14 kB | 9.1/171 kB
+Progress (3): 60/118 kB | 14 kB | 10/171 kB 
+Progress (3): 60/118 kB | 14 kB | 12/171 kB
+Progress (3): 60/118 kB | 14 kB | 13/171 kB
+Progress (3): 60/118 kB | 14 kB | 15/171 kB
+Progress (3): 60/118 kB | 14 kB | 16/171 kB
+Progress (3): 60/118 kB | 14 kB | 17/171 kB
+Progress (3): 60/118 kB | 14 kB | 19/171 kB
+Progress (3): 60/118 kB | 14 kB | 20/171 kB
+Progress (3): 60/118 kB | 14 kB | 21/171 kB
+Progress (3): 60/118 kB | 14 kB | 23/171 kB
+Progress (3): 60/118 kB | 14 kB | 24/171 kB
+Progress (3): 60/118 kB | 14 kB | 26/171 kB
+Progress (3): 60/118 kB | 14 kB | 27/171 kB
+Progress (3): 60/118 kB | 14 kB | 28/171 kB
+Progress (3): 60/118 kB | 14 kB | 30/171 kB
+Progress (3): 60/118 kB | 14 kB | 31/171 kB
+Progress (3): 60/118 kB | 14 kB | 32/171 kB
+Progress (3): 60/118 kB | 14 kB | 34/171 kB
+Progress (3): 60/118 kB | 14 kB | 35/171 kB
+Progress (3): 60/118 kB | 14 kB | 36/171 kB
+Progress (3): 60/118 kB | 14 kB | 38/171 kB
+Progress (3): 60/118 kB | 14 kB | 39/171 kB
+Progress (3): 60/118 kB | 14 kB | 41/171 kB
+Progress (3): 60/118 kB | 14 kB | 42/171 kB
+Progress (3): 60/118 kB | 14 kB | 43/171 kB
+Progress (3): 60/118 kB | 14 kB | 45/171 kB
+                                           
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-logger-api/3.2.5/surefire-logger-api-3.2.5.jar (14 kB at 29 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-extensions-spi/3.2.5/surefire-extensions-spi-3.2.5.jar
+Progress (2): 60/118 kB | 46/171 kB
+Progress (2): 60/118 kB | 47/171 kB
+Progress (2): 60/118 kB | 49/171 kB
+Progress (2): 60/118 kB | 50/171 kB
+Progress (2): 60/118 kB | 52/171 kB
+Progress (2): 60/118 kB | 53/171 kB
+Progress (2): 60/118 kB | 54/171 kB
+Progress (2): 60/118 kB | 56/171 kB
+Progress (2): 60/118 kB | 60/171 kB
+Progress (3): 60/118 kB | 60/171 kB | 0.9/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 2.3/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 3.6/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 5.0/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 6.4/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 7.7/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 9.1/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 10/308 kB 
+Progress (3): 60/118 kB | 60/171 kB | 12/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 13/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 15/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 16/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 17/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 19/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 20/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 21/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 23/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 24/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 25/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 26/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 27/308 kB
+Progress (3): 60/118 kB | 60/171 kB | 29/308 kB
+Progress (4): 60/118 kB | 60/171 kB | 29/308 kB | 0.9/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 29/308 kB | 2.3/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 29/308 kB | 3.6/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 30/308 kB | 3.6/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 30/308 kB | 5.0/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 31/308 kB | 5.0/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 31/308 kB | 6.4/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 33/308 kB | 6.4/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 33/308 kB | 7.7/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 34/308 kB | 7.7/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 36/308 kB | 7.7/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 36/308 kB | 9.1/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 37/308 kB | 9.1/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 38/308 kB | 9.1/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 38/308 kB | 10/26 kB 
+Progress (4): 60/118 kB | 60/171 kB | 40/308 kB | 10/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 40/308 kB | 12/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 40/308 kB | 13/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 40/308 kB | 15/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 40/308 kB | 16/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 40/308 kB | 17/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 40/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 41/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 42/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 44/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 45/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 46/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 48/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 49/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 51/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 52/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 53/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 55/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 59/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 63/308 kB | 19/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 63/308 kB | 20/26 kB
+Progress (4): 60/118 kB | 60/171 kB | 63/308 kB | 21/26 kB
+Progress (4): 64/118 kB | 60/171 kB | 63/308 kB | 21/26 kB
+Progress (4): 64/118 kB | 60/171 kB | 63/308 kB | 23/26 kB
+Progress (4): 64/118 kB | 60/171 kB | 63/308 kB | 24/26 kB
+Progress (4): 64/118 kB | 60/171 kB | 63/308 kB | 26/26 kB
+Progress (4): 64/118 kB | 60/171 kB | 63/308 kB | 26 kB   
+                                                       
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-extensions-api/3.2.5/surefire-extensions-api-3.2.5.jar (26 kB at 51 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/eclipse/aether/aether-util/1.0.0.v20140518/aether-util-1.0.0.v20140518.jar
+Progress (3): 68/118 kB | 60/171 kB | 63/308 kB
+Progress (3): 72/118 kB | 60/171 kB | 63/308 kB
+Progress (3): 76/118 kB | 60/171 kB | 63/308 kB
+Progress (3): 81/118 kB | 60/171 kB | 63/308 kB
+Progress (3): 81/118 kB | 64/171 kB | 63/308 kB
+Progress (3): 81/118 kB | 68/171 kB | 63/308 kB
+Progress (3): 81/118 kB | 73/171 kB | 63/308 kB
+Progress (3): 85/118 kB | 73/171 kB | 63/308 kB
+Progress (3): 85/118 kB | 77/171 kB | 63/308 kB
+Progress (3): 89/118 kB | 77/171 kB | 63/308 kB
+Progress (3): 89/118 kB | 81/171 kB | 63/308 kB
+Progress (3): 93/118 kB | 81/171 kB | 63/308 kB
+Progress (3): 93/118 kB | 85/171 kB | 63/308 kB
+Progress (3): 98/118 kB | 85/171 kB | 63/308 kB
+Progress (3): 102/118 kB | 85/171 kB | 63/308 kB
+Progress (3): 106/118 kB | 85/171 kB | 63/308 kB
+Progress (3): 110/118 kB | 85/171 kB | 63/308 kB
+Progress (3): 110/118 kB | 85/171 kB | 67/308 kB
+Progress (3): 110/118 kB | 89/171 kB | 67/308 kB
+Progress (3): 115/118 kB | 89/171 kB | 67/308 kB
+Progress (3): 115/118 kB | 89/171 kB | 72/308 kB
+Progress (3): 115/118 kB | 94/171 kB | 72/308 kB
+Progress (3): 118 kB | 94/171 kB | 72/308 kB    
+Progress (3): 118 kB | 94/171 kB | 76/308 kB
+Progress (3): 118 kB | 94/171 kB | 80/308 kB
+Progress (3): 118 kB | 98/171 kB | 80/308 kB
+Progress (3): 118 kB | 98/171 kB | 84/308 kB
+Progress (3): 118 kB | 102/171 kB | 84/308 kB
+Progress (3): 118 kB | 102/171 kB | 89/308 kB
+Progress (3): 118 kB | 106/171 kB | 89/308 kB
+Progress (3): 118 kB | 111/171 kB | 89/308 kB
+Progress (3): 118 kB | 111/171 kB | 93/308 kB
+Progress (3): 118 kB | 115/171 kB | 93/308 kB
+Progress (3): 118 kB | 115/171 kB | 97/308 kB
+Progress (3): 118 kB | 119/171 kB | 97/308 kB
+Progress (3): 118 kB | 123/171 kB | 97/308 kB
+                                             
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-booter/3.2.5/surefire-booter-3.2.5.jar (118 kB at 193 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/eclipse/aether/aether-api/1.0.0.v20140518/aether-api-1.0.0.v20140518.jar
+Progress (2): 123/171 kB | 101/308 kB
+Progress (2): 123/171 kB | 105/308 kB
+Progress (2): 123/171 kB | 110/308 kB
+Progress (2): 123/171 kB | 114/308 kB
+Progress (2): 123/171 kB | 118/308 kB
+Progress (2): 123/171 kB | 122/308 kB
+Progress (2): 123/171 kB | 127/308 kB
+Progress (3): 123/171 kB | 127/308 kB | 0.9/8.2 kB
+Progress (4): 123/171 kB | 127/308 kB | 0.9/8.2 kB | 0.9/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 0.9/8.2 kB | 2.3/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 2.3/8.2 kB | 2.3/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 2.3/8.2 kB | 3.6/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 3.6/8.2 kB | 3.6/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 3.6/8.2 kB | 5.0/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 5.0/8.2 kB | 5.0/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 5.0/8.2 kB | 6.4/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 6.4/8.2 kB | 6.4/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 6.4/8.2 kB | 7.7/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 7.7/8.2 kB | 7.7/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 7.7/8.2 kB | 9.1/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 9.1/146 kB    
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 10/146 kB 
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 12/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 13/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 15/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 16/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 17/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 19/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 20/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 21/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 23/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 24/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 25/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 26/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 27/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 32/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 36/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 40/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 44/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 48/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 53/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 57/146 kB
+Progress (4): 123/171 kB | 127/308 kB | 8.2 kB | 61/146 kB
+                                                          
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-extensions-spi/3.2.5/surefire-extensions-spi-3.2.5.jar (8.2 kB at 13 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/3.1.1/maven-common-artifact-filters-3.1.1.jar
+Progress (3): 128/171 kB | 127/308 kB | 61/146 kB
+Progress (3): 132/171 kB | 127/308 kB | 61/146 kB
+Progress (3): 136/171 kB | 127/308 kB | 61/146 kB
+Progress (3): 140/171 kB | 127/308 kB | 61/146 kB
+Progress (3): 144/171 kB | 127/308 kB | 61/146 kB
+Progress (3): 149/171 kB | 127/308 kB | 61/146 kB
+Progress (3): 153/171 kB | 127/308 kB | 61/146 kB
+Progress (3): 153/171 kB | 131/308 kB | 61/146 kB
+Progress (3): 157/171 kB | 131/308 kB | 61/146 kB
+Progress (3): 157/171 kB | 135/308 kB | 61/146 kB
+Progress (3): 161/171 kB | 135/308 kB | 61/146 kB
+Progress (3): 166/171 kB | 135/308 kB | 61/146 kB
+Progress (3): 170/171 kB | 135/308 kB | 61/146 kB
+Progress (3): 170/171 kB | 139/308 kB | 61/146 kB
+Progress (3): 170/171 kB | 144/308 kB | 61/146 kB
+Progress (3): 171 kB | 144/308 kB | 61/146 kB    
+Progress (3): 171 kB | 148/308 kB | 61/146 kB
+Progress (3): 171 kB | 148/308 kB | 65/146 kB
+Progress (3): 171 kB | 152/308 kB | 65/146 kB
+Progress (3): 171 kB | 152/308 kB | 70/146 kB
+Progress (3): 171 kB | 156/308 kB | 70/146 kB
+Progress (3): 171 kB | 160/308 kB | 70/146 kB
+Progress (3): 171 kB | 160/308 kB | 74/146 kB
+Progress (3): 171 kB | 160/308 kB | 78/146 kB
+Progress (3): 171 kB | 164/308 kB | 78/146 kB
+Progress (3): 171 kB | 164/308 kB | 82/146 kB
+Progress (3): 171 kB | 164/308 kB | 87/146 kB
+Progress (3): 171 kB | 168/308 kB | 87/146 kB
+Progress (3): 171 kB | 168/308 kB | 91/146 kB
+Progress (3): 171 kB | 168/308 kB | 95/146 kB
+Progress (3): 171 kB | 173/308 kB | 95/146 kB
+Progress (3): 171 kB | 173/308 kB | 99/146 kB
+Progress (3): 171 kB | 173/308 kB | 103/146 kB
+Progress (3): 171 kB | 177/308 kB | 103/146 kB
+Progress (3): 171 kB | 177/308 kB | 108/146 kB
+Progress (3): 171 kB | 177/308 kB | 112/146 kB
+Progress (3): 171 kB | 177/308 kB | 116/146 kB
+Progress (3): 171 kB | 177/308 kB | 120/146 kB
+Progress (3): 171 kB | 177/308 kB | 125/146 kB
+Progress (3): 171 kB | 177/308 kB | 129/146 kB
+Progress (3): 171 kB | 177/308 kB | 133/146 kB
+Progress (3): 171 kB | 181/308 kB | 133/146 kB
+Progress (3): 171 kB | 181/308 kB | 137/146 kB
+Progress (3): 171 kB | 181/308 kB | 141/146 kB
+Progress (3): 171 kB | 185/308 kB | 141/146 kB
+Progress (3): 171 kB | 185/308 kB | 146/146 kB
+Progress (3): 171 kB | 189/308 kB | 146/146 kB
+Progress (3): 171 kB | 189/308 kB | 146 kB    
+Progress (3): 171 kB | 194/308 kB | 146 kB
+Progress (3): 171 kB | 198/308 kB | 146 kB
+Progress (3): 171 kB | 202/308 kB | 146 kB
+Progress (3): 171 kB | 206/308 kB | 146 kB
+Progress (3): 171 kB | 211/308 kB | 146 kB
+Progress (3): 171 kB | 215/308 kB | 146 kB
+Progress (3): 171 kB | 219/308 kB | 146 kB
+Progress (3): 171 kB | 223/308 kB | 146 kB
+Progress (3): 171 kB | 240/308 kB | 146 kB
+Progress (3): 171 kB | 256/308 kB | 146 kB
+                                          
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-api/3.2.5/surefire-api-3.2.5.jar (171 kB at 268 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/eclipse/aether/aether-util/1.0.0.v20140518/aether-util-1.0.0.v20140518.jar (146 kB at 228 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-shared-utils/3.2.5/surefire-shared-utils-3.2.5.jar
+Progress (1): 272/308 kB
+Progress (1): 287/308 kB
+Progress (1): 303/308 kB
+Progress (1): 308 kB    
+                    
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/maven-surefire-common/3.2.5/maven-surefire-common-3.2.5.jar (308 kB at 460 kB/s)
+Progress (1): 3.8/136 kB
+Progress (1): 8.0/136 kB
+Progress (1): 12/136 kB 
+Progress (1): 16/136 kB
+Progress (1): 21/136 kB
+Progress (1): 24/136 kB
+Progress (1): 28/136 kB
+Progress (1): 33/136 kB
+Progress (1): 37/136 kB
+Progress (1): 41/136 kB
+Progress (1): 45/136 kB
+Progress (1): 49/136 kB
+Progress (1): 54/136 kB
+Progress (1): 58/136 kB
+Progress (1): 62/136 kB
+Progress (1): 66/136 kB
+Progress (1): 71/136 kB
+Progress (1): 75/136 kB
+Progress (1): 79/136 kB
+Progress (1): 83/136 kB
+Progress (1): 88/136 kB
+Progress (1): 92/136 kB
+Progress (1): 96/136 kB
+Progress (1): 100/136 kB
+Progress (1): 104/136 kB
+Progress (1): 121/136 kB
+Progress (2): 121/136 kB | 0.9/61 kB
+Progress (2): 121/136 kB | 2.3/61 kB
+Progress (2): 121/136 kB | 3.6/61 kB
+Progress (2): 121/136 kB | 5.0/61 kB
+Progress (2): 121/136 kB | 6.4/61 kB
+Progress (2): 121/136 kB | 7.7/61 kB
+Progress (2): 121/136 kB | 9.1/61 kB
+Progress (2): 121/136 kB | 10/61 kB 
+Progress (2): 121/136 kB | 12/61 kB
+Progress (2): 121/136 kB | 13/61 kB
+Progress (2): 121/136 kB | 15/61 kB
+Progress (2): 121/136 kB | 16/61 kB
+Progress (2): 121/136 kB | 17/61 kB
+Progress (2): 121/136 kB | 19/61 kB
+Progress (2): 121/136 kB | 20/61 kB
+Progress (2): 121/136 kB | 21/61 kB
+Progress (2): 121/136 kB | 23/61 kB
+Progress (2): 121/136 kB | 24/61 kB
+Progress (2): 121/136 kB | 26/61 kB
+Progress (2): 121/136 kB | 27/61 kB
+Progress (2): 121/136 kB | 28/61 kB
+Progress (2): 121/136 kB | 30/61 kB
+Progress (2): 121/136 kB | 31/61 kB
+Progress (2): 121/136 kB | 35/61 kB
+Progress (2): 121/136 kB | 39/61 kB
+Progress (2): 121/136 kB | 44/61 kB
+Progress (2): 121/136 kB | 48/61 kB
+Progress (2): 121/136 kB | 52/61 kB
+Progress (2): 121/136 kB | 56/61 kB
+Progress (2): 121/136 kB | 61/61 kB
+Progress (2): 121/136 kB | 61 kB   
+                                
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/3.1.1/maven-common-artifact-filters-3.1.1.jar (61 kB at 91 kB/s)
+Progress (1): 136 kB
+                    
+Downloaded from central: https://repo.maven.apache.org/maven2/org/eclipse/aether/aether-api/1.0.0.v20140518/aether-api-1.0.0.v20140518.jar (136 kB at 199 kB/s)
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0/2.4 MB
+Progress (1): 0.1/2.4 MB
+Progress (1): 0.1/2.4 MB
+Progress (1): 0.1/2.4 MB
+Progress (1): 0.1/2.4 MB
+Progress (1): 0.1/2.4 MB
+Progress (2): 0.1/2.4 MB | 3.8/501 kB
+Progress (2): 0.1/2.4 MB | 8.0/501 kB
+Progress (2): 0.1/2.4 MB | 12/501 kB 
+Progress (2): 0.1/2.4 MB | 16/501 kB
+Progress (2): 0.1/2.4 MB | 21/501 kB
+Progress (2): 0.1/2.4 MB | 25/501 kB
+Progress (2): 0.1/2.4 MB | 29/501 kB
+Progress (2): 0.1/2.4 MB | 33/501 kB
+Progress (2): 0.1/2.4 MB | 38/501 kB
+Progress (2): 0.1/2.4 MB | 42/501 kB
+Progress (2): 0.1/2.4 MB | 46/501 kB
+Progress (2): 0.1/2.4 MB | 62/501 kB
+Progress (2): 0.1/2.4 MB | 79/501 kB
+Progress (2): 0.1/2.4 MB | 95/501 kB
+Progress (2): 0.1/2.4 MB | 112/501 kB
+Progress (2): 0.1/2.4 MB | 128/501 kB
+Progress (2): 0.1/2.4 MB | 144/501 kB
+Progress (2): 0.1/2.4 MB | 161/501 kB
+Progress (2): 0.1/2.4 MB | 177/501 kB
+Progress (2): 0.1/2.4 MB | 194/501 kB
+Progress (2): 0.1/2.4 MB | 210/501 kB
+Progress (2): 0.1/2.4 MB | 226/501 kB
+Progress (2): 0.1/2.4 MB | 243/501 kB
+Progress (2): 0.1/2.4 MB | 259/501 kB
+Progress (2): 0.1/2.4 MB | 259/501 kB
+Progress (2): 0.1/2.4 MB | 259/501 kB
+Progress (2): 0.2/2.4 MB | 259/501 kB
+Progress (2): 0.2/2.4 MB | 259/501 kB
+Progress (2): 0.2/2.4 MB | 259/501 kB
+Progress (2): 0.2/2.4 MB | 259/501 kB
+Progress (2): 0.2/2.4 MB | 259/501 kB
+Progress (2): 0.2/2.4 MB | 259/501 kB
+Progress (2): 0.3/2.4 MB | 259/501 kB
+Progress (2): 0.3/2.4 MB | 275/501 kB
+Progress (2): 0.3/2.4 MB | 292/501 kB
+Progress (2): 0.3/2.4 MB | 308/501 kB
+Progress (2): 0.3/2.4 MB | 325/501 kB
+Progress (2): 0.3/2.4 MB | 341/501 kB
+Progress (2): 0.3/2.4 MB | 341/501 kB
+Progress (2): 0.3/2.4 MB | 341/501 kB
+Progress (2): 0.3/2.4 MB | 341/501 kB
+Progress (2): 0.3/2.4 MB | 341/501 kB
+Progress (2): 0.3/2.4 MB | 341/501 kB
+Progress (2): 0.3/2.4 MB | 357/501 kB
+Progress (2): 0.3/2.4 MB | 374/501 kB
+Progress (2): 0.3/2.4 MB | 390/501 kB
+Progress (2): 0.3/2.4 MB | 406/501 kB
+Progress (2): 0.3/2.4 MB | 423/501 kB
+Progress (2): 0.3/2.4 MB | 439/501 kB
+Progress (2): 0.3/2.4 MB | 456/501 kB
+Progress (2): 0.3/2.4 MB | 472/501 kB
+Progress (2): 0.3/2.4 MB | 488/501 kB
+Progress (2): 0.3/2.4 MB | 501 kB    
+Progress (2): 0.4/2.4 MB | 501 kB
+Progress (2): 0.4/2.4 MB | 501 kB
+Progress (2): 0.4/2.4 MB | 501 kB
+Progress (2): 0.4/2.4 MB | 501 kB
+Progress (2): 0.4/2.4 MB | 501 kB
+Progress (2): 0.4/2.4 MB | 501 kB
+Progress (2): 0.5/2.4 MB | 501 kB
+Progress (2): 0.5/2.4 MB | 501 kB
+                                 
+Downloaded from central: https://repo.maven.apache.org/maven2/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar (501 kB at 656 kB/s)
+Progress (1): 0.5/2.4 MB
+Progress (1): 0.5/2.4 MB
+Progress (1): 0.5/2.4 MB
+Progress (1): 0.5/2.4 MB
+Progress (1): 0.6/2.4 MB
+Progress (1): 0.6/2.4 MB
+Progress (1): 0.6/2.4 MB
+Progress (1): 0.6/2.4 MB
+Progress (1): 0.6/2.4 MB
+Progress (1): 0.6/2.4 MB
+Progress (1): 0.7/2.4 MB
+Progress (1): 0.7/2.4 MB
+Progress (1): 0.7/2.4 MB
+Progress (1): 0.7/2.4 MB
+Progress (1): 0.7/2.4 MB
+Progress (1): 0.7/2.4 MB
+Progress (1): 0.8/2.4 MB
+Progress (1): 0.8/2.4 MB
+Progress (1): 0.8/2.4 MB
+Progress (1): 0.8/2.4 MB
+Progress (1): 0.8/2.4 MB
+Progress (1): 0.8/2.4 MB
+Progress (1): 0.9/2.4 MB
+Progress (1): 0.9/2.4 MB
+Progress (1): 0.9/2.4 MB
+Progress (1): 0.9/2.4 MB
+Progress (1): 0.9/2.4 MB
+Progress (1): 0.9/2.4 MB
+Progress (1): 1.0/2.4 MB
+Progress (1): 1.0/2.4 MB
+Progress (1): 1.0/2.4 MB
+Progress (1): 1.0/2.4 MB
+Progress (1): 1.0/2.4 MB
+Progress (1): 1.0/2.4 MB
+Progress (1): 1.0/2.4 MB
+Progress (1): 1.1/2.4 MB
+Progress (1): 1.1/2.4 MB
+Progress (1): 1.1/2.4 MB
+Progress (1): 1.1/2.4 MB
+Progress (1): 1.1/2.4 MB
+Progress (1): 1.1/2.4 MB
+Progress (1): 1.2/2.4 MB
+Progress (1): 1.2/2.4 MB
+Progress (1): 1.2/2.4 MB
+Progress (1): 1.2/2.4 MB
+Progress (1): 1.2/2.4 MB
+Progress (1): 1.2/2.4 MB
+Progress (1): 1.3/2.4 MB
+Progress (1): 1.3/2.4 MB
+Progress (1): 1.3/2.4 MB
+Progress (1): 1.3/2.4 MB
+Progress (1): 1.3/2.4 MB
+Progress (1): 1.3/2.4 MB
+Progress (1): 1.4/2.4 MB
+Progress (1): 1.4/2.4 MB
+Progress (1): 1.4/2.4 MB
+Progress (1): 1.4/2.4 MB
+Progress (1): 1.4/2.4 MB
+Progress (1): 1.4/2.4 MB
+Progress (1): 1.5/2.4 MB
+Progress (1): 1.5/2.4 MB
+Progress (1): 1.5/2.4 MB
+Progress (1): 1.5/2.4 MB
+Progress (1): 1.5/2.4 MB
+Progress (1): 1.5/2.4 MB
+Progress (1): 1.6/2.4 MB
+Progress (1): 1.6/2.4 MB
+Progress (1): 1.6/2.4 MB
+Progress (1): 1.6/2.4 MB
+Progress (1): 1.6/2.4 MB
+Progress (1): 1.6/2.4 MB
+Progress (1): 1.6/2.4 MB
+Progress (1): 1.7/2.4 MB
+Progress (1): 1.7/2.4 MB
+Progress (1): 1.7/2.4 MB
+Progress (1): 1.7/2.4 MB
+Progress (1): 1.7/2.4 MB
+Progress (1): 1.7/2.4 MB
+Progress (1): 1.8/2.4 MB
+Progress (1): 1.8/2.4 MB
+Progress (1): 1.8/2.4 MB
+Progress (1): 1.8/2.4 MB
+Progress (1): 1.8/2.4 MB
+Progress (1): 1.8/2.4 MB
+Progress (1): 1.9/2.4 MB
+Progress (1): 1.9/2.4 MB
+Progress (1): 1.9/2.4 MB
+Progress (1): 1.9/2.4 MB
+Progress (1): 1.9/2.4 MB
+Progress (1): 1.9/2.4 MB
+Progress (1): 1.9/2.4 MB
+Progress (1): 2.0/2.4 MB
+Progress (1): 2.0/2.4 MB
+Progress (1): 2.0/2.4 MB
+Progress (1): 2.0/2.4 MB
+Progress (1): 2.0/2.4 MB
+Progress (1): 2.0/2.4 MB
+Progress (1): 2.1/2.4 MB
+Progress (1): 2.1/2.4 MB
+Progress (1): 2.1/2.4 MB
+Progress (1): 2.1/2.4 MB
+Progress (1): 2.1/2.4 MB
+Progress (1): 2.1/2.4 MB
+Progress (1): 2.2/2.4 MB
+Progress (1): 2.2/2.4 MB
+Progress (1): 2.2/2.4 MB
+Progress (1): 2.2/2.4 MB
+Progress (1): 2.2/2.4 MB
+Progress (1): 2.2/2.4 MB
+Progress (1): 2.2/2.4 MB
+Progress (1): 2.3/2.4 MB
+Progress (1): 2.3/2.4 MB
+Progress (1): 2.3/2.4 MB
+Progress (1): 2.3/2.4 MB
+Progress (1): 2.3/2.4 MB
+Progress (1): 2.3/2.4 MB
+Progress (1): 2.3/2.4 MB
+Progress (1): 2.4/2.4 MB
+Progress (1): 2.4/2.4 MB
+Progress (1): 2.4/2.4 MB
+Progress (1): 2.4/2.4 MB
+Progress (1): 2.4/2.4 MB
+Progress (1): 2.4 MB    
+                    
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/surefire/surefire-shared-utils/3.2.5/surefire-shared-utils-3.2.5.jar (2.4 MB at 2.2 MB/s)
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.4.1:jar (default-jar) @ ai-application ---
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/file-management/3.1.0/file-management-3.1.0.jar
+Downloading from central: https://repo.maven.apache.org/maven2/commons-io/commons-io/2.16.1/commons-io-2.16.1.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/maven-archiver/3.6.2/maven-archiver-3.6.2.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.27/plexus-interpolation-1.27.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/4.9.2/plexus-archiver-4.9.2.jar
+Progress (1): 7.7/509 kB
+Progress (1): 16/509 kB 
+Progress (1): 32/509 kB
+Progress (1): 49/509 kB
+Progress (1): 65/509 kB
+Progress (1): 81/509 kB
+Progress (2): 81/509 kB | 3.8/86 kB
+Progress (2): 81/509 kB | 8.0/86 kB
+Progress (2): 98/509 kB | 8.0/86 kB
+Progress (2): 98/509 kB | 8.2/86 kB
+Progress (2): 98/509 kB | 12/86 kB 
+Progress (2): 98/509 kB | 17/86 kB
+Progress (2): 98/509 kB | 21/86 kB
+Progress (2): 114/509 kB | 21/86 kB
+Progress (2): 114/509 kB | 25/86 kB
+Progress (2): 114/509 kB | 29/86 kB
+Progress (2): 114/509 kB | 34/86 kB
+Progress (2): 114/509 kB | 38/86 kB
+Progress (2): 114/509 kB | 42/86 kB
+Progress (2): 114/509 kB | 46/86 kB
+Progress (2): 114/509 kB | 50/86 kB
+Progress (2): 114/509 kB | 55/86 kB
+Progress (2): 114/509 kB | 59/86 kB
+Progress (2): 114/509 kB | 63/86 kB
+Progress (2): 114/509 kB | 67/86 kB
+Progress (2): 114/509 kB | 72/86 kB
+Progress (2): 114/509 kB | 76/86 kB
+Progress (2): 131/509 kB | 76/86 kB
+Progress (2): 147/509 kB | 76/86 kB
+Progress (2): 147/509 kB | 80/86 kB
+Progress (2): 147/509 kB | 84/86 kB
+Progress (2): 147/509 kB | 86 kB   
+Progress (2): 163/509 kB | 86 kB
+Progress (2): 180/509 kB | 86 kB
+Progress (2): 196/509 kB | 86 kB
+Progress (2): 213/509 kB | 86 kB
+Progress (2): 229/509 kB | 86 kB
+                                
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-interpolation/1.27/plexus-interpolation-1.27.jar (86 kB at 1.2 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/3.4.2/plexus-io-3.4.2.jar
+Progress (2): 229/509 kB | 7.7/225 kB
+Progress (2): 229/509 kB | 16/225 kB 
+Progress (2): 229/509 kB | 32/225 kB
+Progress (2): 229/509 kB | 49/225 kB
+Progress (2): 245/509 kB | 49/225 kB
+Progress (2): 245/509 kB | 65/225 kB
+Progress (2): 245/509 kB | 81/225 kB
+Progress (2): 245/509 kB | 98/225 kB
+Progress (2): 245/509 kB | 114/225 kB
+Progress (2): 245/509 kB | 131/225 kB
+Progress (2): 245/509 kB | 147/225 kB
+Progress (2): 245/509 kB | 163/225 kB
+Progress (2): 245/509 kB | 180/225 kB
+Progress (2): 245/509 kB | 196/225 kB
+Progress (2): 245/509 kB | 213/225 kB
+Progress (2): 245/509 kB | 225 kB    
+Progress (3): 245/509 kB | 225 kB | 7.7/27 kB
+Progress (4): 245/509 kB | 225 kB | 7.7/27 kB | 7.7/36 kB
+Progress (4): 245/509 kB | 225 kB | 7.7/27 kB | 16/36 kB 
+Progress (4): 245/509 kB | 225 kB | 16/27 kB | 16/36 kB 
+Progress (4): 245/509 kB | 225 kB | 16/27 kB | 32/36 kB
+Progress (4): 245/509 kB | 225 kB | 27 kB | 32/36 kB   
+Progress (4): 245/509 kB | 225 kB | 27 kB | 36 kB   
+                                                 
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/maven-archiver/3.6.2/maven-archiver-3.6.2.jar (27 kB at 315 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.26.1/commons-compress-1.26.1.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-archiver/4.9.2/plexus-archiver-4.9.2.jar (225 kB at 2.7 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-lang3/3.14.0/commons-lang3-3.14.0.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/file-management/3.1.0/file-management-3.1.0.jar (36 kB at 427 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.16.1/commons-codec-1.16.1.jar
+Progress (1): 262/509 kB
+Progress (1): 278/509 kB
+Progress (1): 294/509 kB
+Progress (1): 311/509 kB
+Progress (1): 327/509 kB
+Progress (1): 344/509 kB
+Progress (1): 360/509 kB
+Progress (1): 376/509 kB
+Progress (1): 393/509 kB
+Progress (1): 409/509 kB
+Progress (1): 426/509 kB
+Progress (1): 442/509 kB
+Progress (1): 458/509 kB
+Progress (1): 475/509 kB
+Progress (1): 491/509 kB
+Progress (1): 507/509 kB
+Progress (1): 509 kB    
+                    
+Downloaded from central: https://repo.maven.apache.org/maven2/commons-io/commons-io/2.16.1/commons-io-2.16.1.jar (509 kB at 4.9 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/iq80/snappy/snappy/0.4/snappy-0.4.jar
+Progress (1): 3.8/79 kB
+Progress (1): 8.0/79 kB
+Progress (1): 12/79 kB 
+Progress (1): 16/79 kB
+Progress (1): 21/79 kB
+Progress (1): 25/79 kB
+Progress (1): 29/79 kB
+Progress (1): 33/79 kB
+Progress (1): 38/79 kB
+Progress (1): 42/79 kB
+Progress (1): 58/79 kB
+Progress (1): 75/79 kB
+Progress (1): 79 kB   
+                   
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-io/3.4.2/plexus-io-3.4.2.jar (79 kB at 627 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/tukaani/xz/1.9/xz-1.9.jar
+Progress (1): 7.7/365 kB
+Progress (1): 16/365 kB 
+Progress (1): 32/365 kB
+Progress (1): 49/365 kB
+Progress (1): 61/365 kB
+Progress (1): 78/365 kB
+Progress (1): 94/365 kB
+Progress (1): 111/365 kB
+Progress (1): 127/365 kB
+Progress (1): 143/365 kB
+Progress (1): 160/365 kB
+Progress (1): 176/365 kB
+Progress (1): 193/365 kB
+Progress (1): 209/365 kB
+Progress (1): 225/365 kB
+Progress (1): 242/365 kB
+Progress (1): 258/365 kB
+Progress (2): 258/365 kB | 7.7/658 kB
+Progress (2): 258/365 kB | 16/658 kB 
+Progress (2): 258/365 kB | 32/658 kB
+Progress (2): 258/365 kB | 49/658 kB
+Progress (2): 258/365 kB | 65/658 kB
+Progress (2): 258/365 kB | 81/658 kB
+Progress (2): 258/365 kB | 98/658 kB
+Progress (2): 258/365 kB | 114/658 kB
+Progress (2): 258/365 kB | 131/658 kB
+Progress (2): 258/365 kB | 147/658 kB
+Progress (2): 258/365 kB | 163/658 kB
+Progress (2): 258/365 kB | 180/658 kB
+Progress (2): 258/365 kB | 196/658 kB
+Progress (2): 262/365 kB | 196/658 kB
+Progress (2): 262/365 kB | 213/658 kB
+Progress (2): 262/365 kB | 229/658 kB
+Progress (2): 262/365 kB | 245/658 kB
+Progress (2): 279/365 kB | 245/658 kB
+Progress (2): 295/365 kB | 245/658 kB
+Progress (2): 311/365 kB | 245/658 kB
+Progress (3): 311/365 kB | 245/658 kB | 0/1.1 MB
+Progress (3): 311/365 kB | 245/658 kB | 0/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.1/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.1/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.1/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.1/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.1/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.1/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.2/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.2/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.2/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.2/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.2/1.1 MB
+Progress (3): 328/365 kB | 245/658 kB | 0.2/1.1 MB
+Progress (3): 344/365 kB | 245/658 kB | 0.2/1.1 MB
+Progress (3): 344/365 kB | 245/658 kB | 0.3/1.1 MB
+Progress (3): 360/365 kB | 245/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 245/658 kB | 0.3/1.1 MB    
+Progress (3): 365 kB | 245/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 262/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 262/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 278/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 278/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 294/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 294/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 311/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 311/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.3/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.4/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.4/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.4/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.4/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.4/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.4/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.5/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.5/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.5/1.1 MB
+Progress (3): 365 kB | 327/658 kB | 0.5/1.1 MB
+                                              
+Downloaded from central: https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.16.1/commons-codec-1.16.1.jar (365 kB at 1.0 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/com/github/luben/zstd-jni/1.5.5-11/zstd-jni-1.5.5-11.jar
+Progress (3): 327/658 kB | 0.5/1.1 MB | 7.7/116 kB
+Progress (3): 327/658 kB | 0.5/1.1 MB | 16/116 kB 
+Progress (3): 327/658 kB | 0.5/1.1 MB | 16/116 kB
+Progress (3): 344/658 kB | 0.5/1.1 MB | 16/116 kB
+Progress (3): 360/658 kB | 0.5/1.1 MB | 16/116 kB
+Progress (3): 376/658 kB | 0.5/1.1 MB | 16/116 kB
+Progress (4): 376/658 kB | 0.5/1.1 MB | 16/116 kB | 0/6.8 MB
+Progress (4): 376/658 kB | 0.5/1.1 MB | 16/116 kB | 0/6.8 MB
+Progress (4): 376/658 kB | 0.5/1.1 MB | 16/116 kB | 0/6.8 MB
+Progress (4): 393/658 kB | 0.5/1.1 MB | 16/116 kB | 0/6.8 MB
+Progress (4): 393/658 kB | 0.5/1.1 MB | 32/116 kB | 0/6.8 MB
+Progress (4): 393/658 kB | 0.6/1.1 MB | 32/116 kB | 0/6.8 MB
+Progress (4): 409/658 kB | 0.6/1.1 MB | 32/116 kB | 0/6.8 MB
+Progress (4): 409/658 kB | 0.6/1.1 MB | 49/116 kB | 0/6.8 MB
+Progress (4): 409/658 kB | 0.6/1.1 MB | 49/116 kB | 0/6.8 MB
+Progress (4): 426/658 kB | 0.6/1.1 MB | 49/116 kB | 0/6.8 MB
+Progress (4): 426/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB
+Progress (4): 426/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB
+Progress (4): 426/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB
+Progress (4): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB | 7.7/58 kB
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB | 16/58 kB 
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB | 16/58 kB
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.6/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.7/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.1/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.8/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.2/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 0.9/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.3/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.4/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 442/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 458/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 458/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 475/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 491/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 507/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 524/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 540/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 557/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 573/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 589/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 606/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 622/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 639/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 655/658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (5): 658 kB | 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB    
+                                                                     
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-lang3/3.14.0/commons-lang3-3.14.0.jar (658 kB at 783 kB/s)
+Progress (4): 1.0/1.1 MB | 65/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (4): 1.0/1.1 MB | 81/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (4): 1.1/1.1 MB | 81/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (4): 1.1/1.1 MB | 98/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (4): 1.1 MB | 98/116 kB | 0.5/6.8 MB | 32/58 kB    
+Progress (4): 1.1 MB | 114/116 kB | 0.5/6.8 MB | 32/58 kB
+Progress (4): 1.1 MB | 116 kB | 0.5/6.8 MB | 32/58 kB    
+Progress (4): 1.1 MB | 116 kB | 0.6/6.8 MB | 32/58 kB
+Progress (4): 1.1 MB | 116 kB | 0.6/6.8 MB | 32/58 kB
+Progress (4): 1.1 MB | 116 kB | 0.6/6.8 MB | 32/58 kB
+Progress (4): 1.1 MB | 116 kB | 0.6/6.8 MB | 32/58 kB
+                                                     
+Downloaded from central: https://repo.maven.apache.org/maven2/org/tukaani/xz/1.9/xz-1.9.jar (116 kB at 137 kB/s)
+Progress (3): 1.1 MB | 0.6/6.8 MB | 32/58 kB
+Progress (3): 1.1 MB | 0.6/6.8 MB | 32/58 kB
+Progress (3): 1.1 MB | 0.7/6.8 MB | 32/58 kB
+Progress (3): 1.1 MB | 0.7/6.8 MB | 32/58 kB
+Progress (3): 1.1 MB | 0.7/6.8 MB | 32/58 kB
+Progress (3): 1.1 MB | 0.7/6.8 MB | 32/58 kB
+                                            
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.26.1/commons-compress-1.26.1.jar (1.1 MB at 1.3 MB/s)
+Progress (2): 0.7/6.8 MB | 32/58 kB
+Progress (2): 0.7/6.8 MB | 32/58 kB
+Progress (2): 0.8/6.8 MB | 32/58 kB
+Progress (2): 0.8/6.8 MB | 32/58 kB
+Progress (2): 0.8/6.8 MB | 32/58 kB
+Progress (2): 0.8/6.8 MB | 32/58 kB
+Progress (2): 0.8/6.8 MB | 32/58 kB
+Progress (2): 0.8/6.8 MB | 32/58 kB
+Progress (2): 0.9/6.8 MB | 32/58 kB
+Progress (2): 0.9/6.8 MB | 32/58 kB
+Progress (2): 0.9/6.8 MB | 32/58 kB
+Progress (2): 0.9/6.8 MB | 32/58 kB
+Progress (2): 0.9/6.8 MB | 32/58 kB
+Progress (2): 0.9/6.8 MB | 32/58 kB
+Progress (2): 1.0/6.8 MB | 32/58 kB
+Progress (2): 1.0/6.8 MB | 32/58 kB
+Progress (2): 1.0/6.8 MB | 32/58 kB
+Progress (2): 1.0/6.8 MB | 32/58 kB
+Progress (2): 1.0/6.8 MB | 32/58 kB
+Progress (2): 1.0/6.8 MB | 32/58 kB
+Progress (2): 1.1/6.8 MB | 32/58 kB
+Progress (2): 1.1/6.8 MB | 32/58 kB
+Progress (2): 1.1/6.8 MB | 32/58 kB
+Progress (2): 1.1/6.8 MB | 32/58 kB
+Progress (2): 1.1/6.8 MB | 32/58 kB
+Progress (2): 1.1/6.8 MB | 32/58 kB
+Progress (2): 1.2/6.8 MB | 32/58 kB
+Progress (2): 1.2/6.8 MB | 32/58 kB
+Progress (2): 1.2/6.8 MB | 32/58 kB
+Progress (2): 1.2/6.8 MB | 32/58 kB
+Progress (2): 1.2/6.8 MB | 32/58 kB
+Progress (2): 1.2/6.8 MB | 32/58 kB
+Progress (2): 1.2/6.8 MB | 32/58 kB
+Progress (2): 1.3/6.8 MB | 32/58 kB
+Progress (2): 1.3/6.8 MB | 32/58 kB
+Progress (2): 1.3/6.8 MB | 32/58 kB
+Progress (2): 1.3/6.8 MB | 32/58 kB
+Progress (2): 1.3/6.8 MB | 32/58 kB
+Progress (2): 1.3/6.8 MB | 32/58 kB
+Progress (2): 1.4/6.8 MB | 32/58 kB
+Progress (2): 1.4/6.8 MB | 32/58 kB
+Progress (2): 1.4/6.8 MB | 32/58 kB
+Progress (2): 1.4/6.8 MB | 32/58 kB
+Progress (2): 1.4/6.8 MB | 32/58 kB
+Progress (2): 1.4/6.8 MB | 32/58 kB
+Progress (2): 1.5/6.8 MB | 32/58 kB
+Progress (2): 1.5/6.8 MB | 32/58 kB
+Progress (2): 1.5/6.8 MB | 32/58 kB
+Progress (2): 1.5/6.8 MB | 32/58 kB
+Progress (2): 1.5/6.8 MB | 32/58 kB
+Progress (2): 1.5/6.8 MB | 32/58 kB
+Progress (2): 1.6/6.8 MB | 32/58 kB
+Progress (2): 1.6/6.8 MB | 32/58 kB
+Progress (2): 1.6/6.8 MB | 32/58 kB
+Progress (2): 1.6/6.8 MB | 32/58 kB
+Progress (2): 1.6/6.8 MB | 32/58 kB
+Progress (2): 1.6/6.8 MB | 32/58 kB
+Progress (2): 1.7/6.8 MB | 32/58 kB
+Progress (2): 1.7/6.8 MB | 32/58 kB
+Progress (2): 1.7/6.8 MB | 32/58 kB
+Progress (2): 1.7/6.8 MB | 32/58 kB
+Progress (2): 1.7/6.8 MB | 32/58 kB
+Progress (2): 1.7/6.8 MB | 32/58 kB
+Progress (2): 1.8/6.8 MB | 32/58 kB
+Progress (2): 1.8/6.8 MB | 32/58 kB
+Progress (2): 1.8/6.8 MB | 32/58 kB
+Progress (2): 1.8/6.8 MB | 32/58 kB
+Progress (2): 1.8/6.8 MB | 32/58 kB
+Progress (2): 1.8/6.8 MB | 32/58 kB
+Progress (2): 1.9/6.8 MB | 32/58 kB
+Progress (2): 1.9/6.8 MB | 32/58 kB
+Progress (2): 1.9/6.8 MB | 32/58 kB
+Progress (2): 1.9/6.8 MB | 32/58 kB
+Progress (2): 1.9/6.8 MB | 32/58 kB
+Progress (2): 1.9/6.8 MB | 32/58 kB
+Progress (2): 2.0/6.8 MB | 32/58 kB
+Progress (2): 2.0/6.8 MB | 32/58 kB
+Progress (2): 2.0/6.8 MB | 32/58 kB
+Progress (2): 2.0/6.8 MB | 32/58 kB
+Progress (2): 2.0/6.8 MB | 32/58 kB
+Progress (2): 2.0/6.8 MB | 32/58 kB
+Progress (2): 2.1/6.8 MB | 32/58 kB
+Progress (2): 2.1/6.8 MB | 32/58 kB
+Progress (2): 2.1/6.8 MB | 32/58 kB
+Progress (2): 2.1/6.8 MB | 32/58 kB
+Progress (2): 2.1/6.8 MB | 32/58 kB
+Progress (2): 2.1/6.8 MB | 32/58 kB
+Progress (2): 2.2/6.8 MB | 32/58 kB
+Progress (2): 2.2/6.8 MB | 32/58 kB
+Progress (2): 2.2/6.8 MB | 32/58 kB
+Progress (2): 2.2/6.8 MB | 32/58 kB
+Progress (2): 2.2/6.8 MB | 32/58 kB
+Progress (2): 2.2/6.8 MB | 32/58 kB
+Progress (2): 2.2/6.8 MB | 32/58 kB
+Progress (2): 2.3/6.8 MB | 32/58 kB
+Progress (2): 2.3/6.8 MB | 32/58 kB
+Progress (2): 2.3/6.8 MB | 32/58 kB
+Progress (2): 2.3/6.8 MB | 32/58 kB
+Progress (2): 2.3/6.8 MB | 32/58 kB
+Progress (2): 2.3/6.8 MB | 32/58 kB
+Progress (2): 2.3/6.8 MB | 32/58 kB
+Progress (2): 2.4/6.8 MB | 32/58 kB
+Progress (2): 2.4/6.8 MB | 32/58 kB
+Progress (2): 2.4/6.8 MB | 32/58 kB
+Progress (2): 2.4/6.8 MB | 32/58 kB
+Progress (2): 2.4/6.8 MB | 32/58 kB
+Progress (2): 2.4/6.8 MB | 32/58 kB
+Progress (2): 2.4/6.8 MB | 32/58 kB
+Progress (2): 2.5/6.8 MB | 32/58 kB
+Progress (2): 2.5/6.8 MB | 32/58 kB
+Progress (2): 2.5/6.8 MB | 32/58 kB
+Progress (2): 2.5/6.8 MB | 32/58 kB
+Progress (2): 2.5/6.8 MB | 32/58 kB
+Progress (2): 2.5/6.8 MB | 32/58 kB
+Progress (2): 2.6/6.8 MB | 32/58 kB
+Progress (2): 2.6/6.8 MB | 32/58 kB
+Progress (2): 2.6/6.8 MB | 32/58 kB
+Progress (2): 2.6/6.8 MB | 32/58 kB
+Progress (2): 2.6/6.8 MB | 32/58 kB
+Progress (2): 2.6/6.8 MB | 32/58 kB
+Progress (2): 2.7/6.8 MB | 32/58 kB
+Progress (2): 2.7/6.8 MB | 32/58 kB
+Progress (2): 2.7/6.8 MB | 32/58 kB
+Progress (2): 2.7/6.8 MB | 32/58 kB
+Progress (2): 2.7/6.8 MB | 32/58 kB
+Progress (2): 2.7/6.8 MB | 32/58 kB
+Progress (2): 2.8/6.8 MB | 32/58 kB
+Progress (2): 2.8/6.8 MB | 32/58 kB
+Progress (2): 2.8/6.8 MB | 32/58 kB
+Progress (2): 2.8/6.8 MB | 32/58 kB
+Progress (2): 2.8/6.8 MB | 32/58 kB
+Progress (2): 2.8/6.8 MB | 32/58 kB
+Progress (2): 2.9/6.8 MB | 32/58 kB
+Progress (2): 2.9/6.8 MB | 32/58 kB
+Progress (2): 2.9/6.8 MB | 32/58 kB
+Progress (2): 2.9/6.8 MB | 32/58 kB
+Progress (2): 2.9/6.8 MB | 32/58 kB
+Progress (2): 2.9/6.8 MB | 32/58 kB
+Progress (2): 2.9/6.8 MB | 32/58 kB
+Progress (2): 3.0/6.8 MB | 32/58 kB
+Progress (2): 3.0/6.8 MB | 32/58 kB
+Progress (2): 3.0/6.8 MB | 32/58 kB
+Progress (2): 3.0/6.8 MB | 32/58 kB
+Progress (2): 3.0/6.8 MB | 32/58 kB
+Progress (2): 3.0/6.8 MB | 32/58 kB
+Progress (2): 3.1/6.8 MB | 32/58 kB
+Progress (2): 3.1/6.8 MB | 32/58 kB
+Progress (2): 3.1/6.8 MB | 32/58 kB
+Progress (2): 3.1/6.8 MB | 32/58 kB
+Progress (2): 3.1/6.8 MB | 32/58 kB
+Progress (2): 3.1/6.8 MB | 32/58 kB
+Progress (2): 3.2/6.8 MB | 32/58 kB
+Progress (2): 3.2/6.8 MB | 32/58 kB
+Progress (2): 3.2/6.8 MB | 32/58 kB
+Progress (2): 3.2/6.8 MB | 32/58 kB
+Progress (2): 3.2/6.8 MB | 32/58 kB
+Progress (2): 3.2/6.8 MB | 32/58 kB
+Progress (2): 3.3/6.8 MB | 32/58 kB
+Progress (2): 3.3/6.8 MB | 32/58 kB
+Progress (2): 3.3/6.8 MB | 32/58 kB
+Progress (2): 3.3/6.8 MB | 32/58 kB
+Progress (2): 3.3/6.8 MB | 32/58 kB
+Progress (2): 3.3/6.8 MB | 32/58 kB
+Progress (2): 3.4/6.8 MB | 32/58 kB
+Progress (2): 3.4/6.8 MB | 32/58 kB
+Progress (2): 3.4/6.8 MB | 32/58 kB
+Progress (2): 3.4/6.8 MB | 32/58 kB
+Progress (2): 3.4/6.8 MB | 32/58 kB
+Progress (2): 3.4/6.8 MB | 32/58 kB
+Progress (2): 3.5/6.8 MB | 32/58 kB
+Progress (2): 3.5/6.8 MB | 32/58 kB
+Progress (2): 3.5/6.8 MB | 32/58 kB
+Progress (2): 3.5/6.8 MB | 32/58 kB
+Progress (2): 3.5/6.8 MB | 32/58 kB
+Progress (2): 3.5/6.8 MB | 32/58 kB
+Progress (2): 3.6/6.8 MB | 32/58 kB
+Progress (2): 3.6/6.8 MB | 32/58 kB
+Progress (2): 3.6/6.8 MB | 32/58 kB
+Progress (2): 3.6/6.8 MB | 32/58 kB
+Progress (2): 3.6/6.8 MB | 32/58 kB
+Progress (2): 3.6/6.8 MB | 32/58 kB
+Progress (2): 3.6/6.8 MB | 32/58 kB
+Progress (2): 3.7/6.8 MB | 32/58 kB
+Progress (2): 3.7/6.8 MB | 32/58 kB
+Progress (2): 3.7/6.8 MB | 32/58 kB
+Progress (2): 3.7/6.8 MB | 32/58 kB
+Progress (2): 3.7/6.8 MB | 32/58 kB
+Progress (2): 3.7/6.8 MB | 32/58 kB
+Progress (2): 3.8/6.8 MB | 32/58 kB
+Progress (2): 3.8/6.8 MB | 32/58 kB
+Progress (2): 3.8/6.8 MB | 32/58 kB
+Progress (2): 3.8/6.8 MB | 32/58 kB
+Progress (2): 3.8/6.8 MB | 32/58 kB
+Progress (2): 3.8/6.8 MB | 32/58 kB
+Progress (2): 3.8/6.8 MB | 32/58 kB
+Progress (2): 3.9/6.8 MB | 32/58 kB
+Progress (2): 3.9/6.8 MB | 32/58 kB
+Progress (2): 3.9/6.8 MB | 32/58 kB
+Progress (2): 3.9/6.8 MB | 32/58 kB
+Progress (2): 3.9/6.8 MB | 32/58 kB
+Progress (2): 3.9/6.8 MB | 32/58 kB
+Progress (2): 4.0/6.8 MB | 32/58 kB
+Progress (2): 4.0/6.8 MB | 32/58 kB
+Progress (2): 4.0/6.8 MB | 32/58 kB
+Progress (2): 4.0/6.8 MB | 32/58 kB
+Progress (2): 4.0/6.8 MB | 32/58 kB
+Progress (2): 4.0/6.8 MB | 32/58 kB
+Progress (2): 4.1/6.8 MB | 32/58 kB
+Progress (2): 4.1/6.8 MB | 32/58 kB
+Progress (2): 4.1/6.8 MB | 32/58 kB
+Progress (2): 4.1/6.8 MB | 32/58 kB
+Progress (2): 4.1/6.8 MB | 32/58 kB
+Progress (2): 4.1/6.8 MB | 32/58 kB
+Progress (2): 4.2/6.8 MB | 32/58 kB
+Progress (2): 4.2/6.8 MB | 32/58 kB
+Progress (2): 4.2/6.8 MB | 32/58 kB
+Progress (2): 4.2/6.8 MB | 32/58 kB
+Progress (2): 4.2/6.8 MB | 32/58 kB
+Progress (2): 4.2/6.8 MB | 32/58 kB
+Progress (2): 4.3/6.8 MB | 32/58 kB
+Progress (2): 4.3/6.8 MB | 32/58 kB
+Progress (2): 4.3/6.8 MB | 32/58 kB
+Progress (2): 4.3/6.8 MB | 32/58 kB
+Progress (2): 4.3/6.8 MB | 32/58 kB
+Progress (2): 4.3/6.8 MB | 49/58 kB
+Progress (2): 4.3/6.8 MB | 49/58 kB
+Progress (2): 4.3/6.8 MB | 58 kB   
+Progress (2): 4.4/6.8 MB | 58 kB
+Progress (2): 4.4/6.8 MB | 58 kB
+Progress (2): 4.4/6.8 MB | 58 kB
+Progress (2): 4.4/6.8 MB | 58 kB
+Progress (2): 4.4/6.8 MB | 58 kB
+Progress (2): 4.4/6.8 MB | 58 kB
+Progress (2): 4.4/6.8 MB | 58 kB
+Progress (2): 4.5/6.8 MB | 58 kB
+Progress (2): 4.5/6.8 MB | 58 kB
+                                
+Downloaded from central: https://repo.maven.apache.org/maven2/org/iq80/snappy/snappy/0.4/snappy-0.4.jar (58 kB at 32 kB/s)
+Progress (1): 4.5/6.8 MB
+Progress (1): 4.5/6.8 MB
+Progress (1): 4.5/6.8 MB
+Progress (1): 4.5/6.8 MB
+Progress (1): 4.6/6.8 MB
+Progress (1): 4.6/6.8 MB
+Progress (1): 4.6/6.8 MB
+Progress (1): 4.6/6.8 MB
+Progress (1): 4.6/6.8 MB
+Progress (1): 4.6/6.8 MB
+Progress (1): 4.7/6.8 MB
+Progress (1): 4.7/6.8 MB
+Progress (1): 4.7/6.8 MB
+Progress (1): 4.7/6.8 MB
+Progress (1): 4.7/6.8 MB
+Progress (1): 4.7/6.8 MB
+Progress (1): 4.8/6.8 MB
+Progress (1): 4.8/6.8 MB
+Progress (1): 4.8/6.8 MB
+Progress (1): 4.8/6.8 MB
+Progress (1): 4.8/6.8 MB
+Progress (1): 4.8/6.8 MB
+Progress (1): 4.9/6.8 MB
+Progress (1): 4.9/6.8 MB
+Progress (1): 4.9/6.8 MB
+Progress (1): 4.9/6.8 MB
+Progress (1): 4.9/6.8 MB
+Progress (1): 4.9/6.8 MB
+Progress (1): 5.0/6.8 MB
+Progress (1): 5.0/6.8 MB
+Progress (1): 5.0/6.8 MB
+Progress (1): 5.0/6.8 MB
+Progress (1): 5.0/6.8 MB
+Progress (1): 5.0/6.8 MB
+Progress (1): 5.0/6.8 MB
+Progress (1): 5.1/6.8 MB
+Progress (1): 5.1/6.8 MB
+Progress (1): 5.1/6.8 MB
+Progress (1): 5.1/6.8 MB
+Progress (1): 5.1/6.8 MB
+Progress (1): 5.1/6.8 MB
+Progress (1): 5.2/6.8 MB
+Progress (1): 5.2/6.8 MB
+Progress (1): 5.2/6.8 MB
+Progress (1): 5.2/6.8 MB
+Progress (1): 5.2/6.8 MB
+Progress (1): 5.2/6.8 MB
+Progress (1): 5.3/6.8 MB
+Progress (1): 5.3/6.8 MB
+Progress (1): 5.3/6.8 MB
+Progress (1): 5.3/6.8 MB
+Progress (1): 5.3/6.8 MB
+Progress (1): 5.3/6.8 MB
+Progress (1): 5.4/6.8 MB
+Progress (1): 5.4/6.8 MB
+Progress (1): 5.4/6.8 MB
+Progress (1): 5.4/6.8 MB
+Progress (1): 5.4/6.8 MB
+Progress (1): 5.4/6.8 MB
+Progress (1): 5.5/6.8 MB
+Progress (1): 5.5/6.8 MB
+Progress (1): 5.5/6.8 MB
+Progress (1): 5.5/6.8 MB
+Progress (1): 5.5/6.8 MB
+Progress (1): 5.5/6.8 MB
+Progress (1): 5.6/6.8 MB
+Progress (1): 5.6/6.8 MB
+Progress (1): 5.6/6.8 MB
+Progress (1): 5.6/6.8 MB
+Progress (1): 5.6/6.8 MB
+Progress (1): 5.6/6.8 MB
+Progress (1): 5.7/6.8 MB
+Progress (1): 5.7/6.8 MB
+Progress (1): 5.7/6.8 MB
+Progress (1): 5.7/6.8 MB
+Progress (1): 5.7/6.8 MB
+Progress (1): 5.7/6.8 MB
+Progress (1): 5.7/6.8 MB
+Progress (1): 5.8/6.8 MB
+Progress (1): 5.8/6.8 MB
+Progress (1): 5.8/6.8 MB
+Progress (1): 5.8/6.8 MB
+Progress (1): 5.8/6.8 MB
+Progress (1): 5.8/6.8 MB
+Progress (1): 5.9/6.8 MB
+Progress (1): 5.9/6.8 MB
+Progress (1): 5.9/6.8 MB
+Progress (1): 5.9/6.8 MB
+Progress (1): 5.9/6.8 MB
+Progress (1): 5.9/6.8 MB
+Progress (1): 6.0/6.8 MB
+Progress (1): 6.0/6.8 MB
+Progress (1): 6.0/6.8 MB
+Progress (1): 6.0/6.8 MB
+Progress (1): 6.0/6.8 MB
+Progress (1): 6.0/6.8 MB
+Progress (1): 6.1/6.8 MB
+Progress (1): 6.1/6.8 MB
+Progress (1): 6.1/6.8 MB
+Progress (1): 6.1/6.8 MB
+Progress (1): 6.1/6.8 MB
+Progress (1): 6.1/6.8 MB
+Progress (1): 6.2/6.8 MB
+Progress (1): 6.2/6.8 MB
+Progress (1): 6.2/6.8 MB
+Progress (1): 6.2/6.8 MB
+Progress (1): 6.2/6.8 MB
+Progress (1): 6.2/6.8 MB
+Progress (1): 6.2/6.8 MB
+Progress (1): 6.3/6.8 MB
+Progress (1): 6.3/6.8 MB
+Progress (1): 6.3/6.8 MB
+Progress (1): 6.3/6.8 MB
+Progress (1): 6.3/6.8 MB
+Progress (1): 6.3/6.8 MB
+Progress (1): 6.4/6.8 MB
+Progress (1): 6.4/6.8 MB
+Progress (1): 6.4/6.8 MB
+Progress (1): 6.4/6.8 MB
+Progress (1): 6.4/6.8 MB
+Progress (1): 6.4/6.8 MB
+Progress (1): 6.5/6.8 MB
+Progress (1): 6.5/6.8 MB
+Progress (1): 6.5/6.8 MB
+Progress (1): 6.5/6.8 MB
+Progress (1): 6.5/6.8 MB
+Progress (1): 6.5/6.8 MB
+Progress (1): 6.6/6.8 MB
+Progress (1): 6.6/6.8 MB
+Progress (1): 6.6/6.8 MB
+Progress (1): 6.6/6.8 MB
+Progress (1): 6.6/6.8 MB
+Progress (1): 6.6/6.8 MB
+Progress (1): 6.7/6.8 MB
+Progress (1): 6.7/6.8 MB
+Progress (1): 6.7/6.8 MB
+Progress (1): 6.7/6.8 MB
+Progress (1): 6.7/6.8 MB
+Progress (1): 6.7/6.8 MB
+Progress (1): 6.8/6.8 MB
+Progress (1): 6.8/6.8 MB
+Progress (1): 6.8 MB    
+                    
+Downloaded from central: https://repo.maven.apache.org/maven2/com/github/luben/zstd-jni/1.5.5-11/zstd-jni-1.5.5-11.jar (6.8 MB at 2.7 MB/s)
+[INFO] Building jar: C:\Users\pc\Desktop\Work\quickflow\backend\target\ai-application-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.0:repackage (repackage) @ ai-application ---
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-buildpack-platform/3.3.0/spring-boot-buildpack-platform-3.3.0.jar
+Downloading from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.14.2/jackson-databind-2.14.2.jar
+Downloading from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.14.2/jackson-core-2.14.2.jar
+Downloading from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.14.2/jackson-annotations-2.14.2.jar
+Downloading from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/module/jackson-module-parameter-names/2.14.2/jackson-module-parameter-names-2.14.2.jar
+Progress (1): 7.7/77 kB
+Progress (1): 16/77 kB 
+Progress (1): 32/77 kB
+Progress (1): 49/77 kB
+Progress (1): 65/77 kB
+Progress (1): 77 kB   
+Progress (2): 77 kB | 7.7/287 kB
+Progress (2): 77 kB | 16/287 kB 
+                               
+Downloaded from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.14.2/jackson-annotations-2.14.2.jar (77 kB at 1.3 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/net/java/dev/jna/jna-platform/5.13.0/jna-platform-5.13.0.jar
+Progress (1): 32/287 kB
+Progress (2): 32/287 kB | 7.7/459 kB
+Progress (2): 32/287 kB | 16/459 kB 
+Progress (2): 32/287 kB | 25/459 kB
+Progress (2): 49/287 kB | 25/459 kB
+Progress (2): 65/287 kB | 25/459 kB
+Progress (2): 65/287 kB | 41/459 kB
+Progress (2): 65/287 kB | 57/459 kB
+Progress (2): 81/287 kB | 57/459 kB
+Progress (3): 81/287 kB | 57/459 kB | 7.7/9.5 kB
+Progress (3): 81/287 kB | 57/459 kB | 9.5 kB    
+Progress (3): 81/287 kB | 74/459 kB | 9.5 kB
+Progress (3): 98/287 kB | 74/459 kB | 9.5 kB
+Progress (3): 98/287 kB | 90/459 kB | 9.5 kB
+Progress (3): 114/287 kB | 90/459 kB | 9.5 kB
+Progress (3): 114/287 kB | 106/459 kB | 9.5 kB
+                                              
+Downloaded from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/module/jackson-module-parameter-names/2.14.2/jackson-module-parameter-names-2.14.2.jar (9.5 kB at 113 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar
+Progress (2): 131/287 kB | 106/459 kB
+Progress (2): 131/287 kB | 123/459 kB
+Progress (2): 147/287 kB | 123/459 kB
+Progress (2): 147/287 kB | 139/459 kB
+Progress (2): 163/287 kB | 139/459 kB
+Progress (2): 163/287 kB | 156/459 kB
+Progress (2): 180/287 kB | 156/459 kB
+Progress (2): 180/287 kB | 172/459 kB
+Progress (2): 196/287 kB | 172/459 kB
+Progress (2): 196/287 kB | 188/459 kB
+Progress (2): 196/287 kB | 205/459 kB
+Progress (2): 196/287 kB | 221/459 kB
+Progress (2): 213/287 kB | 221/459 kB
+Progress (2): 213/287 kB | 238/459 kB
+Progress (2): 229/287 kB | 238/459 kB
+Progress (2): 229/287 kB | 254/459 kB
+Progress (2): 245/287 kB | 254/459 kB
+Progress (2): 245/287 kB | 270/459 kB
+Progress (2): 262/287 kB | 270/459 kB
+Progress (2): 262/287 kB | 287/459 kB
+Progress (2): 262/287 kB | 303/459 kB
+Progress (2): 278/287 kB | 303/459 kB
+Progress (3): 278/287 kB | 303/459 kB | 0/1.6 MB
+Progress (3): 278/287 kB | 303/459 kB | 0/1.6 MB
+Progress (3): 287 kB | 303/459 kB | 0/1.6 MB    
+Progress (3): 287 kB | 319/459 kB | 0/1.6 MB
+                                            
+Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-buildpack-platform/3.3.0/spring-boot-buildpack-platform-3.3.0.jar (287 kB at 2.1 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.25.0/commons-compress-1.25.0.jar
+Progress (2): 336/459 kB | 0/1.6 MB
+Progress (2): 352/459 kB | 0/1.6 MB
+Progress (2): 369/459 kB | 0/1.6 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.1/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.1/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.1/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.1/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.1/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.1/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.1/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.2/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.2/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.2/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.2/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.2/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.2/1.4 MB
+Progress (3): 369/459 kB | 0/1.6 MB | 0.3/1.4 MB
+Progress (3): 385/459 kB | 0/1.6 MB | 0.3/1.4 MB
+Progress (3): 401/459 kB | 0/1.6 MB | 0.3/1.4 MB
+Progress (3): 418/459 kB | 0/1.6 MB | 0.3/1.4 MB
+Progress (3): 418/459 kB | 0/1.6 MB | 0.3/1.4 MB
+Progress (3): 434/459 kB | 0/1.6 MB | 0.3/1.4 MB
+Progress (3): 451/459 kB | 0/1.6 MB | 0.3/1.4 MB
+Progress (3): 459 kB | 0/1.6 MB | 0.3/1.4 MB    
+Progress (4): 459 kB | 0/1.6 MB | 0.3/1.4 MB | 0/1.9 MB
+Progress (4): 459 kB | 0/1.6 MB | 0.3/1.4 MB | 0/1.9 MB
+Progress (4): 459 kB | 0/1.6 MB | 0.3/1.4 MB | 0/1.9 MB
+Progress (4): 459 kB | 0/1.6 MB | 0.3/1.4 MB | 0/1.9 MB
+Progress (4): 459 kB | 0/1.6 MB | 0.3/1.4 MB | 0.1/1.9 MB
+Progress (4): 459 kB | 0/1.6 MB | 0.3/1.4 MB | 0.1/1.9 MB
+Progress (4): 459 kB | 0/1.6 MB | 0.3/1.4 MB | 0.1/1.9 MB
+                                                         
+Downloaded from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.14.2/jackson-core-2.14.2.jar (459 kB at 1.6 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/httpcomponents/client5/httpclient5/5.3.1/httpclient5-5.3.1.jar
+Progress (3): 0/1.6 MB | 0.3/1.4 MB | 0.1/1.9 MB
+Progress (3): 0/1.6 MB | 0.3/1.4 MB | 0.1/1.9 MB
+Progress (3): 0/1.6 MB | 0.3/1.4 MB | 0.1/1.9 MB
+Progress (3): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB
+Progress (3): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB
+Progress (3): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.2/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.3/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.4/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.5/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.5/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.5/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.5/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.5/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.5/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.5/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.1/1.1 MB
+Progress (4): 0/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.1/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.1/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.1/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.6/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.1/1.6 MB | 0.3/1.4 MB | 0.7/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.7/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.7/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.7/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.7/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.7/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.7/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.8/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.8/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.8/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.8/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.8/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.8/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB
+Progress (4): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB | 7.7/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB | 16/862 kB 
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB | 32/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 0.9/1.9 MB | 0.2/1.1 MB | 49/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 49/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 49/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 49/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 49/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 49/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 65/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 65/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 81/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.0/1.9 MB | 0.2/1.1 MB | 98/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 98/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 114/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 114/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 131/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 147/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 163/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 180/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 196/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 213/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 229/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 245/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 262/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 278/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 294/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 294/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 311/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 311/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 327/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 327/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 344/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 344/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 360/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 376/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.1/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.2/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.3/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.4/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.4/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.4/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.4/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.4/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.4/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.4/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.5/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.5/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.5/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.5/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.5/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.5/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.6/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.3/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.7/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.4/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.2/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.2/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.5/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.6/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.6/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.6/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.6/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.6/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.6/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.7/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.7/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.7/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.7/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.7/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.7/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.8/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.8/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.8/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.8/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.8/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.8/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.3/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.4/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.4/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.4/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.4/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.4/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.4/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.5/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.5/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.5/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.5/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.5/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.5/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.6/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.6/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.6/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.6/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.6/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.6/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 393/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 409/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 426/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 442/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 458/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 475/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 491/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 507/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 524/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 540/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 557/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 573/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 589/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 606/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 622/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 639/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 655/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 671/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 688/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 704/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 720/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 737/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 753/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 753/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 770/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 786/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 786/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 802/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 819/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 835/862 kB
+Progress (5): 0.3/1.6 MB | 0.8/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 835/862 kB
+Progress (5): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 835/862 kB
+Progress (5): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 835/862 kB
+Progress (5): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 851/862 kB
+Progress (5): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB | 862 kB    
+                                                                        
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/httpcomponents/client5/httpclient5/5.3.1/httpclient5-5.3.1.jar (862 kB at 558 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5/5.2.4/httpcore5-5.2.4.jar
+Progress (4): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 0.9/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.0/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.0/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.0/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.0/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.0/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.0/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.1/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.1/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.1/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.1/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.1/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.1/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.1/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.3/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 0.9/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.7/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.4/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.0/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.1/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.1/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.1/1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.8/1.9 MB | 1.1 MB    
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9/1.9 MB | 1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9/1.9 MB | 1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB    
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB
+Progress (4): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB
+Progress (5): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB | 7.7/855 kB
+Progress (5): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB | 16/855 kB 
+Progress (5): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB | 29/855 kB
+Progress (5): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB | 45/855 kB
+Progress (5): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB | 61/855 kB
+Progress (5): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB | 78/855 kB
+Progress (5): 0.5/1.6 MB | 1.2/1.4 MB | 1.9 MB | 1.1 MB | 94/855 kB
+                                                                   
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.25.0/commons-compress-1.25.0.jar (1.1 MB at 620 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5-h2/5.2.4/httpcore5-h2-5.2.4.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar (1.9 MB at 1.1 MB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/tomlj/tomlj/1.0.0/tomlj-1.0.0.jar
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 111/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 127/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 143/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 160/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 176/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 193/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 209/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 225/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 242/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 258/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 274/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 291/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 291/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 307/855 kB
+Progress (3): 0.5/1.6 MB | 1.2/1.4 MB | 324/855 kB
+Progress (3): 0.5/1.6 MB | 1.3/1.4 MB | 324/855 kB
+Progress (3): 0.5/1.6 MB | 1.3/1.4 MB | 340/855 kB
+Progress (3): 0.5/1.6 MB | 1.3/1.4 MB | 340/855 kB
+Progress (3): 0.5/1.6 MB | 1.3/1.4 MB | 340/855 kB
+Progress (3): 0.5/1.6 MB | 1.3/1.4 MB | 340/855 kB
+Progress (3): 0.5/1.6 MB | 1.3/1.4 MB | 340/855 kB
+Progress (3): 0.5/1.6 MB | 1.3/1.4 MB | 340/855 kB
+Progress (3): 0.5/1.6 MB | 1.4 MB | 340/855 kB    
+                                              
+Downloaded from central: https://repo.maven.apache.org/maven2/net/java/dev/jna/jna-platform/5.13.0/jna-platform-5.13.0.jar (1.4 MB at 721 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/antlr/antlr4-runtime/4.7.2/antlr4-runtime-4.7.2.jar
+Progress (2): 0.5/1.6 MB | 356/855 kB
+Progress (2): 0.5/1.6 MB | 356/855 kB
+Progress (2): 0.5/1.6 MB | 373/855 kB
+Progress (2): 0.5/1.6 MB | 373/855 kB
+Progress (2): 0.5/1.6 MB | 373/855 kB
+Progress (2): 0.6/1.6 MB | 373/855 kB
+Progress (2): 0.6/1.6 MB | 373/855 kB
+Progress (2): 0.6/1.6 MB | 373/855 kB
+Progress (2): 0.6/1.6 MB | 373/855 kB
+Progress (2): 0.6/1.6 MB | 373/855 kB
+Progress (2): 0.6/1.6 MB | 373/855 kB
+Progress (2): 0.7/1.6 MB | 373/855 kB
+Progress (2): 0.7/1.6 MB | 373/855 kB
+Progress (2): 0.7/1.6 MB | 373/855 kB
+Progress (2): 0.7/1.6 MB | 389/855 kB
+Progress (2): 0.7/1.6 MB | 406/855 kB
+Progress (2): 0.7/1.6 MB | 422/855 kB
+Progress (2): 0.7/1.6 MB | 438/855 kB
+Progress (2): 0.7/1.6 MB | 455/855 kB
+Progress (3): 0.7/1.6 MB | 455/855 kB | 7.7/237 kB
+Progress (3): 0.7/1.6 MB | 455/855 kB | 16/237 kB 
+Progress (3): 0.7/1.6 MB | 471/855 kB | 16/237 kB
+Progress (3): 0.7/1.6 MB | 487/855 kB | 16/237 kB
+Progress (3): 0.7/1.6 MB | 504/855 kB | 16/237 kB
+Progress (3): 0.7/1.6 MB | 504/855 kB | 16/237 kB
+Progress (3): 0.7/1.6 MB | 504/855 kB | 32/237 kB
+Progress (3): 0.7/1.6 MB | 504/855 kB | 32/237 kB
+Progress (3): 0.7/1.6 MB | 504/855 kB | 49/237 kB
+Progress (3): 0.7/1.6 MB | 520/855 kB | 49/237 kB
+Progress (4): 0.7/1.6 MB | 520/855 kB | 49/237 kB | 7.7/157 kB
+Progress (4): 0.7/1.6 MB | 520/855 kB | 49/237 kB | 16/157 kB 
+Progress (4): 0.7/1.6 MB | 520/855 kB | 49/237 kB | 32/157 kB
+Progress (4): 0.7/1.6 MB | 520/855 kB | 49/237 kB | 49/157 kB
+Progress (4): 0.7/1.6 MB | 520/855 kB | 49/237 kB | 65/157 kB
+Progress (4): 0.7/1.6 MB | 520/855 kB | 57/237 kB | 65/157 kB
+Progress (4): 0.7/1.6 MB | 537/855 kB | 57/237 kB | 65/157 kB
+Progress (4): 0.7/1.6 MB | 537/855 kB | 57/237 kB | 81/157 kB
+Progress (4): 0.7/1.6 MB | 553/855 kB | 57/237 kB | 81/157 kB
+Progress (4): 0.7/1.6 MB | 553/855 kB | 57/237 kB | 98/157 kB
+Progress (4): 0.7/1.6 MB | 569/855 kB | 57/237 kB | 98/157 kB
+Progress (4): 0.7/1.6 MB | 569/855 kB | 57/237 kB | 114/157 kB
+Progress (4): 0.7/1.6 MB | 569/855 kB | 74/237 kB | 114/157 kB
+Progress (4): 0.7/1.6 MB | 586/855 kB | 74/237 kB | 114/157 kB
+Progress (4): 0.7/1.6 MB | 602/855 kB | 74/237 kB | 114/157 kB
+Progress (4): 0.7/1.6 MB | 618/855 kB | 74/237 kB | 114/157 kB
+Progress (4): 0.7/1.6 MB | 618/855 kB | 74/237 kB | 131/157 kB
+Progress (4): 0.7/1.6 MB | 635/855 kB | 74/237 kB | 131/157 kB
+Progress (4): 0.7/1.6 MB | 635/855 kB | 90/237 kB | 131/157 kB
+Progress (4): 0.7/1.6 MB | 651/855 kB | 90/237 kB | 131/157 kB
+Progress (4): 0.7/1.6 MB | 651/855 kB | 90/237 kB | 147/157 kB
+Progress (4): 0.7/1.6 MB | 668/855 kB | 90/237 kB | 147/157 kB
+Progress (4): 0.7/1.6 MB | 668/855 kB | 90/237 kB | 157 kB    
+Progress (4): 0.7/1.6 MB | 684/855 kB | 90/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 106/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 123/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 139/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 156/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 172/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 188/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 205/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 221/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 684/855 kB | 221/237 kB | 157 kB
+Progress (4): 0.7/1.6 MB | 700/855 kB | 221/237 kB | 157 kB
+Progress (4): 0.8/1.6 MB | 700/855 kB | 221/237 kB | 157 kB
+Progress (4): 0.8/1.6 MB | 717/855 kB | 221/237 kB | 157 kB
+Progress (4): 0.8/1.6 MB | 717/855 kB | 221/237 kB | 157 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 157 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 157 kB
+                                                           
+Downloaded from central: https://repo.maven.apache.org/maven2/org/tomlj/tomlj/1.0.0/tomlj-1.0.0.jar (157 kB at 75 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 7.7/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 12/338 kB 
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 29/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 45/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 61/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 78/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 94/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 111/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 127/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 143/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 160/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 176/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 193/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 209/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 225/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 242/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 258/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 274/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 291/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 291/338 kB
+Progress (4): 0.8/1.6 MB | 733/855 kB | 221/237 kB | 291/338 kB
+Progress (4): 0.8/1.6 MB | 750/855 kB | 221/237 kB | 291/338 kB
+Progress (4): 0.8/1.6 MB | 750/855 kB | 221/237 kB | 307/338 kB
+Progress (4): 0.8/1.6 MB | 750/855 kB | 221/237 kB | 307/338 kB
+Progress (4): 0.8/1.6 MB | 750/855 kB | 221/237 kB | 324/338 kB
+Progress (4): 0.8/1.6 MB | 766/855 kB | 221/237 kB | 324/338 kB
+Progress (4): 0.8/1.6 MB | 766/855 kB | 237 kB | 324/338 kB    
+Progress (4): 0.9/1.6 MB | 766/855 kB | 237 kB | 324/338 kB
+Progress (4): 0.9/1.6 MB | 766/855 kB | 237 kB | 338 kB    
+                                                       
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5-h2/5.2.4/httpcore5-h2-5.2.4.jar (237 kB at 108 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-loader-tools/3.3.0/spring-boot-loader-tools-3.3.0.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/antlr/antlr4-runtime/4.7.2/antlr4-runtime-4.7.2.jar (338 kB at 154 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/3.3.2/maven-common-artifact-filters-3.3.2.jar
+Progress (2): 0.9/1.6 MB | 782/855 kB
+Progress (2): 0.9/1.6 MB | 799/855 kB
+Progress (2): 0.9/1.6 MB | 815/855 kB
+Progress (2): 0.9/1.6 MB | 815/855 kB
+Progress (2): 0.9/1.6 MB | 831/855 kB
+Progress (2): 0.9/1.6 MB | 848/855 kB
+Progress (2): 0.9/1.6 MB | 848/855 kB
+Progress (2): 0.9/1.6 MB | 855 kB    
+Progress (2): 0.9/1.6 MB | 855 kB
+Progress (2): 0.9/1.6 MB | 855 kB
+Progress (2): 0.9/1.6 MB | 855 kB
+Progress (2): 0.9/1.6 MB | 855 kB
+Progress (2): 1.0/1.6 MB | 855 kB
+Progress (2): 1.0/1.6 MB | 855 kB
+Progress (2): 1.0/1.6 MB | 855 kB
+Progress (3): 1.0/1.6 MB | 855 kB | 7.7/58 kB
+Progress (4): 1.0/1.6 MB | 855 kB | 7.7/58 kB | 7.7/20 kB
+Progress (4): 1.0/1.6 MB | 855 kB | 12/58 kB | 7.7/20 kB 
+Progress (4): 1.0/1.6 MB | 855 kB | 12/58 kB | 16/20 kB 
+Progress (4): 1.0/1.6 MB | 855 kB | 12/58 kB | 20 kB   
+                                                    
+Downloaded from central: https://repo.maven.apache.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar (20 kB at 8.5 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-observation/1.12.6/micrometer-observation-1.12.6.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5/5.2.4/httpcore5-5.2.4.jar (855 kB at 365 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-commons/1.12.6/micrometer-commons-1.12.6.jar
+Progress (2): 1.0/1.6 MB | 28/58 kB
+Progress (2): 1.0/1.6 MB | 44/58 kB
+Progress (2): 1.0/1.6 MB | 44/58 kB
+Progress (2): 1.0/1.6 MB | 58 kB   
+Progress (2): 1.0/1.6 MB | 58 kB
+Progress (2): 1.0/1.6 MB | 58 kB
+Progress (2): 1.1/1.6 MB | 58 kB
+Progress (2): 1.1/1.6 MB | 58 kB
+Progress (2): 1.1/1.6 MB | 58 kB
+Progress (2): 1.1/1.6 MB | 58 kB
+Progress (2): 1.1/1.6 MB | 58 kB
+Progress (2): 1.1/1.6 MB | 58 kB
+Progress (2): 1.2/1.6 MB | 58 kB
+Progress (3): 1.2/1.6 MB | 58 kB | 7.7/72 kB
+Progress (3): 1.2/1.6 MB | 58 kB | 12/72 kB 
+                                           
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/3.3.2/maven-common-artifact-filters-3.3.2.jar (58 kB at 24 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.8/plexus-utils-1.5.8.jar
+Progress (2): 1.2/1.6 MB | 29/72 kB
+Progress (2): 1.2/1.6 MB | 45/72 kB
+Progress (2): 1.2/1.6 MB | 45/72 kB
+Progress (2): 1.2/1.6 MB | 61/72 kB
+Progress (2): 1.2/1.6 MB | 72 kB   
+Progress (2): 1.2/1.6 MB | 72 kB
+Progress (2): 1.2/1.6 MB | 72 kB
+Progress (2): 1.2/1.6 MB | 72 kB
+Progress (2): 1.2/1.6 MB | 72 kB
+Progress (2): 1.3/1.6 MB | 72 kB
+Progress (2): 1.3/1.6 MB | 72 kB
+                                
+Downloaded from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-observation/1.12.6/micrometer-observation-1.12.6.jar (72 kB at 29 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-shade-plugin/3.5.0/maven-shade-plugin-3.5.0.jar
+Progress (2): 1.3/1.6 MB | 7.7/458 kB
+Progress (2): 1.3/1.6 MB | 16/458 kB 
+Progress (2): 1.3/1.6 MB | 32/458 kB
+Progress (2): 1.3/1.6 MB | 32/458 kB
+Progress (2): 1.3/1.6 MB | 32/458 kB
+Progress (2): 1.3/1.6 MB | 48/458 kB
+Progress (2): 1.3/1.6 MB | 65/458 kB
+Progress (2): 1.3/1.6 MB | 81/458 kB
+Progress (2): 1.3/1.6 MB | 98/458 kB
+Progress (2): 1.3/1.6 MB | 114/458 kB
+Progress (2): 1.3/1.6 MB | 114/458 kB
+Progress (2): 1.3/1.6 MB | 114/458 kB
+Progress (2): 1.4/1.6 MB | 114/458 kB
+Progress (2): 1.4/1.6 MB | 114/458 kB
+Progress (2): 1.4/1.6 MB | 114/458 kB
+Progress (2): 1.4/1.6 MB | 114/458 kB
+Progress (2): 1.4/1.6 MB | 114/458 kB
+Progress (2): 1.4/1.6 MB | 114/458 kB
+Progress (2): 1.4/1.6 MB | 130/458 kB
+Progress (2): 1.4/1.6 MB | 131/458 kB
+Progress (2): 1.4/1.6 MB | 147/458 kB
+Progress (2): 1.4/1.6 MB | 164/458 kB
+Progress (2): 1.4/1.6 MB | 180/458 kB
+Progress (2): 1.4/1.6 MB | 197/458 kB
+Progress (2): 1.4/1.6 MB | 213/458 kB
+Progress (2): 1.4/1.6 MB | 229/458 kB
+Progress (2): 1.4/1.6 MB | 246/458 kB
+Progress (2): 1.4/1.6 MB | 262/458 kB
+Progress (2): 1.4/1.6 MB | 279/458 kB
+Progress (2): 1.4/1.6 MB | 295/458 kB
+Progress (3): 1.4/1.6 MB | 295/458 kB | 7.7/268 kB
+Progress (3): 1.4/1.6 MB | 295/458 kB | 16/268 kB 
+Progress (3): 1.4/1.6 MB | 311/458 kB | 16/268 kB
+Progress (4): 1.4/1.6 MB | 311/458 kB | 16/268 kB | 7.7/147 kB
+Progress (4): 1.4/1.6 MB | 311/458 kB | 16/268 kB | 16/147 kB 
+Progress (4): 1.4/1.6 MB | 311/458 kB | 16/268 kB | 25/147 kB
+Progress (4): 1.4/1.6 MB | 328/458 kB | 16/268 kB | 25/147 kB
+Progress (4): 1.4/1.6 MB | 328/458 kB | 32/268 kB | 25/147 kB
+Progress (4): 1.4/1.6 MB | 328/458 kB | 32/268 kB | 41/147 kB
+Progress (4): 1.4/1.6 MB | 328/458 kB | 32/268 kB | 57/147 kB
+Progress (4): 1.4/1.6 MB | 344/458 kB | 32/268 kB | 57/147 kB
+Progress (4): 1.4/1.6 MB | 344/458 kB | 32/268 kB | 74/147 kB
+Progress (4): 1.4/1.6 MB | 360/458 kB | 32/268 kB | 74/147 kB
+Progress (4): 1.4/1.6 MB | 360/458 kB | 49/268 kB | 74/147 kB
+Progress (4): 1.4/1.6 MB | 377/458 kB | 49/268 kB | 74/147 kB
+Progress (4): 1.4/1.6 MB | 377/458 kB | 49/268 kB | 90/147 kB
+Progress (4): 1.4/1.6 MB | 377/458 kB | 49/268 kB | 106/147 kB
+Progress (4): 1.4/1.6 MB | 377/458 kB | 65/268 kB | 106/147 kB
+Progress (4): 1.4/1.6 MB | 393/458 kB | 65/268 kB | 106/147 kB
+Progress (4): 1.4/1.6 MB | 393/458 kB | 81/268 kB | 106/147 kB
+Progress (4): 1.4/1.6 MB | 393/458 kB | 81/268 kB | 123/147 kB
+Progress (4): 1.4/1.6 MB | 393/458 kB | 81/268 kB | 131/147 kB
+Progress (4): 1.4/1.6 MB | 393/458 kB | 81/268 kB | 147 kB    
+Progress (4): 1.4/1.6 MB | 410/458 kB | 81/268 kB | 147 kB
+                                                          
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-shade-plugin/3.5.0/maven-shade-plugin-3.5.0.jar (147 kB at 55 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/ow2/asm/asm/9.5/asm-9.5.jar
+Progress (3): 1.4/1.6 MB | 410/458 kB | 98/268 kB
+Progress (3): 1.4/1.6 MB | 426/458 kB | 98/268 kB
+Progress (3): 1.5/1.6 MB | 426/458 kB | 98/268 kB
+Progress (3): 1.5/1.6 MB | 426/458 kB | 98/268 kB
+Progress (3): 1.5/1.6 MB | 426/458 kB | 98/268 kB
+Progress (3): 1.5/1.6 MB | 426/458 kB | 98/268 kB
+Progress (3): 1.5/1.6 MB | 426/458 kB | 98/268 kB
+Progress (3): 1.5/1.6 MB | 426/458 kB | 98/268 kB
+Progress (3): 1.5/1.6 MB | 426/458 kB | 114/268 kB
+Progress (3): 1.6/1.6 MB | 426/458 kB | 114/268 kB
+Progress (3): 1.6/1.6 MB | 442/458 kB | 114/268 kB
+Progress (3): 1.6/1.6 MB | 442/458 kB | 131/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 131/268 kB    
+Progress (3): 1.6/1.6 MB | 458 kB | 147/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 163/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 180/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 196/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 213/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 229/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 245/268 kB
+Progress (3): 1.6/1.6 MB | 458 kB | 262/268 kB
+Progress (4): 1.6/1.6 MB | 458 kB | 262/268 kB | 7.7/47 kB
+Progress (4): 1.6/1.6 MB | 458 kB | 262/268 kB | 16/47 kB 
+Progress (4): 1.6/1.6 MB | 458 kB | 262/268 kB | 16/47 kB
+Progress (4): 1.6/1.6 MB | 458 kB | 262/268 kB | 16/47 kB
+Progress (4): 1.6/1.6 MB | 458 kB | 262/268 kB | 32/47 kB
+Progress (4): 1.6/1.6 MB | 458 kB | 262/268 kB | 32/47 kB
+Progress (4): 1.6/1.6 MB | 458 kB | 262/268 kB | 47 kB   
+                                                      
+Downloaded from central: https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-loader-tools/3.3.0/spring-boot-loader-tools-3.3.0.jar (458 kB at 167 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/ow2/asm/asm-commons/9.5/asm-commons-9.5.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/io/micrometer/micrometer-commons/1.12.6/micrometer-commons-1.12.6.jar (47 kB at 17 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/ow2/asm/asm-tree/9.5/asm-tree-9.5.jar
+Progress (2): 1.6/1.6 MB | 268 kB
+Progress (2): 1.6 MB | 268 kB    
+                             
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/1.5.8/plexus-utils-1.5.8.jar (268 kB at 94 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/jdom/jdom2/2.0.6.1/jdom2-2.0.6.1.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.14.2/jackson-databind-2.14.2.jar (1.6 MB at 569 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-dependency-tree/3.2.1/maven-dependency-tree-3.2.1.jar
+Progress (1): 7.7/122 kB
+Progress (1): 16/122 kB 
+Progress (1): 28/122 kB
+Progress (1): 44/122 kB
+Progress (1): 61/122 kB
+Progress (1): 77/122 kB
+Progress (1): 93/122 kB
+Progress (1): 110/122 kB
+Progress (1): 122 kB    
+Progress (2): 122 kB | 16/72 kB
+Progress (2): 122 kB | 25/72 kB
+Progress (2): 122 kB | 41/72 kB
+Progress (2): 122 kB | 57/72 kB
+Progress (3): 122 kB | 57/72 kB | 7.7/52 kB
+Progress (3): 122 kB | 57/72 kB | 16/52 kB 
+Progress (3): 122 kB | 57/72 kB | 32/52 kB
+                                          
+Downloaded from central: https://repo.maven.apache.org/maven2/org/ow2/asm/asm/9.5/asm-9.5.jar (122 kB at 43 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/commons-io/commons-io/2.13.0/commons-io-2.13.0.jar
+Progress (2): 57/72 kB | 49/52 kB
+Progress (2): 72 kB | 49/52 kB   
+Progress (2): 72 kB | 52 kB   
+                           
+Downloaded from central: https://repo.maven.apache.org/maven2/org/ow2/asm/asm-commons/9.5/asm-commons-9.5.jar (72 kB at 25 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/vafer/jdependency/2.8.0/jdependency-2.8.0.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/ow2/asm/asm-tree/9.5/asm-tree-9.5.jar (52 kB at 18 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar
+Progress (1): 7.7/43 kB
+Progress (1): 16/43 kB 
+Progress (1): 32/43 kB
+Progress (1): 43 kB   
+                   
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/shared/maven-dependency-tree/3.2.1/maven-dependency-tree-3.2.1.jar (43 kB at 15 kB/s)
+Progress (1): 16/328 kB
+Progress (2): 16/328 kB | 7.7/484 kB
+Progress (2): 16/328 kB | 16/484 kB 
+Progress (2): 16/328 kB | 32/484 kB
+Progress (2): 16/328 kB | 49/484 kB
+Progress (3): 16/328 kB | 49/484 kB | 7.7/233 kB
+Progress (3): 16/328 kB | 49/484 kB | 16/233 kB 
+Progress (3): 33/328 kB | 49/484 kB | 16/233 kB
+Progress (3): 33/328 kB | 49/484 kB | 32/233 kB
+Progress (4): 33/328 kB | 49/484 kB | 32/233 kB | 7.7/752 kB
+Progress (4): 33/328 kB | 49/484 kB | 32/233 kB | 16/752 kB 
+Progress (4): 33/328 kB | 65/484 kB | 32/233 kB | 16/752 kB
+Progress (4): 33/328 kB | 65/484 kB | 32/233 kB | 29/752 kB
+Progress (4): 33/328 kB | 81/484 kB | 32/233 kB | 29/752 kB
+Progress (4): 33/328 kB | 81/484 kB | 49/233 kB | 29/752 kB
+Progress (4): 33/328 kB | 98/484 kB | 49/233 kB | 29/752 kB
+Progress (4): 33/328 kB | 98/484 kB | 65/233 kB | 29/752 kB
+Progress (4): 33/328 kB | 98/484 kB | 65/233 kB | 45/752 kB
+Progress (4): 33/328 kB | 98/484 kB | 81/233 kB | 45/752 kB
+Progress (4): 33/328 kB | 98/484 kB | 81/233 kB | 61/752 kB
+Progress (4): 33/328 kB | 114/484 kB | 81/233 kB | 61/752 kB
+Progress (4): 49/328 kB | 114/484 kB | 81/233 kB | 61/752 kB
+Progress (4): 49/328 kB | 114/484 kB | 98/233 kB | 61/752 kB
+Progress (4): 49/328 kB | 114/484 kB | 114/233 kB | 61/752 kB
+Progress (4): 49/328 kB | 114/484 kB | 114/233 kB | 78/752 kB
+Progress (4): 49/328 kB | 114/484 kB | 131/233 kB | 78/752 kB
+Progress (4): 49/328 kB | 131/484 kB | 131/233 kB | 78/752 kB
+Progress (4): 49/328 kB | 147/484 kB | 131/233 kB | 78/752 kB
+Progress (4): 49/328 kB | 147/484 kB | 131/233 kB | 94/752 kB
+Progress (4): 49/328 kB | 147/484 kB | 147/233 kB | 94/752 kB
+Progress (4): 49/328 kB | 147/484 kB | 163/233 kB | 94/752 kB
+Progress (4): 66/328 kB | 147/484 kB | 163/233 kB | 94/752 kB
+Progress (4): 66/328 kB | 163/484 kB | 163/233 kB | 94/752 kB
+Progress (4): 66/328 kB | 163/484 kB | 163/233 kB | 111/752 kB
+Progress (4): 66/328 kB | 180/484 kB | 163/233 kB | 111/752 kB
+Progress (4): 66/328 kB | 180/484 kB | 180/233 kB | 111/752 kB
+Progress (4): 66/328 kB | 196/484 kB | 180/233 kB | 111/752 kB
+Progress (4): 66/328 kB | 196/484 kB | 180/233 kB | 127/752 kB
+Progress (4): 66/328 kB | 196/484 kB | 196/233 kB | 127/752 kB
+Progress (4): 66/328 kB | 196/484 kB | 196/233 kB | 143/752 kB
+Progress (4): 66/328 kB | 213/484 kB | 196/233 kB | 143/752 kB
+Progress (4): 66/328 kB | 213/484 kB | 196/233 kB | 160/752 kB
+Progress (4): 66/328 kB | 213/484 kB | 213/233 kB | 160/752 kB
+Progress (4): 82/328 kB | 213/484 kB | 213/233 kB | 160/752 kB
+Progress (4): 82/328 kB | 229/484 kB | 213/233 kB | 160/752 kB
+Progress (4): 82/328 kB | 229/484 kB | 229/233 kB | 160/752 kB
+Progress (4): 82/328 kB | 229/484 kB | 233 kB | 160/752 kB    
+Progress (4): 82/328 kB | 229/484 kB | 233 kB | 176/752 kB
+Progress (4): 98/328 kB | 229/484 kB | 233 kB | 176/752 kB
+Progress (4): 98/328 kB | 245/484 kB | 233 kB | 176/752 kB
+Progress (4): 98/328 kB | 245/484 kB | 233 kB | 193/752 kB
+                                                          
+Downloaded from central: https://repo.maven.apache.org/maven2/org/vafer/jdependency/2.8.0/jdependency-2.8.0.jar (233 kB at 78 kB/s)
+Progress (3): 98/328 kB | 262/484 kB | 193/752 kB
+Progress (3): 98/328 kB | 262/484 kB | 209/752 kB
+Progress (3): 98/328 kB | 262/484 kB | 225/752 kB
+Progress (3): 98/328 kB | 278/484 kB | 225/752 kB
+Progress (3): 115/328 kB | 278/484 kB | 225/752 kB
+Progress (3): 115/328 kB | 294/484 kB | 225/752 kB
+Progress (3): 115/328 kB | 311/484 kB | 225/752 kB
+Progress (3): 115/328 kB | 311/484 kB | 242/752 kB
+Progress (3): 131/328 kB | 311/484 kB | 242/752 kB
+Progress (3): 131/328 kB | 311/484 kB | 258/752 kB
+Progress (3): 147/328 kB | 311/484 kB | 258/752 kB
+Progress (3): 147/328 kB | 311/484 kB | 274/752 kB
+Progress (3): 147/328 kB | 311/484 kB | 291/752 kB
+Progress (3): 147/328 kB | 311/484 kB | 307/752 kB
+Progress (3): 147/328 kB | 327/484 kB | 307/752 kB
+Progress (3): 147/328 kB | 344/484 kB | 307/752 kB
+Progress (3): 164/328 kB | 344/484 kB | 307/752 kB
+Progress (3): 164/328 kB | 344/484 kB | 324/752 kB
+Progress (3): 164/328 kB | 344/484 kB | 340/752 kB
+Progress (3): 164/328 kB | 360/484 kB | 340/752 kB
+Progress (3): 164/328 kB | 376/484 kB | 340/752 kB
+Progress (3): 180/328 kB | 376/484 kB | 340/752 kB
+Progress (3): 180/328 kB | 376/484 kB | 356/752 kB
+Progress (3): 180/328 kB | 393/484 kB | 356/752 kB
+Progress (3): 180/328 kB | 393/484 kB | 373/752 kB
+Progress (3): 180/328 kB | 409/484 kB | 373/752 kB
+Progress (3): 197/328 kB | 409/484 kB | 373/752 kB
+Progress (3): 197/328 kB | 409/484 kB | 389/752 kB
+Progress (3): 197/328 kB | 426/484 kB | 389/752 kB
+Progress (3): 213/328 kB | 426/484 kB | 389/752 kB
+Progress (3): 213/328 kB | 442/484 kB | 389/752 kB
+Progress (3): 213/328 kB | 458/484 kB | 389/752 kB
+Progress (3): 213/328 kB | 458/484 kB | 406/752 kB
+Progress (3): 213/328 kB | 458/484 kB | 422/752 kB
+Progress (3): 213/328 kB | 475/484 kB | 422/752 kB
+Progress (3): 213/328 kB | 475/484 kB | 438/752 kB
+Progress (3): 213/328 kB | 484 kB | 438/752 kB    
+Progress (3): 229/328 kB | 484 kB | 438/752 kB
+Progress (3): 246/328 kB | 484 kB | 438/752 kB
+Progress (3): 246/328 kB | 484 kB | 455/752 kB
+Progress (3): 262/328 kB | 484 kB | 455/752 kB
+Progress (3): 262/328 kB | 484 kB | 471/752 kB
+Progress (3): 262/328 kB | 484 kB | 487/752 kB
+Progress (3): 262/328 kB | 484 kB | 504/752 kB
+Progress (3): 279/328 kB | 484 kB | 504/752 kB
+Progress (3): 279/328 kB | 484 kB | 520/752 kB
+Progress (3): 295/328 kB | 484 kB | 520/752 kB
+Progress (3): 295/328 kB | 484 kB | 537/752 kB
+                                              
+Downloaded from central: https://repo.maven.apache.org/maven2/commons-io/commons-io/2.13.0/commons-io-2.13.0.jar (484 kB at 149 kB/s)
+Progress (2): 295/328 kB | 553/752 kB
+Progress (2): 295/328 kB | 569/752 kB
+Progress (2): 295/328 kB | 586/752 kB
+Progress (2): 295/328 kB | 602/752 kB
+Progress (2): 295/328 kB | 618/752 kB
+Progress (2): 295/328 kB | 635/752 kB
+Progress (2): 311/328 kB | 635/752 kB
+Progress (2): 311/328 kB | 651/752 kB
+Progress (2): 328/328 kB | 651/752 kB
+Progress (2): 328 kB | 651/752 kB    
+Progress (2): 328 kB | 668/752 kB
+Progress (2): 328 kB | 684/752 kB
+Progress (2): 328 kB | 700/752 kB
+Progress (2): 328 kB | 717/752 kB
+Progress (2): 328 kB | 733/752 kB
+Progress (2): 328 kB | 750/752 kB
+Progress (2): 328 kB | 752 kB    
+                             
+Downloaded from central: https://repo.maven.apache.org/maven2/org/jdom/jdom2/2.0.6.1/jdom2-2.0.6.1.jar (328 kB at 98 kB/s)
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar (752 kB at 225 kB/s)
+[INFO] Replacing main artifact C:\Users\pc\Desktop\Work\quickflow\backend\target\ai-application-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to C:\Users\pc\Desktop\Work\quickflow\backend\target\ai-application-0.0.1-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ ai-application ---
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/resolver/maven-resolver-util/1.9.18/maven-resolver-util-1.9.18.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/resolver/maven-resolver-api/1.9.18/maven-resolver-api-1.9.18.jar
+Progress (1): 7.7/157 kB
+Progress (1): 12/157 kB 
+Progress (2): 12/157 kB | 7.7/196 kB
+Progress (2): 12/157 kB | 16/196 kB 
+Progress (2): 29/157 kB | 16/196 kB
+Progress (2): 45/157 kB | 16/196 kB
+Progress (2): 45/157 kB | 32/196 kB
+Progress (2): 61/157 kB | 32/196 kB
+Progress (2): 78/157 kB | 32/196 kB
+Progress (2): 94/157 kB | 32/196 kB
+Progress (2): 94/157 kB | 49/196 kB
+Progress (2): 111/157 kB | 49/196 kB
+Progress (2): 127/157 kB | 49/196 kB
+Progress (2): 127/157 kB | 65/196 kB
+Progress (2): 143/157 kB | 65/196 kB
+Progress (2): 157 kB | 65/196 kB    
+Progress (2): 157 kB | 81/196 kB
+Progress (2): 157 kB | 98/196 kB
+                                
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/resolver/maven-resolver-api/1.9.18/maven-resolver-api-1.9.18.jar (157 kB at 1.3 MB/s)
+Progress (1): 114/196 kB
+Progress (1): 131/196 kB
+Progress (1): 147/196 kB
+Progress (1): 163/196 kB
+Progress (1): 180/196 kB
+Progress (1): 196 kB    
+                    
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/resolver/maven-resolver-util/1.9.18/maven-resolver-util-1.9.18.jar (196 kB at 1.0 MB/s)
+[INFO] Installing C:\Users\pc\Desktop\Work\quickflow\backend\pom.xml to C:\Users\pc\.m2\repository\com\ai\ai-application\0.0.1-SNAPSHOT\ai-application-0.0.1-SNAPSHOT.pom
+[INFO] Installing C:\Users\pc\Desktop\Work\quickflow\backend\target\ai-application-0.0.1-SNAPSHOT.jar to C:\Users\pc\.m2\repository\com\ai\ai-application\0.0.1-SNAPSHOT\ai-application-0.0.1-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.824 s
+[INFO] Finished at: 2026-01-20T00:45:52+01:00
+[INFO] ------------------------------------------------------------------------
