@@ -78,11 +78,73 @@ export const sendFinal = async (
     data: Record<string, unknown>
 ): Promise<ApiResponse> => {
     try {
-        const response = await api.post<ApiResponse>(`/${reviewType}/send-final`, data)
+        const endpoint = reviewType === 'pv' ? '/meeting/send-final' : '/email/send-final'
+        const response = await api.post<ApiResponse>(endpoint, data)
         return response.data
     } catch (error) {
         console.error('Send error:', error)
         return { status: 'error', message: 'Network error' }
+    }
+}
+
+/**
+ * Stores OAuth tokens after successful OAuth login.
+ */
+export const storeOAuthTokens = async (
+    accessToken: string,
+    refreshToken: string | null,
+    provider: string,
+    email: string,
+    expiresIn: number = 3600
+): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/auth/store-tokens', {
+            accessToken,
+            refreshToken,
+            provider,
+            email,
+            expiresIn,
+        })
+        return response.data
+    } catch (error) {
+        console.error('Token storage error:', error)
+        return { status: 'error', message: 'Failed to store tokens' }
+    }
+}
+
+/**
+ * Checks if the user can send emails via OAuth.
+ */
+export const getEmailCapability = async (): Promise<{
+    canSendEmail: boolean
+    provider: string
+}> => {
+    try {
+        const response = await api.get('/auth/email-capability')
+        return response.data
+    } catch (error) {
+        console.error('Email capability check error:', error)
+        return { canSendEmail: false, provider: 'none' }
+    }
+}
+
+/**
+ * Generates a PDF preview from HTML content.
+ */
+export const previewPdf = async (
+    content: string,
+    title?: string,
+    date?: string
+): Promise<Blob | null> => {
+    try {
+        const response = await api.post('/pdf/preview',
+            { content, title, date },
+            { responseType: 'blob' }
+        )
+        return response.data
+    } catch (error) {
+        console.error('PDF preview error:', error)
+        return null
     }
 }
 

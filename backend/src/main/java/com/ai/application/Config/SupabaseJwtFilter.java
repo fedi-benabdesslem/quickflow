@@ -72,6 +72,9 @@ public class SupabaseJwtFilter extends OncePerRequestFilter {
                     String userId = (String) userData.get("id");
                     String email = (String) userData.get("email");
 
+                    // Extract provider from app_metadata or identities
+                    String provider = extractProvider(userData);
+
                     // Create authentication token
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userId,
@@ -79,7 +82,7 @@ public class SupabaseJwtFilter extends OncePerRequestFilter {
                             Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
                     // Store additional user info in authentication details
-                    authentication.setDetails(new SupabaseUserDetails(userId, email));
+                    authentication.setDetails(new SupabaseUserDetails(userId, email, provider));
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     logger.debug("JWT verified successfully for user: " + userId);
@@ -98,15 +101,49 @@ public class SupabaseJwtFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Simple record to hold Supabase user details extracted from JWT.
+     * Extracts the OAuth provider from user metadata.
+     * Returns "google", "azure", or "email" based on how the user signed in.
+     */
+    @SuppressWarnings("unchecked")
+    private String extractProvider(Map<String, Object> userData) {
+        try {
+            // Check app_metadata first
+            Map<String, Object> appMetadata = (Map<String, Object>) userData.get("app_metadata");
+            if (appMetadata != null) {
+                String provider = (String) appMetadata.get("provider");
+                if (provider != null && !provider.isEmpty()) {
+                    return provider;
+                }
+            }
+
+            // Check identities array
+            java.util.List<Map<String, Object>> identities = (java.util.List<Map<String, Object>>) userData
+                    .get("identities");
+            if (identities != null && !identities.isEmpty()) {
+                String provider = (String) identities.get(0).get("provider");
+                if (provider != null && !provider.isEmpty()) {
+                    return provider;
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("Failed to extract provider from user data: " + e.getMessage());
+        }
+
+        return "email"; // Default to email if no OAuth provider found
+    }
+
+    /**
+     * Class to hold Supabase user details extracted from JWT.
      */
     public static class SupabaseUserDetails {
         private final String userId;
         private final String email;
+        private final String provider;
 
-        public SupabaseUserDetails(String userId, String email) {
+        public SupabaseUserDetails(String userId, String email, String provider) {
             this.userId = userId;
             this.email = email;
+            this.provider = provider != null ? provider : "email";
         }
 
         public String getUserId() {
@@ -115,6 +152,10 @@ public class SupabaseJwtFilter extends OncePerRequestFilter {
 
         public String getEmail() {
             return email;
+        }
+
+        public String getProvider() {
+            return provider;
         }
     }
 }

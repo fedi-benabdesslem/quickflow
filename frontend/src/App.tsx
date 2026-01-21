@@ -3,6 +3,7 @@ import { useAuth } from './contexts/AuthContext'
 import { setAuthToken } from './lib/api'
 import { useEffect } from 'react'
 import NebulaBackground from './components/NebulaBackground'
+import { ToastProvider } from './components/Toast'
 import AuthPage from './pages/AuthPage'
 import HomePage from './pages/HomePage'
 import MeetingPage from './pages/MeetingPage'
@@ -71,6 +72,7 @@ function App() {
     return (
         <>
             <NebulaBackground />
+            <ToastProvider />
             <Routes>
                 <Route path="/" element={<RootRedirect />} />
                 <Route

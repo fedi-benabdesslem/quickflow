@@ -6,7 +6,7 @@ import com.ai.application.model.TemplateType;
 import com.ai.application.model.DTO.EmailRequest;
 import com.ai.application.model.DTO.TemplateResponse;
 import com.ai.application.Services.TemplateService;
-import com.ai.application.Services.EmailSenderService;
+import com.ai.application.Services.EmailProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +27,7 @@ public class EmailController {
     private TemplateService templateService;
 
     @Autowired
-    private EmailSenderService emailSenderService;
+    private EmailProviderService emailProviderService;
 
     @PostMapping("/send")
     public ResponseEntity<?> sendEmail(@RequestBody EmailRequest templateReq, Principal principal) {
@@ -82,12 +82,18 @@ public class EmailController {
     }
 
     @PostMapping("/send-final")
-    public ResponseEntity<?> sendFinalEmail(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> sendFinalEmail(@RequestBody Map<String, Object> body, Principal principal) {
         String id = (String) body.get("id");
         String finalSubject = (String) body.get("subject");
         String finalContent = (String) body.get("content");
         @SuppressWarnings("unchecked")
         List<String> finalRecipients = (List<String>) body.get("recipients");
+
+        if (principal == null) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "error",
+                    "message", "Not authenticated"));
+        }
 
         Optional<Email> optionalEmail = emailRepository.findById(id);
         if (optionalEmail.isEmpty()) {
@@ -98,21 +104,41 @@ public class EmailController {
         email.setRecipients(finalRecipients != null ? finalRecipients : email.getRecipients());
         email.setSubject(finalSubject);
         email.setGeneratedContent(finalContent);
-        email.setStatus("sent");
-        emailRepository.save(email);
 
-        // Actually send the email via SMTP
-        try {
-            String[] recipients = email.getRecipients().toArray(new String[0]);
-            emailSenderService.sendBulkEmail(recipients, email.getSubject(), email.getGeneratedContent());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of(
-                    "status", "error",
-                    "message", "Failed to send email: " + e.getMessage()));
+        // Try sending via OAuth provider first
+        String supabaseId = principal.getName();
+        String recipients = String.join(", ", email.getRecipients());
+
+        // Convert plain text to HTML if it's not already
+        String htmlContent = finalContent;
+        if (!finalContent.trim().startsWith("<")) {
+            htmlContent = "<p>" + finalContent.replace("\n", "</p><p>") + "</p>";
         }
 
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "Email sent successfully"));
+        EmailProviderService.SendResult result = emailProviderService.sendEmail(
+                supabaseId, recipients, email.getSubject(), htmlContent);
+
+        if (result.isSuccess()) {
+            email.setStatus("sent");
+            emailRepository.save(email);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Email sent successfully"));
+        } else if (result.isUnsupportedProvider()) {
+            // Email/password user - show toast message
+            email.setStatus("draft");
+            emailRepository.save(email);
+            return ResponseEntity.ok(Map.of(
+                    "status", "unsupported",
+                    "message", result.getMessage()));
+        } else if (result.requiresReauth()) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "reauth_required",
+                    "message", result.getMessage()));
+        } else {
+            return ResponseEntity.status(500).body(Map.of(
+                    "status", "error",
+                    "message", result.getMessage()));
+        }
     }
 }
