@@ -89,10 +89,10 @@ export default function HomePage() {
                         </motion.div>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
-                        Create Meeting Summary
+                        Create Meeting Minutes
                     </h3>
                     <p className="text-slate-400">
-                        Generate professional meeting summaries (PV) with AI
+                        Generate professional meeting minutes (PV) with AI
                     </p>
                     <div className="mt-4 h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300" />
                 </motion.div>
