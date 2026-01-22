@@ -3,7 +3,7 @@
 > **Intelligent Meetings, Effortless Emails.**
 > Transform your workflow with AI-powered meeting summaries and instant email drafting.
 
-![QuickFlow Banner](https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=2564&ixlib=rb-4.0.3)
+<img src="frontend/public/banner.png" alt="QuickFlow Banner" width="100%">
 <!-- Placeholder image for now, user can replace later -->
 
 ## Overview
