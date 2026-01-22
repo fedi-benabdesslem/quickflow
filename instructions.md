@@ -23,12 +23,96 @@ The app has two AI-powered features that are partially implemented:
 1. **AI Meeting Minutes Generator**
    - User fills form (meeting date, time, attendees, topics, action items)
    - Mistral-Nemo generates professional meeting minutes text
-   - Currently: Text is generated but cannot be sent as email
+   - ✅ Full flow implemented: Generate → Edit → Preview PDF → Send Email
 
 2. **AI Professional Email Writer**
    - User inputs recipient and casual message description
    - Mistral-Nemo generates professional email with auto-generated subject
-   - Currently: Email content is generated but cannot be sent
+   - ✅ Full flow implemented: Generate → Edit → Send Email
+
+---
+
+## ⚠️ CRITICAL SETUP REQUIREMENTS
+
+Before email sending will work, you **MUST** complete the following setup:
+
+### 1. Enable Gmail API in Google Cloud Console
+
+> **This is the most common issue!** If email sending returns a 500 error, the Gmail API is likely not enabled.
+
+**Steps:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Select your project (the one with OAuth credentials)
+3. Navigate to **APIs & Services** → **Library**
+4. Search for **"Gmail API"**
+5. Click **Enable**
+6. Wait 2-3 minutes for propagation
+
+### 2. Configure OAuth Scopes in Supabase
+
+Ensure your Supabase Google OAuth configuration includes these scopes:
+- `https://www.googleapis.com/auth/gmail.send`
+- `email`
+- `profile`
+- `openid`
+
+In Supabase Dashboard → Authentication → Providers → Google:
+- Add `access_type: 'offline'` to request refresh tokens
+- Add `prompt: 'consent'` to force consent screen
+
+### 3. Backend Environment Variables
+
+Create/update `backend/src/main/resources/application.properties`:
+
+```properties
+# MongoDB Connection
+spring.data.mongodb.uri=mongodb://localhost:27017/quickflow
+
+# Supabase JWT Secret (from Supabase Dashboard → Settings → API)
+supabase.jwt.secret=your-supabase-jwt-secret
+
+# Token Encryption Key (MUST be exactly 32 characters)
+token.encryption.key=your-32-character-encryption-key!!
+
+# Google OAuth Credentials (from Google Cloud Console)
+google.client.id=your-google-client-id.apps.googleusercontent.com
+google.client.secret=your-google-client-secret
+
+# Microsoft OAuth (optional - for Outlook email sending)
+microsoft.client.id=your-azure-app-client-id
+microsoft.client.secret=your-azure-app-client-secret
+microsoft.tenant.id=your-azure-tenant-id
+
+# Ollama Configuration
+spring.ai.ollama.base-url=http://localhost:11434
+spring.ai.ollama.chat.model=mistral-nemo
+```
+
+### 4. Frontend Environment Variables
+
+Create `frontend/.env`:
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_API_URL=http://localhost:8080
+```
+
+### 5. Start Required Services
+
+```bash
+# 1. Start Ollama with Mistral-Nemo
+ollama run mistral-nemo
+
+# 2. Start MongoDB
+mongod
+
+# 3. Start Backend (in backend directory)
+mvn spring-boot:run
+
+# 4. Start Frontend (in frontend directory)
+npm run dev
+```
 
 ---
 
