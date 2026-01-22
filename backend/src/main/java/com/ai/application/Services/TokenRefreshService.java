@@ -51,24 +51,36 @@ public class TokenRefreshService {
      * Returns the new access token, or null if refresh fails.
      */
     public String refreshTokenIfNeeded(String supabaseId) {
+        System.out.println("[TokenRefreshService] refreshTokenIfNeeded called for user: " + supabaseId);
+
         TokenStorageService.DecryptedTokens tokens = tokenStorageService.getDecryptedTokens(supabaseId);
 
         if (tokens == null) {
+            System.err.println("[TokenRefreshService] ERROR: No tokens found for user: " + supabaseId);
             return null;
         }
 
+        System.out.println("[TokenRefreshService] Found tokens - provider: " + tokens.getProvider());
+        System.out.println("[TokenRefreshService] Token expires at: " + tokens.getExpiresAt());
+        System.out.println("[TokenRefreshService] Is expired or expiring soon: " + tokens.isExpiredOrExpiringSoon());
+
         // If token is not expired, return existing
         if (!tokens.isExpiredOrExpiringSoon()) {
+            System.out.println("[TokenRefreshService] Token is still valid, returning existing token");
             return tokens.getAccessToken();
         }
 
         // Token is expired, try to refresh
+        System.out.println("[TokenRefreshService] Token is expired/expiring, attempting refresh...");
         String provider = tokens.getProvider();
         String refreshToken = tokens.getRefreshToken();
 
         if (refreshToken == null || refreshToken.isEmpty()) {
+            System.err.println("[TokenRefreshService] ERROR: No refresh token available for token refresh");
             return null;
         }
+
+        System.out.println("[TokenRefreshService] Has refresh token, attempting " + provider + " token refresh");
 
         try {
             RefreshResult result = switch (provider.toLowerCase()) {
@@ -78,15 +90,19 @@ public class TokenRefreshService {
             };
 
             if (result != null && result.accessToken != null) {
+                System.out.println("[TokenRefreshService] Token refresh successful, updating database");
                 // Update tokens in database
                 tokenStorageService.updateTokensAfterRefresh(
                         supabaseId,
                         result.accessToken,
                         result.expiresIn);
                 return result.accessToken;
+            } else {
+                System.err.println("[TokenRefreshService] Token refresh returned null result");
             }
         } catch (Exception e) {
             System.err.println("Failed to refresh token for user " + supabaseId + ": " + e.getMessage());
+            e.printStackTrace();
         }
 
         return null;

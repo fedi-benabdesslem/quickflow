@@ -41,7 +41,10 @@ public class AuthController {
      */
     @PostMapping("/store-tokens")
     public ResponseEntity<?> storeTokens(@RequestBody Map<String, Object> body, Principal principal) {
+        System.out.println("[AuthController] /store-tokens endpoint called");
+
         if (principal == null) {
+            System.err.println("[AuthController] ERROR: No principal - user not authenticated");
             return ResponseEntity.status(401).body(Map.of(
                     "status", "error",
                     "message", "Not authenticated"));
@@ -53,6 +56,12 @@ public class AuthController {
         String provider = (String) body.get("provider");
         String email = (String) body.get("email");
 
+        System.out.println("[AuthController] Storing tokens for user: " + supabaseId);
+        System.out.println("[AuthController] Provider: " + provider + ", Email: " + email);
+        System.out.println("[AuthController] Access token present: " + (accessToken != null && !accessToken.isEmpty()));
+        System.out.println(
+                "[AuthController] Refresh token present: " + (refreshToken != null && !refreshToken.isEmpty()));
+
         // Handle expiresIn - can be integer or long
         long expiresIn = 3600; // default 1 hour
         Object expiresInObj = body.get("expiresIn");
@@ -61,9 +70,11 @@ public class AuthController {
                 expiresIn = ((Number) expiresInObj).longValue();
             }
         }
+        System.out.println("[AuthController] Token expires in: " + expiresIn + " seconds");
 
         // Validate required fields
         if (accessToken == null || accessToken.isEmpty()) {
+            System.err.println("[AuthController] ERROR: Access token is empty or null");
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
                     "message", "Access token is required"));
@@ -86,10 +97,13 @@ public class AuthController {
                     refreshToken,
                     expiresIn);
 
+            System.out.println("[AuthController] SUCCESS: Tokens stored successfully for user: " + supabaseId);
             return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", "Tokens stored successfully"));
         } catch (Exception e) {
+            System.err.println("[AuthController] ERROR: Failed to store tokens: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(500).body(Map.of(
                     "status", "error",
                     "message", "Failed to store tokens: " + e.getMessage()));

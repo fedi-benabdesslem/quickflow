@@ -70,28 +70,38 @@ public class GmailService {
      */
     public boolean sendEmailWithAttachment(String supabaseId, String to, String subject,
             String htmlBody, byte[] pdfBytes, String pdfFilename) throws Exception {
+        System.out.println("[GmailService] sendEmailWithAttachment called for user: " + supabaseId);
+
         // Get or refresh access token
         String accessToken = tokenRefreshService.refreshTokenIfNeeded(supabaseId);
         if (accessToken == null) {
+            System.err.println("[GmailService] ERROR: No valid access token - refresh failed or no token exists");
             throw new Exception("No valid access token available. Please sign in again.");
         }
+        System.out.println("[GmailService] Got access token (length: " + accessToken.length() + ")");
 
         // Get user's email address
         TokenStorageService.DecryptedTokens tokens = tokenStorageService.getDecryptedTokens(supabaseId);
         if (tokens == null) {
+            System.err.println("[GmailService] ERROR: No stored tokens found for user");
             throw new Exception("No stored tokens found for user.");
         }
         String fromEmail = tokens.getEmail();
+        System.out.println("[GmailService] Sending from email: " + fromEmail + " to: " + to);
 
         // Create Gmail service
         Gmail gmail = createGmailService(accessToken);
+        System.out.println("[GmailService] Gmail service created successfully");
 
         // Create MIME message
         MimeMessage mimeMessage = createMimeMessage(fromEmail, to, subject, htmlBody, pdfBytes, pdfFilename);
+        System.out.println("[GmailService] MIME message created, subject: " + subject);
 
         // Encode and send
         Message message = createMessageFromMimeMessage(mimeMessage);
+        System.out.println("[GmailService] Sending message via Gmail API...");
         gmail.users().messages().send("me", message).execute();
+        System.out.println("[GmailService] SUCCESS: Email sent via Gmail API!");
 
         return true;
     }

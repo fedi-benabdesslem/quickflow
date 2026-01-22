@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User, AuthContextType, AuthResult, Session } from '../types'
-import { storeOAuthTokens } from '../lib/api'
+import { storeOAuthTokens, setAuthToken } from '../lib/api'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -11,75 +11,103 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Get initial session with proper error handling
-        supabase.auth.getSession()
-            .then(({ data: { session: currentSession }, error }) => {
+        let isCleanedUp = false;
+
+        // Initialize auth - get existing session
+        const initializeAuth = async () => {
+            try {
+                const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+
+                if (isCleanedUp) return;
+
                 if (error) {
-                    console.error('Error getting session:', error)
-                    setLoading(false)
-                    return
+                    console.error('Error getting session:', error);
+                    return;
                 }
+
                 if (currentSession) {
                     setSession({
                         access_token: currentSession.access_token,
                         refresh_token: currentSession.refresh_token,
                         expires_at: currentSession.expires_at,
-                    })
+                    });
                     setUser({
                         id: currentSession.user.id,
                         username: currentSession.user.user_metadata?.username || currentSession.user.email?.split('@')[0] || 'User',
                         email: currentSession.user.email,
-                    })
+                    });
+                    // Set auth token synchronously for API calls
+                    setAuthToken(currentSession.access_token);
                 }
-                setLoading(false)
-            })
-            .catch((error) => {
-                console.error('Failed to get session:', error)
-                setLoading(false)
-            })
+            } catch (error) {
+                console.error('Failed to get session:', error);
+            } finally {
+                if (!isCleanedUp) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        initializeAuth();
+
+        // Safety timeout - ensure loading NEVER stays true forever
+        const safetyTimeout = setTimeout(() => {
+            if (!isCleanedUp) {
+                console.warn('Auth initialization safety timeout reached');
+                setLoading(false);
+            }
+        }, 5000);
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+            if (isCleanedUp) return;
+
             if (currentSession) {
                 setSession({
                     access_token: currentSession.access_token,
                     refresh_token: currentSession.refresh_token,
                     expires_at: currentSession.expires_at,
-                })
+                });
                 setUser({
                     id: currentSession.user.id,
                     username: currentSession.user.user_metadata?.username || currentSession.user.email?.split('@')[0] || 'User',
                     email: currentSession.user.email,
-                })
+                });
+                // Set auth token synchronously
+                setAuthToken(currentSession.access_token);
 
                 // Extract and store OAuth provider tokens for email sending
+                // IMPORTANT: Don't await this - it would block the auth flow and cause hangs
                 if (event === 'SIGNED_IN' && currentSession.provider_token) {
-                    const provider = currentSession.user.app_metadata?.provider || 'email'
+                    const provider = currentSession.user.app_metadata?.provider || 'email';
                     if (provider === 'google' || provider === 'azure') {
-                        try {
-                            await storeOAuthTokens(
-                                currentSession.provider_token,
-                                currentSession.provider_refresh_token || null,
-                                provider,
-                                currentSession.user.email || '',
-                                3600 // Default 1 hour expiry
-                            )
-                            console.log(`OAuth tokens stored for ${provider} provider`)
-                        } catch (error) {
-                            console.error('Failed to store OAuth tokens:', error)
-                        }
+                        // Fire and forget - don't block auth flow
+                        storeOAuthTokens(
+                            currentSession.provider_token,
+                            currentSession.provider_refresh_token || null,
+                            provider,
+                            currentSession.user.email || '',
+                            3600 // Default 1 hour expiry
+                        ).then(() => {
+                            console.log(`OAuth tokens stored for ${provider} provider`);
+                        }).catch(error => {
+                            console.error('Failed to store OAuth tokens:', error);
+                        });
                     }
                 }
             } else {
-                setSession(null)
-                setUser(null)
+                setSession(null);
+                setUser(null);
+                setAuthToken(null);
             }
-            setLoading(false)
-        })
+            setLoading(false);
+        });
 
         return () => {
-            subscription.unsubscribe()
-        }
+            isCleanedUp = true;
+            clearTimeout(safetyTimeout);
+            subscription.unsubscribe();
+        };
     }, [])
 
     const signIn = async (email: string, password: string): Promise<AuthResult> => {

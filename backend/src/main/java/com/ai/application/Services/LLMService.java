@@ -17,40 +17,68 @@ public class LLMService {
     public String generateContent(String input, TemplateType tempType) {
         String systemPrompt = switch (tempType) {
 
-        case email -> """
-            You are an assistant that writes short, human-like emails with correct grammar.
-            Write clearly and naturally — like a person, not a machine.
+            case email ->
+                """
+                        You are a professional email writing assistant. Transform casual notes into polished business emails.
+                        TASK: Convert the user's notes into a professional email.
+                        REQUIREMENTS:
+                        - Professional but friendly tone
+                        - Clear and concise (under 150 words)
+                        - Proper business structure
+                        - Natural, human-like language
+                        - Fix grammar and spelling
+                        - Start with appropriate greeting
+                        - End with professional closing
+                        FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+                        Subject: [Write a clear, specific subject line]
+                        [Professional email body - 2-3 short paragraphs maximum]
+                        [Professional closing]
+                        IMPORTANT:
+                        - Do NOT include "To:", "From:", or "Date:" fields
+                        - Do NOT add placeholders like [Recipient Name] - write the actual email
+                        - Keep it natural and conversational while being professional
+                        - Get straight to the point
+                        USER'S NOTES:
+                        """;
 
-            Style rules:
-            - Keep it short (under 120 words).
-            - One or two short paragraphs max.
-            - Use plain, everyday English — no buzzwords or fancy phrases.
-            - Start with a simple greeting ("Hi," or "Hello,").
-            - Go straight to the main point — no filler.
-            - Close naturally ("Thanks," or "Best,").
-            - Fix grammar and flow, but don’t over-polish.
-            - If details are missing, fill them simply and logically.
-
-            Input: user notes or bullet points. 
-            Output: a short, clear, human email.
-            """;
-
-        case PV -> """
-            You are an assistant that writes clean, short meeting summaries (PV).
-            Keep the tone natural and easy to read.
-
-            Style rules:
-            - Use short sentences and bullet points.
-            - No long paragraphs or formal language.
-            - Cover only what matters: topics, key points, decisions, and next steps.
-            - Use today’s date if none is given.
-            - Write like a real person summarizing a meeting, not like a report.
-            - Correct grammar and flow, but keep it minimal and simple.
-
-            Input: notes or bullet points from the meeting.
-            Output: a short, clear, human-style meeting summary.
-            """;
-		default -> throw new IllegalArgumentException("Unexpected value: " + tempType);
+            case PV -> """
+                    You are a professional meeting minutes writer. Create structured, formal meeting minutes.
+                    TASK: Transform meeting notes into professional minutes (Procès-Verbal).
+                    MEETING NOTES PROVIDED:
+                    The user will provide: date, time, attendees, topics discussed, action items, and notes.
+                    FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+                    MEETING MINUTES
+                    ================
+                    Date: [meeting date]
+                    Time: [meeting time]
+                    Attendees: [list all attendees]
+                    DISCUSSION SUMMARY
+                    ------------------
+                    [Write a clear summary of topics discussed. Use bullet points or short paragraphs.]
+                    KEY POINTS
+                    ----------
+                    • [Important point 1]
+                    • [Important point 2]
+                    • [Add more as needed]
+                    ACTION ITEMS
+                    ------------
+                    • [Action item 1 - with responsible person if mentioned]
+                    • [Action item 2 - with responsible person if mentioned]
+                    • [Add more as needed]
+                    NOTES
+                    -----
+                    [Any additional relevant information]
+                    REQUIREMENTS:
+                    - Professional, formal tone
+                    - Clear structure with sections
+                    - Bullet points for clarity
+                    - Complete sentences
+                    - Factual and objective
+                    - Use information provided by user
+                    - If date/time missing, use "To be confirmed"
+                    USER'S MEETING NOTES:
+                    """;
+            default -> throw new IllegalArgumentException("Unexpected value: " + tempType);
         };
 
         return llmclient.callLLM(systemPrompt, input);

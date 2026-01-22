@@ -44,26 +44,37 @@ public class EmailProviderService {
      */
     public SendResult sendEmailWithAttachment(String supabaseId, String to, String subject,
             String htmlBody, byte[] pdfBytes, String pdfFilename) {
+        System.out.println("[EmailProviderService] sendEmail called for user: " + supabaseId);
+        System.out.println("[EmailProviderService] Recipients: " + to + ", Subject: " + subject);
+
         // Get user's provider
         Optional<UserToken> userTokenOpt = tokenStorageService.getUserToken(supabaseId);
 
         if (userTokenOpt.isEmpty()) {
+            System.err.println("[EmailProviderService] ERROR: No OAuth tokens found for user: " + supabaseId);
             return new SendResult(false, "No OAuth tokens found. Please sign in again.", "no_tokens");
         }
 
         UserToken userToken = userTokenOpt.get();
         String provider = userToken.getProvider();
+        System.out.println("[EmailProviderService] Found token for user, provider: " + provider);
+        System.out.println("[EmailProviderService] Token expires at: " + userToken.getExpiresAt());
+        System.out.println(
+                "[EmailProviderService] Token expired or expiring soon: " + userToken.isTokenExpiredOrExpiringSoon());
 
         // Check if user can send emails
         if (!userToken.canSendEmail()) {
+            System.out.println("[EmailProviderService] User cannot send email - unsupported provider: " + provider);
             return new SendResult(false,
                     "Email sending not supported for your domain yet. Coming soon!",
                     "unsupported_provider");
         }
 
         try {
+            System.out.println("[EmailProviderService] Attempting to send via provider: " + provider);
             boolean success = switch (provider.toLowerCase()) {
                 case "google" -> {
+                    System.out.println("[EmailProviderService] Using Gmail service...");
                     if (pdfBytes != null) {
                         yield gmailService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes,
                                 pdfFilename);
@@ -72,6 +83,7 @@ public class EmailProviderService {
                     }
                 }
                 case "azure" -> {
+                    System.out.println("[EmailProviderService] Using Microsoft Graph service...");
                     if (pdfBytes != null) {
                         yield microsoftGraphService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes,
                                 pdfFilename);
@@ -83,12 +95,16 @@ public class EmailProviderService {
             };
 
             if (success) {
+                System.out.println("[EmailProviderService] SUCCESS: Email sent successfully!");
                 return new SendResult(true, "Email sent successfully!", "success");
             } else {
+                System.err.println("[EmailProviderService] FAILED: Email sending returned false");
                 return new SendResult(false, "Failed to send email.", "send_failed");
             }
         } catch (Exception e) {
             String message = e.getMessage();
+            System.err.println("[EmailProviderService] EXCEPTION: " + message);
+            e.printStackTrace();
 
             // Handle specific error cases
             if (message != null && message.contains("sign in again")) {
