@@ -28,7 +28,7 @@ export interface AuthResult {
 }
 
 export interface ApiResponse {
-    status: 'success' | 'error';
+    status: 'success' | 'error' | 'unsupported' | 'reauth_required';
     message?: string;
     token?: string;
     user?: User;

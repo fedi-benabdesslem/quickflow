@@ -6,10 +6,14 @@ import com.ai.application.model.TemplateType;
 import com.ai.application.model.DTO.MeetingRequest;
 import com.ai.application.model.DTO.TemplateResponse;
 import com.ai.application.Services.TemplateService;
+import com.ai.application.Services.PdfService;
+import com.ai.application.Services.GridFsService;
+import com.ai.application.Services.EmailProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,11 +27,19 @@ public class MeetingController {
 
     private final MeetingRepository meetingRepository;
     private final TemplateService templateService;
+    private final PdfService pdfService;
+    private final GridFsService gridFsService;
+    private final EmailProviderService emailProviderService;
 
     @Autowired
-    public MeetingController(MeetingRepository meetingRepository, TemplateService templateService) {
+    public MeetingController(MeetingRepository meetingRepository, TemplateService templateService,
+            PdfService pdfService, GridFsService gridFsService,
+            EmailProviderService emailProviderService) {
         this.meetingRepository = meetingRepository;
         this.templateService = templateService;
+        this.pdfService = pdfService;
+        this.gridFsService = gridFsService;
+        this.emailProviderService = emailProviderService;
     }
 
     @PostMapping("/generate")
@@ -100,7 +112,7 @@ public class MeetingController {
     }
 
     @PostMapping("/send-final")
-    public ResponseEntity<?> sendFinalMeeting(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> sendFinalMeeting(@RequestBody Map<String, Object> body, Principal principal) {
         String id = (String) body.get("id");
         String finalSubject = (String) body.get("subject");
         String finalContent = (String) body.get("content");
@@ -108,6 +120,14 @@ public class MeetingController {
         List<String> finalPeople = (List<String>) body.get("people");
         String finalLocation = (String) body.get("location");
         String finalDate = (String) body.get("date");
+        @SuppressWarnings("unchecked")
+        List<String> recipients = (List<String>) body.get("recipients");
+
+        if (principal == null) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "error",
+                    "message", "Not authenticated"));
+        }
 
         Optional<Meeting> optionalMeeting = meetingRepository.findById(id);
         if (optionalMeeting.isEmpty()) {
@@ -127,19 +147,80 @@ public class MeetingController {
         if (finalContent != null) {
             meeting.setGeneratedContent(finalContent);
         }
+
+        LocalDate meetingDate = LocalDate.now();
         if (finalDate != null) {
             try {
-                LocalDate date = LocalDate.parse(finalDate);
-                meeting.setDate(LocalDateTime.of(date, LocalTime.parse("00:00")));
+                meetingDate = LocalDate.parse(finalDate);
+                meeting.setDate(LocalDateTime.of(meetingDate, LocalTime.parse("00:00")));
             } catch (Exception e) {
                 // Keep existing date if parsing fails
             }
         }
+
+        // Generate PDF if recipients are provided (for email sending)
+        if (recipients != null && !recipients.isEmpty()) {
+            String supabaseId = principal.getName();
+
+            // Check if user can send emails
+            if (!emailProviderService.canUserSendEmail(supabaseId)) {
+                meeting.setStatus("draft");
+                meetingRepository.save(meeting);
+                return ResponseEntity.ok(Map.of(
+                        "status", "unsupported",
+                        "message", "Email sending not supported for your domain yet. Coming soon!"));
+            }
+
+            try {
+                // Generate PDF
+                String htmlContent = finalContent != null ? finalContent : meeting.getGeneratedContent();
+                if (!htmlContent.trim().startsWith("<")) {
+                    htmlContent = "<p>" + htmlContent.replace("\n", "</p><p>") + "</p>";
+                }
+
+                byte[] pdfBytes = pdfService.generateMeetingMinutesPdf(
+                        meeting.getSubject(), meetingDate, htmlContent);
+                String pdfFilename = pdfService.getMeetingMinutesFilename(meetingDate);
+
+                // Store PDF in GridFS
+                String pdfFileId = gridFsService.storePdf(pdfBytes, pdfFilename);
+                meeting.setPdfFileId(pdfFileId);
+
+                // Send email with PDF attachment
+                String recipientString = String.join(", ", recipients);
+                String emailSubject = "Meeting Minutes - " + meetingDate;
+                String emailBody = "<p>Please find attached the meeting minutes from " + meetingDate + ".</p>";
+
+                EmailProviderService.SendResult result = emailProviderService.sendEmailWithAttachment(
+                        supabaseId, recipientString, emailSubject, emailBody, pdfBytes, pdfFilename);
+
+                if (result.isSuccess()) {
+                    meeting.setStatus("sent");
+                    meetingRepository.save(meeting);
+                    return ResponseEntity.ok(Map.of(
+                            "status", "success",
+                            "message", "Meeting minutes sent successfully",
+                            "pdfFileId", pdfFileId));
+                } else {
+                    meeting.setStatus("draft");
+                    meetingRepository.save(meeting);
+                    return ResponseEntity.ok(Map.of(
+                            "status", result.isUnsupportedProvider() ? "unsupported" : "error",
+                            "message", result.getMessage()));
+                }
+            } catch (Exception e) {
+                return ResponseEntity.status(500).body(Map.of(
+                        "status", "error",
+                        "message", "Failed to process: " + e.getMessage()));
+            }
+        }
+
+        // No recipients - just save the meeting
         meeting.setStatus("sent");
         meetingRepository.save(meeting);
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "message", "Meeting summary sent successfully"));
+                "message", "Meeting summary saved successfully"));
     }
 }

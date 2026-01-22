@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { useReview } from '../contexts/ReviewContext'
 import { sendFinal } from '../lib/api'
+import { showToast } from '../components/Toast'
 
 export default function ReviewPage() {
     const [subject, setSubject] = useState('')
@@ -58,13 +59,15 @@ export default function ReviewPage() {
 
     const handleSend = async () => {
         if (!content.trim() || !subject.trim()) {
-            setError('Subject and content required')
+            showToast.error('Subject and content required')
             return
         }
 
         setError('')
         setSuccess('')
         setLoading(true)
+
+        const loadingToast = showToast.loading('Sending...')
 
         const requestData: Record<string, unknown> = {
             id: reviewData?.id,
@@ -78,18 +81,28 @@ export default function ReviewPage() {
             requestData.people = people.split(',').map((p) => p.trim())
             requestData.location = location
             requestData.date = date
+            // For meeting minutes, also send recipients for email
+            if (recipients.trim()) {
+                requestData.recipients = recipients.split(',').map((r) => r.trim())
+            }
         }
 
         const result = await sendFinal(reviewData?.type || 'email', requestData)
+        showToast.dismiss(loadingToast)
 
         if (result.status === 'success') {
-            setSuccess(result.message || 'Sent successfully!')
+            showToast.success(result.message || 'Sent successfully!')
             setTimeout(() => {
                 setReviewData(null)
                 navigate('/home')
             }, 2000)
+        } else if (result.status === 'unsupported') {
+            // Email/password user - show info toast
+            showToast.unsupportedProvider()
+        } else if (result.status === 'reauth_required') {
+            showToast.reauthRequired()
         } else {
-            setError(result.message || 'Failed to send')
+            showToast.error(result.message || 'Failed to send')
         }
 
         setLoading(false)

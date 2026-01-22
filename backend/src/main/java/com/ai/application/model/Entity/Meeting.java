@@ -10,22 +10,24 @@ import java.util.List;
 public class Meeting {
     @Id
     private String id;
-    
-    private List<String> people;  // Changed to List for multiple attendees
+
+    private List<String> people; // Changed to List for multiple attendees
     private String location;
-    private LocalDateTime timeBegin;  // Improved: Use LocalDateTime
+    private LocalDateTime timeBegin; // Improved: Use LocalDateTime
     private LocalDateTime timeEnd;
-    @Indexed  // For date-based queries
-    private LocalDateTime date;  // Changed to LocalDateTime
+    @Indexed // For date-based queries
+    private LocalDateTime date; // Changed to LocalDateTime
     private String subject;
     private String details;
-    private String status = "draft";  // "draft" or "sent"
-    private String generatedContent;  // Generated meeting summary content
+    private String status = "draft"; // "draft" or "sent"
+    private String generatedContent; // Generated meeting summary content
 
     // Constructors
-    public Meeting() {}
+    public Meeting() {
+    }
+
     public Meeting(List<String> people, String location, LocalDateTime timeBegin, LocalDateTime timeEnd,
-                   LocalDateTime date, String subject, String details) {
+            LocalDateTime date, String subject, String details) {
         this.people = people;
         this.location = location;
         this.timeBegin = timeBegin;
@@ -36,33 +38,93 @@ public class Meeting {
     }
 
     // Getters and Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    
-    public List<String> getPeople() { return people; }
-    public void setPeople(List<String> people) { this.people = people; }
+    public String getId() {
+        return id;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public LocalDateTime getTimeBegin() { return timeBegin; }
-    public void setTimeBegin(LocalDateTime timeBegin) { this.timeBegin = timeBegin; }
+    public List<String> getPeople() {
+        return people;
+    }
 
-    public LocalDateTime getTimeEnd() { return timeEnd; }
-    public void setTimeEnd(LocalDateTime timeEnd) { this.timeEnd = timeEnd; }
+    public void setPeople(List<String> people) {
+        this.people = people;
+    }
 
-    public LocalDateTime getDate() { return date; }
-    public void setDate(LocalDateTime date) { this.date = date; }
+    public String getLocation() {
+        return location;
+    }
 
-    public String getSubject() { return subject; }
-    public void setSubject(String subject) { this.subject = subject; }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-    public String getDetails() { return details; }
-    public void setDetails(String details) { this.details = details; }
-    
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    
-    public String getGeneratedContent() { return generatedContent; }
-    public void setGeneratedContent(String generatedContent) { this.generatedContent = generatedContent; }
+    public LocalDateTime getTimeBegin() {
+        return timeBegin;
+    }
+
+    public void setTimeBegin(LocalDateTime timeBegin) {
+        this.timeBegin = timeBegin;
+    }
+
+    public LocalDateTime getTimeEnd() {
+        return timeEnd;
+    }
+
+    public void setTimeEnd(LocalDateTime timeEnd) {
+        this.timeEnd = timeEnd;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getGeneratedContent() {
+        return generatedContent;
+    }
+
+    public void setGeneratedContent(String generatedContent) {
+        this.generatedContent = generatedContent;
+    }
+
+    private String pdfFileId; // GridFS file ID for attached PDF
+
+    public String getPdfFileId() {
+        return pdfFileId;
+    }
+
+    public void setPdfFileId(String pdfFileId) {
+        this.pdfFileId = pdfFileId;
+    }
 }

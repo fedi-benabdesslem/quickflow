@@ -82,6 +82,55 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-mail</artifactId>
       </dependency>
+
+      <!-- Google Gmail API -->
+      <dependency>
+          <groupId>com.google.apis</groupId>
+          <artifactId>google-api-services-gmail</artifactId>
+          <version>v1-rev20231218-2.0.0</version>
+      </dependency>
+      <dependency>
+          <groupId>com.google.auth</groupId>
+          <artifactId>google-auth-library-oauth2-http</artifactId>
+          <version>1.23.0</version>
+      </dependency>
+      <dependency>
+          <groupId>com.google.api-client</groupId>
+          <artifactId>google-api-client</artifactId>
+          <version>2.3.0</version>
+      </dependency>
+
+      <!-- Microsoft Graph SDK -->
+      <dependency>
+          <groupId>com.microsoft.graph</groupId>
+          <artifactId>microsoft-graph</artifactId>
+          <version>5.77.0</version>
+      </dependency>
+      <dependency>
+          <groupId>com.azure</groupId>
+          <artifactId>azure-identity</artifactId>
+          <version>1.11.4</version>
+      </dependency>
+
+      <!-- iText PDF Generation -->
+      <dependency>
+          <groupId>com.itextpdf</groupId>
+          <artifactId>itext7-core</artifactId>
+          <version>8.0.3</version>
+          <type>pom</type>
+      </dependency>
+      <dependency>
+          <groupId>com.itextpdf</groupId>
+          <artifactId>html2pdf</artifactId>
+          <version>5.0.3</version>
+      </dependency>
+
+      <!-- JSON processing -->
+      <dependency>
+          <groupId>com.google.code.gson</groupId>
+          <artifactId>gson</artifactId>
+          <version>2.10.1</version>
+      </dependency>
   </dependencies>
 
   <build>
