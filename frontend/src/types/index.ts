@@ -67,3 +67,74 @@ export interface ReviewContextType {
     reviewData: ReviewData | null;
     setReviewData: (data: ReviewData | null) => void;
 }
+
+// ===== Meeting Minutes Types (Phase 1 Step 1) =====
+
+export interface Participant {
+    id: string;
+    name: string;
+    email?: string;
+    role?: 'Chair' | 'Secretary' | 'Member' | 'Guest' | string;
+    present: boolean;
+}
+
+export interface AgendaItem {
+    id: string;
+    title: string;
+    objective: 'Discussion' | 'Decision' | 'Review' | 'Information';
+    keyPoints?: string;
+}
+
+export interface Decision {
+    id: string;
+    statement: string;
+    status: 'Approved' | 'Rejected' | 'Deferred' | 'No Decision';
+    relatedAgendaId?: string;
+    rationale?: string;
+}
+
+export interface ActionItem {
+    id: string;
+    task: string;
+    owner?: string;
+    deadline?: string;
+    priority?: 'High' | 'Medium' | 'Low';
+}
+
+export interface OutputPreferences {
+    tone: 'Formal' | 'Executive' | 'Technical';
+    length: 'Standard' | 'Detailed' | 'Summary';
+    includeSections: {
+        attendees: boolean;
+        agenda: boolean;
+        decisions: boolean;
+        actionItems: boolean;
+        additionalNotes: boolean;
+    };
+    pdfFooter: 'None' | 'Confidential' | 'Internal Use Only';
+}
+
+export interface QuickModeData {
+    content: string;
+    file?: File;
+    date?: string;
+    time?: string;
+}
+
+export interface StructuredModeData {
+    meetingInfo: {
+        title: string;
+        date: string;
+        startTime: string;
+        endTime: string;
+        location: string;
+        organizer?: string;
+    };
+    participants: Participant[];
+    absentParticipants: Participant[];
+    agenda: AgendaItem[];
+    decisions: Decision[];
+    actionItems: ActionItem[];
+    additionalNotes?: string;
+    outputPreferences: OutputPreferences;
+}

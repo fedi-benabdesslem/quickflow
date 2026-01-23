@@ -9,6 +9,9 @@ import HomePage from './pages/HomePage'
 import MeetingPage from './pages/MeetingPage'
 import EmailPage from './pages/EmailPage'
 import ReviewPage from './pages/ReviewPage'
+import ModeSelectionPage from './pages/ModeSelectionPage'
+import QuickModePage from './pages/QuickModePage'
+import StructuredModePage from './pages/StructuredModePage'
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -112,6 +115,30 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <ReviewPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/new"
+                    element={
+                        <ProtectedRoute>
+                            <ModeSelectionPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/quick"
+                    element={
+                        <ProtectedRoute>
+                            <QuickModePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/structured"
+                    element={
+                        <ProtectedRoute>
+                            <StructuredModePage />
                         </ProtectedRoute>
                     }
                 />
