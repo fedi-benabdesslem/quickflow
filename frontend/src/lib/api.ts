@@ -352,5 +352,89 @@ export const sendMinutesEmail = async (request: MinutesEmailRequest): Promise<Ap
     }
 }
 
+// ============ Meeting Template APIs (Step 5) ============
+
+import type {
+    MeetingTemplate,
+    CreateMeetingTemplateRequest,
+    UpdateMeetingTemplateRequest
+} from '../types/template'
+
+interface TemplateResponse {
+    success: boolean
+    template?: MeetingTemplate
+    templates?: MeetingTemplate[]
+    message?: string
+}
+
+export const createTemplate = async (request: CreateMeetingTemplateRequest): Promise<TemplateResponse> => {
+    try {
+        const response = await api.post<TemplateResponse>('/meeting-templates', request)
+        return response.data
+    } catch (error) {
+        console.error('Create template error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as TemplateResponse
+        }
+        return { success: false, message: 'Failed to create template' }
+    }
+}
+
+export const getUserTemplates = async (): Promise<TemplateResponse> => {
+    try {
+        const response = await api.get<TemplateResponse>('/meeting-templates')
+        return response.data
+    } catch (error) {
+        console.error('Get templates error:', error)
+        return { success: false, message: 'Failed to fetch templates' }
+    }
+}
+
+export const getTemplate = async (templateId: string): Promise<TemplateResponse> => {
+    try {
+        const response = await api.get<TemplateResponse>(`/meeting-templates/${templateId}`)
+        return response.data
+    } catch (error) {
+        console.error('Get template error:', error)
+        return { success: false, message: 'Failed to fetch template' }
+    }
+}
+
+export const updateTemplate = async (
+    templateId: string,
+    request: UpdateMeetingTemplateRequest
+): Promise<TemplateResponse> => {
+    try {
+        const response = await api.put<TemplateResponse>(`/meeting-templates/${templateId}`, request)
+        return response.data
+    } catch (error) {
+        console.error('Update template error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as TemplateResponse
+        }
+        return { success: false, message: 'Failed to update template' }
+    }
+}
+
+export const deleteTemplate = async (templateId: string): Promise<TemplateResponse> => {
+    try {
+        const response = await api.delete<TemplateResponse>(`/meeting-templates/${templateId}`)
+        return response.data
+    } catch (error) {
+        console.error('Delete template error:', error)
+        return { success: false, message: 'Failed to delete template' }
+    }
+}
+
+export const trackTemplateUsage = async (templateId: string): Promise<TemplateResponse> => {
+    try {
+        const response = await api.post<TemplateResponse>(`/meeting-templates/${templateId}/track-usage`)
+        return response.data
+    } catch (error) {
+        console.error('Track usage error:', error)
+        return { success: false, message: 'Failed to track usage' }
+    }
+}
+
 export default api
 

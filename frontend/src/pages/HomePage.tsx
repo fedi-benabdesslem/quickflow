@@ -132,6 +132,43 @@ export default function HomePage() {
                     </p>
                     <div className="mt-4 h-1 w-0 group-hover:w-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all duration-300" />
                 </motion.div>
+
+                {/* Templates Card */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 }}
+                    whileHover={{ scale: 1.02, y: -5 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/templates')}
+                    className="glass-card p-8 cursor-pointer group md:col-span-2 sm:col-span-1"
+                >
+                    <div className="flex items-start justify-between mb-4">
+                        <motion.div
+                            className="text-4xl text-purple-400"
+                            animate={{ rotate: [0, -5, 5, 0] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12">
+                                <path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z" />
+                                <path d="M3.265 10.602l7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.739a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.37-.738Z" />
+                                <path d="M10.933 19.231l-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.489.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134 0Z" />
+                            </svg>
+                        </motion.div>
+                        <motion.div
+                            className="text-2xl text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"
+                        >
+                            →
+                        </motion.div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
+                        Manage Templates
+                    </h3>
+                    <p className="text-slate-400">
+                        Create and manage reusable meeting structures
+                    </p>
+                    <div className="mt-4 h-1 w-0 group-hover:w-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-300" />
+                </motion.div>
             </div>
         </div>
     )
