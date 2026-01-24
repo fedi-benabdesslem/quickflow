@@ -40,9 +40,19 @@ public class TemplateService {
         String userPrompt = buildUserPrompt(request);
         String output = llmService.generateContent(userPrompt, request.getTemplateType());
 
+        String subject = null;
+        String content = output;
+
+        // Parse subject if it's an email template
+        if (request.getTemplateType() == TemplateType.email) {
+            String[] parts = parseEmailOutput(output);
+            subject = parts[0];
+            content = parts[1];
+        }
+
         GeneratedOutput genOut = new GeneratedOutput();
         genOut.setRequestHash(requestHash);
-        genOut.setContent(output);
+        genOut.setContent(content);
 
         if (request.getUserId() != null) {
             // Optional: Store userId in GeneratedOutput if needed, but User entity is gone
@@ -53,7 +63,36 @@ public class TemplateService {
         genOut.setTokensUsed(0);
         generatedOutputRepo.save(genOut);
 
-        return new TemplateResponse(output);
+        return new TemplateResponse(content, subject);
+    }
+
+    private String[] parseEmailOutput(String output) {
+        String subject = null;
+        String content = output;
+
+        // Try to find "Subject:" line
+        String[] lines = output.split("\\n");
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.toLowerCase().startsWith("subject:")) {
+                subject = line.substring(8).trim();
+                // Everything after this line (and potentially next blank lines) is content
+                StringBuilder contentBuilder = new StringBuilder();
+                boolean contentStarted = false;
+                for (int j = i + 1; j < lines.length; j++) {
+                    String contentLine = lines[j]; // Don't trim to preserve spacing, or trim if desired
+                    if (!contentStarted && contentLine.trim().isEmpty()) {
+                        continue; // Skip leading blank lines after subject
+                    }
+                    contentStarted = true;
+                    contentBuilder.append(contentLine).append("\n");
+                }
+                content = contentBuilder.toString().trim();
+                break;
+            }
+        }
+
+        return new String[] { subject, content };
     }
 
     private String computeRequestHash(TemplateRequest request) {

@@ -4,10 +4,18 @@ public class TemplateResponse {
 
     private String generatedContent;
 
-    public TemplateResponse() {}
+    private String subject;
+
+    public TemplateResponse() {
+    }
 
     public TemplateResponse(String generatedContent) {
         this.generatedContent = generatedContent;
+    }
+
+    public TemplateResponse(String generatedContent, String subject) {
+        this.generatedContent = generatedContent;
+        this.subject = subject;
     }
 
     public String getGeneratedContent() {
@@ -18,8 +26,11 @@ public class TemplateResponse {
         this.generatedContent = generatedContent;
     }
 
-	public Object getSubject() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
 }
