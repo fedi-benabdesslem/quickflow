@@ -16,3 +16,4 @@ oauth_creds.txt
 # Keycloak exports (may contain user data)
 *realm-export*.json
 keycloak-data/
+prompt.md

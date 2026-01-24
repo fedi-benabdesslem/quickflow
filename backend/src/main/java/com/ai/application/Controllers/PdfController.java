@@ -1,130 +1,84 @@
 package com.ai.application.Controllers;
 
-import com.ai.application.Services.PdfService;
 import com.ai.application.Services.GridFsService;
+import com.ai.application.Services.PdfGenerationService;
+import com.ai.application.model.PdfGenerationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.Map;
 
-/**
- * Controller for PDF generation and preview.
- */
 @RestController
 @RequestMapping("/api/pdf")
 public class PdfController {
 
-    private final PdfService pdfService;
+    private final PdfGenerationService pdfGenerationService;
     private final GridFsService gridFsService;
 
     @Autowired
-    public PdfController(PdfService pdfService, GridFsService gridFsService) {
-        this.pdfService = pdfService;
+    public PdfController(PdfGenerationService pdfGenerationService, GridFsService gridFsService) {
+        this.pdfGenerationService = pdfGenerationService;
         this.gridFsService = gridFsService;
     }
 
-    /**
-     * Generates a PDF preview from HTML content.
-     * 
-     * Request body:
-     * {
-     * "content": "
-     * <p>
-     * HTML content...
-     * </p>
-     * ",
-     * "title": "Optional title",
-     * "date": "2024-01-15" // Optional, defaults to today
-     * }
-     * 
-     * @return PDF as binary data
-     */
-    @PostMapping("/preview")
-    public ResponseEntity<?> previewPdf(@RequestBody Map<String, String> body) {
-        String content = body.get("content");
-        String title = body.getOrDefault("title", "Document");
-        String dateStr = body.get("date");
-
-        if (content == null || content.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "error",
-                    "message", "Content is required"));
-        }
-
-        try {
-            LocalDate date = dateStr != null ? LocalDate.parse(dateStr) : LocalDate.now();
-
-            byte[] pdfBytes = pdfService.generateMeetingMinutesPdf(title, date, content);
-            String filename = pdfService.getMeetingMinutesFilename(date);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDisposition(ContentDisposition.inline().filename(filename).build());
-
-            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of(
-                    "status", "error",
-                    "message", "Failed to generate PDF: " + e.getMessage()));
-        }
-    }
-
-    /**
-     * Generates and stores a PDF, returning the file ID.
-     */
     @PostMapping("/generate")
-    public ResponseEntity<?> generateAndStorePdf(@RequestBody Map<String, String> body) {
-        String content = body.get("content");
-        String title = body.getOrDefault("title", "Document");
-        String dateStr = body.get("date");
-
-        if (content == null || content.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "status", "error",
-                    "message", "Content is required"));
-        }
-
+    public ResponseEntity<?> generatePdf(@RequestBody PdfGenerationRequest request) {
         try {
-            LocalDate date = dateStr != null ? LocalDate.parse(dateStr) : LocalDate.now();
+            // Validate input
+            if (request.getHtmlContent() == null || request.getHtmlContent().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "HTML content is required"));
+            }
 
-            byte[] pdfBytes = pdfService.generateMeetingMinutesPdf(title, date, content);
-            String filename = pdfService.getMeetingMinutesFilename(date);
+            // Generate PDF
+            byte[] pdfBytes = pdfGenerationService.generatePdf(
+                    request.getHtmlContent(),
+                    request.getMeetingMetadata(),
+                    request.getOutputPreferences());
 
+            // Generate filename
+            String title = request.getMeetingMetadata().getOrDefault("title", "Meeting_Minutes");
+            String date = request.getMeetingMetadata().getOrDefault("date", "Unknown_Date");
+            String filename = "Meeting_Minutes_" + date + "_" + title.replaceAll("[^a-zA-Z0-9]", "_") + ".pdf";
+
+            // Store in GridFS
             String fileId = gridFsService.storePdf(pdfBytes, filename);
 
             return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "fileId", fileId,
-                    "filename", filename));
+                    "filename", filename,
+                    "message", "PDF generated successfully"));
+
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of(
-                    "status", "error",
-                    "message", "Failed to generate PDF: " + e.getMessage()));
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "PDF generation failed: " + e.getMessage()));
         }
     }
 
-    /**
-     * Retrieves a stored PDF by ID.
-     */
-    @GetMapping("/{fileId}")
-    public ResponseEntity<?> getPdf(@PathVariable String fileId) {
-        try {
-            byte[] pdfBytes = gridFsService.getFile(fileId);
+    @GetMapping("/preview/{fileId}")
+    public ResponseEntity<byte[]> previewPdf(@PathVariable String fileId) {
+        return getPdfResponse(fileId, "inline");
+    }
 
-            if (pdfBytes == null) {
-                return ResponseEntity.notFound().build();
-            }
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable String fileId) {
+        return getPdfResponse(fileId, "attachment");
+    }
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
+    private ResponseEntity<byte[]> getPdfResponse(String fileId, String disposition) {
+        byte[] content = gridFsService.getFile(fileId);
 
-            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of(
-                    "status", "error",
-                    "message", "Failed to retrieve PDF: " + e.getMessage()));
+        if (content == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"meeting_minutes.pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(content);
     }
 }

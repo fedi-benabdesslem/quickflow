@@ -68,7 +68,7 @@ export default function HomePage() {
                     transition={{ delay: 0.2 }}
                     whileHover={{ scale: 1.02, y: -5 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => navigate('/meeting')}
+                    onClick={() => navigate('/minutes/new')}
                     className="glass-card p-8 cursor-pointer group"
                 >
                     <div className="flex items-start justify-between mb-4">

@@ -9,6 +9,12 @@ import HomePage from './pages/HomePage'
 import MeetingPage from './pages/MeetingPage'
 import EmailPage from './pages/EmailPage'
 import ReviewPage from './pages/ReviewPage'
+import ModeSelectionPage from './pages/ModeSelectionPage'
+import QuickModePage from './pages/QuickModePage'
+import QuickModeReviewPage from './pages/QuickModeReviewPage'
+import StructuredModePage from './pages/StructuredModePage'
+import ContentEditorPage from './pages/ContentEditorPage'
+
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -112,6 +118,46 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <ReviewPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/new"
+                    element={
+                        <ProtectedRoute>
+                            <ModeSelectionPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/quick"
+                    element={
+                        <ProtectedRoute>
+                            <QuickModePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/structured"
+                    element={
+                        <ProtectedRoute>
+                            <StructuredModePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/quick/review"
+                    element={
+                        <ProtectedRoute>
+                            <QuickModeReviewPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/editor"
+                    element={
+                        <ProtectedRoute>
+                            <ContentEditorPage />
                         </ProtectedRoute>
                     }
                 />

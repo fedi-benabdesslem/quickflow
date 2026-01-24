@@ -91,10 +91,13 @@ body {
 }
 
 @keyframes nebulaBreathe {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.4;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.7;
     transform: scale(1.1);
@@ -108,7 +111,7 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(59, 130, 246, 0.15);
   border-radius: 24px;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   position: relative;
@@ -122,13 +125,12 @@ body {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(59, 130, 246, 0.4), 
-    rgba(255, 20, 147, 0.4), 
-    rgba(59, 130, 246, 0.4), 
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(59, 130, 246, 0.4),
+      rgba(255, 20, 147, 0.4),
+      rgba(59, 130, 246, 0.4),
+      transparent);
 }
 
 /* ===== Input Styles ===== */
@@ -152,7 +154,7 @@ body {
   outline: none;
   border-color: rgba(59, 130, 246, 0.6);
   background: rgba(10, 10, 15, 0.8);
-  box-shadow: 
+  box-shadow:
     0 0 0 4px rgba(59, 130, 246, 0.1),
     0 0 20px rgba(59, 130, 246, 0.2);
 }
@@ -283,6 +285,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -295,6 +298,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -306,6 +310,7 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -386,4 +391,27 @@ body {
 ::selection {
   background: rgba(59, 130, 246, 0.4);
   color: #ffffff;
+}
+
+/* ===== PDF Preview Modal ===== */
+.react-pdf__Page__canvas {
+  margin: 0 auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
+  height: auto !important;
+}
+
+.pdf-viewer-container {
+  display: flex;
+  justify-content: center;
+  background-color: #525659;
+  overflow: auto;
+  height: 100%;
+  padding: 20px;
+}
+
+.pdf-document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

@@ -142,4 +142,215 @@ export const previewPdf = async (
     }
 }
 
+// ============ Meeting Minutes AI APIs (Step 2) ============
+
+import type { ExtractedMeetingData, StructuredModeData } from '../types'
+
+interface ExtractionResponse {
+    status: 'success' | 'error'
+    data?: ExtractedMeetingData
+    message?: string
+}
+
+interface GenerationResponse {
+    status: 'success' | 'error'
+    content?: string
+    message?: string
+}
+
+/**
+ * Extract structured data from pasted meeting notes (Quick Mode).
+ */
+export const extractFromNotes = async (
+    content: string,
+    date?: string,
+    time?: string
+): Promise<ExtractionResponse> => {
+    try {
+        const response = await api.post<ExtractionResponse>('/minutes/quick/extract', {
+            content,
+            date,
+            time,
+        })
+        return response.data
+    } catch (error) {
+        console.error('Extraction error:', error)
+        return { status: 'error', message: 'Failed to extract data. Please try again.' }
+    }
+}
+
+/**
+ * Extract structured data from an uploaded file (Quick Mode).
+ */
+export const extractFromFile = async (
+    file: File,
+    date?: string,
+    time?: string
+): Promise<ExtractionResponse> => {
+    try {
+        const formData = new FormData()
+        formData.append('file', file)
+        if (date) formData.append('date', date)
+        if (time) formData.append('time', time)
+
+        const response = await api.post<ExtractionResponse>(
+            '/minutes/quick/extract-file',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        )
+        return response.data
+    } catch (error) {
+        console.error('File extraction error:', error)
+        return { status: 'error', message: 'Failed to process file. Please try again.' }
+    }
+}
+
+/**
+ * Generate minutes from reviewed extracted data (Quick Mode final step).
+ */
+export const generateFromExtracted = async (
+    data: ExtractedMeetingData,
+    tone: string = 'Formal',
+    length: string = 'Standard'
+): Promise<GenerationResponse> => {
+    try {
+        const response = await api.post<GenerationResponse>('/minutes/quick/generate', {
+            data,
+            tone,
+            length,
+        })
+        return response.data
+    } catch (error) {
+        console.error('Generation error:', error)
+        return { status: 'error', message: 'Failed to generate minutes. Please try again.' }
+    }
+}
+
+/**
+ * Generate professional meeting minutes from structured form data.
+ */
+export const generateMinutes = async (
+    data: StructuredModeData
+): Promise<GenerationResponse> => {
+    try {
+        const response = await api.post<GenerationResponse>('/minutes/structured/generate', data)
+        return response.data
+    } catch (error) {
+        console.error('Generation error:', error)
+        return { status: 'error', message: 'Failed to generate minutes. Please try again.' }
+    }
+}
+
+/**
+ * Regenerate minutes with same data (for retry functionality).
+ */
+export const regenerateMinutes = async (
+    data: StructuredModeData
+): Promise<GenerationResponse> => {
+    try {
+        const response = await api.post<GenerationResponse>('/minutes/structured/regenerate', data)
+        return response.data
+    } catch (error) {
+        console.error('Regeneration error:', error)
+        return { status: 'error', message: 'Failed to regenerate minutes. Please try again.' }
+    }
+}
+
+// ============ PDF Generation APIs (Step 3) ============
+
+export interface PdfGenerationRequest {
+    htmlContent: string
+    meetingMetadata: Record<string, string>
+    outputPreferences: Record<string, any>
+}
+
+interface PdfResponse {
+    status: 'success' | 'error'
+    fileId?: string
+    filename?: string
+    message?: string
+}
+
+/**
+ * Generate PDF from HTML content (Step 3).
+ */
+export const generatePdf = async (
+    request: PdfGenerationRequest
+): Promise<PdfResponse> => {
+    try {
+        const response = await api.post<PdfResponse>('/pdf/generate', request)
+        return response.data
+    } catch (error) {
+        console.error('PDF generation error:', error)
+        return { status: 'error', message: 'Failed to generate PDF. Please try again.' }
+    }
+}
+
+/**
+ * Get preview URL for generated PDF.
+ */
+export const getPdfPreviewUrl = (fileId: string): string => {
+    return `/api/pdf/preview/${fileId}`
+}
+
+/**
+ * Trigger PDF download.
+ */
+export const downloadPdf = async (fileId: string) => {
+    try {
+        const response = await api.get(`/pdf/download/${fileId}`, {
+            responseType: 'blob',
+        })
+
+        // Extract filename from Content-Disposition header if possible
+        const contentDisposition = response.headers['content-disposition']
+        let filename = 'meeting_minutes.pdf'
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/)
+            if (filenameMatch && filenameMatch.length === 2)
+                filename = filenameMatch[1]
+        }
+
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', filename)
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode?.removeChild(link)
+        window.URL.revokeObjectURL(url)
+    } catch (error) {
+        console.error('Download error:', error)
+        alert('Failed to download PDF. Please try again.')
+    }
+}
+
+// ============ Minutes Email APIs (Step 4) ============
+
+export interface MinutesEmailRequest {
+    pdfFileId: string
+    recipients: string[]
+    subject?: string
+    body?: string
+    meetingMetadata?: Record<string, string>
+}
+
+export const sendMinutesEmail = async (request: MinutesEmailRequest): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/minutes/send', request)
+        return response.data
+    } catch (error) {
+        console.error('Send minutes error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as ApiResponse
+        }
+        return { status: 'error', message: 'Network error or service unavailable' }
+    }
+}
+
 export default api
+
