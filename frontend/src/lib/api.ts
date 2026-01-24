@@ -329,5 +329,28 @@ export const downloadPdf = async (fileId: string) => {
     }
 }
 
+// ============ Minutes Email APIs (Step 4) ============
+
+export interface MinutesEmailRequest {
+    pdfFileId: string
+    recipients: string[]
+    subject?: string
+    body?: string
+    meetingMetadata?: Record<string, string>
+}
+
+export const sendMinutesEmail = async (request: MinutesEmailRequest): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/minutes/send', request)
+        return response.data
+    } catch (error) {
+        console.error('Send minutes error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as ApiResponse
+        }
+        return { status: 'error', message: 'Network error or service unavailable' }
+    }
+}
+
 export default api
 

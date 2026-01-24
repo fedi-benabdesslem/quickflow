@@ -281,6 +281,7 @@ export default function ContentEditorPage() {
                 onClose={() => setShowPdfPreview(false)}
                 fileId={pdfFileId}
                 filename={pdfFilename}
+                meetingData={summary || undefined}
             />
 
             {/* Header */}
