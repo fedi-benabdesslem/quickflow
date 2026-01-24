@@ -49,6 +49,3 @@ We are constantly improving QuickFlow. Here's what's coming next:
 - [ ] **Voice Mode**: Real-time transcription and summarization.
 - [ ] **Team Workspaces**: Share templates and minutes with your team.
 
-## License
-
-[MIT](./LICENSE)
