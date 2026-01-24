@@ -5,7 +5,9 @@ import { useAuth } from '../contexts/AuthContext'
 import RichTextEditor from '../components/RichTextEditor'
 import PdfPreviewModal from '../components/PdfPreviewModal'
 import { generateFromExtracted, generateMinutes, generatePdf } from '../lib/api'
+
 import type { ExtractedMeetingData, StructuredModeData } from '../types'
+import { marked } from 'marked'
 
 interface LocationState {
     content: string
@@ -30,21 +32,40 @@ export default function ContentEditorPage() {
     const [pdfFileId, setPdfFileId] = useState<string | null>(null)
     const [pdfFilename, setPdfFilename] = useState('')
 
+    // Helper to process content (handle markdown if present)
+    const processContent = async (rawContent: string) => {
+        try {
+            // Check if content looks like markdown (has ** or ##) and doesn't look like HTML
+            if ((rawContent.includes('**') || rawContent.includes('##')) && !rawContent.includes('<div')) {
+                const html = await marked.parse(rawContent)
+                return html
+            }
+            return rawContent
+        } catch (e) {
+            console.error('Markdown parsing error:', e)
+            return rawContent
+        }
+    }
+
     useEffect(() => {
-        if (state?.content) {
-            setContent(state.content)
-            // Save to localStorage
-            localStorage.setItem('minutesEditorContent', state.content)
-            setLastSaved(new Date())
-        } else {
-            // Try to restore from localStorage
-            const saved = localStorage.getItem('minutesEditorContent')
-            if (saved) {
-                setContent(saved)
+        const initContent = async () => {
+            if (state?.content) {
+                const html = await processContent(state.content)
+                setContent(html)
+                // Save to localStorage
+                localStorage.setItem('minutesEditorContent', html)
+                setLastSaved(new Date())
             } else {
-                navigate('/minutes/new')
+                // Try to restore from localStorage
+                const saved = localStorage.getItem('minutesEditorContent')
+                if (saved) {
+                    setContent(saved)
+                } else {
+                    navigate('/minutes/new')
+                }
             }
         }
+        initContent()
     }, [state, navigate])
 
     // Auto-save every 30 seconds
@@ -86,8 +107,9 @@ export default function ContentEditorPage() {
             }
 
             if (result.status === 'success' && result.content) {
-                setContent(result.content)
-                localStorage.setItem('minutesEditorContent', result.content)
+                const html = await processContent(result.content)
+                setContent(html)
+                localStorage.setItem('minutesEditorContent', html)
                 setLastSaved(new Date())
             } else {
                 setError(result.message || 'Regeneration failed. Please try again.')
