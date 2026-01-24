@@ -33,6 +33,8 @@ Built with cutting-edge technologies for performance and experience:
 - **AI Engine**: [Ollama](https://ollama.ai/) (Local Mistral-Nemo model)
 - **Auth**: [Supabase](https://supabase.com/)
 
+> **[Click here for the full Techmical report](./tech-report.md)**
+
 ## 🚀 Getting Started
 
 QuickFlow is designed to be easy to set up.
