@@ -2,6 +2,7 @@ import { useState, useRef, DragEvent, ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import { extractFromNotes, extractFromFile } from '../lib/api'
 import type { QuickModeData } from '../types'
 
 type TabType = 'paste' | 'upload'
@@ -22,6 +23,7 @@ export default function QuickModePage() {
     const [isDragOver, setIsDragOver] = useState(false)
     const [fileError, setFileError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const { signOut } = useAuth()
@@ -84,14 +86,47 @@ export default function QuickModePage() {
     }
 
     const handleSubmit = async () => {
-        if (!canSubmit) return
+        if (!canSubmit || loading) return
         setLoading(true)
+        setError('')
 
-        // For now, just show success message (AI generation comes in Step 2)
-        setTimeout(() => {
+        try {
+            let result
+            if (activeTab === 'paste') {
+                result = await extractFromNotes(
+                    formData.content,
+                    formData.date || undefined,
+                    formData.time || undefined
+                )
+            } else if (formData.file) {
+                result = await extractFromFile(
+                    formData.file,
+                    formData.date || undefined,
+                    formData.time || undefined
+                )
+            } else {
+                throw new Error('No content to extract')
+            }
+
+            if (result.status === 'success' && result.data) {
+                // Navigate to review page with extracted data
+                navigate('/minutes/quick/review', {
+                    state: {
+                        extractedData: result.data,
+                        originalContent: activeTab === 'paste' ? formData.content : formData.file?.name,
+                        originalDate: formData.date,
+                        originalTime: formData.time,
+                    },
+                })
+            } else {
+                setError(result.message || 'Extraction failed. Please try again.')
+            }
+        } catch (err) {
+            console.error('Extraction error:', err)
+            setError('AI service temporarily unavailable. Please try again later.')
+        } finally {
             setLoading(false)
-            alert('Form complete! AI generation coming in Step 2.')
-        }, 1000)
+        }
     }
 
     const formatFileSize = (bytes: number): string => {
@@ -102,6 +137,25 @@ export default function QuickModePage() {
 
     return (
         <div className="min-h-screen p-4 sm:p-6 relative z-10">
+            {/* Loading Overlay */}
+            {loading && (
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="glass-card p-8 text-center max-w-md"
+                    >
+                        <div className="spinner spinner-large mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                            Extracting Structure...
+                        </h3>
+                        <p className="text-slate-400 text-sm">
+                            AI is analyzing your notes. This may take 10-20 seconds.
+                        </p>
+                    </motion.div>
+                </div>
+            )}
+
             {/* Header */}
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
@@ -157,6 +211,23 @@ export default function QuickModePage() {
                         AI will extract structure from your meeting notes
                     </p>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="message-error mb-6"
+                    >
+                        {error}
+                        <button
+                            onClick={() => setError('')}
+                            className="ml-2 text-red-300 hover:text-red-100"
+                        >
+                            ✕
+                        </button>
+                    </motion.div>
+                )}
 
                 {/* Tab Toggle */}
                 <div className="flex bg-slate-900/50 rounded-lg p-1 mb-6">
@@ -346,7 +417,7 @@ export default function QuickModePage() {
                         {loading ? (
                             <span className="flex items-center justify-center gap-2">
                                 <span className="spinner" />
-                                Processing...
+                                Extracting...
                             </span>
                         ) : (
                             'Extract Structure →'

@@ -2,6 +2,7 @@ import { useState, KeyboardEvent, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import { generateMinutes } from '../lib/api'
 import CollapsibleSection from '../components/minutes/CollapsibleSection'
 import ParticipantTag from '../components/minutes/ParticipantTag'
 import FormProgress from '../components/minutes/FormProgress'
@@ -71,6 +72,7 @@ export default function StructuredModePage() {
 
     const [loading, setLoading] = useState(false)
     const [showClearModal, setShowClearModal] = useState(false)
+    const [error, setError] = useState('')
 
     const { signOut } = useAuth()
     const navigate = useNavigate()
@@ -267,14 +269,30 @@ export default function StructuredModePage() {
     }
 
     const handleSubmit = async () => {
-        if (!canSubmit) return
+        if (!canSubmit || loading) return
         setLoading(true)
+        setError('')
 
-        // For now, just show success message (AI generation comes in Step 2)
-        setTimeout(() => {
+        try {
+            const result = await generateMinutes(formData)
+
+            if (result.status === 'success' && result.content) {
+                navigate('/minutes/editor', {
+                    state: {
+                        content: result.content,
+                        sourceData: formData,
+                        mode: 'structured',
+                    },
+                })
+            } else {
+                setError(result.message || 'Generation failed. Please try again.')
+            }
+        } catch (err) {
+            console.error('Generation error:', err)
+            setError('AI service temporarily unavailable. Please try again later.')
+        } finally {
             setLoading(false)
-            alert('Form complete! AI generation coming in Step 2.')
-        }, 1000)
+        }
     }
 
     const getStatusColor = (status: Decision['status']) => {
@@ -297,6 +315,37 @@ export default function StructuredModePage() {
 
     return (
         <div className="min-h-screen p-4 sm:p-6 relative z-10">
+            {/* Loading Overlay */}
+            {loading && (
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="glass-card p-8 text-center max-w-md"
+                    >
+                        <div className="spinner spinner-large mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-white mb-2">
+                            Generating Meeting Minutes...
+                        </h3>
+                        <p className="text-slate-400 text-sm">
+                            AI is creating professional minutes. This may take 15-30 seconds.
+                        </p>
+                    </motion.div>
+                </div>
+            )}
+
+            {/* Error Toast */}
+            {error && (
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 message-error max-w-md"
+                >
+                    {error}
+                    <button onClick={() => setError('')} className="ml-2 text-red-300 hover:text-red-100">✕</button>
+                </motion.div>
+            )}
+
             {/* Header */}
             <motion.header
                 initial={{ opacity: 0, y: -20 }}

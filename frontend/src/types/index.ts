@@ -138,3 +138,28 @@ export interface StructuredModeData {
     additionalNotes?: string;
     outputPreferences: OutputPreferences;
 }
+
+// ===== AI Extraction Types (Phase 1 Step 2) =====
+
+export interface ExtractedDecision {
+    statement: string;
+    status: string;
+}
+
+export interface ExtractedActionItem {
+    task: string;
+    owner?: string;
+    deadline?: string;
+}
+
+export interface ExtractedMeetingData {
+    meetingTitle?: string;
+    date?: string;
+    time?: string;
+    participants: string[];
+    discussionPoints: string[];
+    decisions: ExtractedDecision[];
+    actionItems: ExtractedActionItem[];
+    confidence: 'high' | 'medium' | 'low';
+}
+

@@ -19,8 +19,9 @@ export default function ModeSelectionPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex justify-between items-center mb-8 sm:mb-12"
             >
-                <button onClick={() => navigate('/home')} className="flex items-center gap-3 group">
-                    <img src="/logo.png" alt="QuickFlow" className="h-10 w-auto object-contain" />
+                <button onClick={() => navigate('/home')} className="btn-secondary">
+                    <span>←</span>
+                    <span className="hidden sm:inline">Back</span>
                 </button>
                 <div className="flex gap-3">
                     <button onClick={handleLogout} className="btn-logout">
