@@ -14,6 +14,7 @@ import QuickModePage from './pages/QuickModePage'
 import QuickModeReviewPage from './pages/QuickModeReviewPage'
 import StructuredModePage from './pages/StructuredModePage'
 import ContentEditorPage from './pages/ContentEditorPage'
+import TemplateManagementPage from './pages/TemplateManagementPage'
 
 
 // Protected Route wrapper
@@ -158,6 +159,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <ContentEditorPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/templates"
+                    element={
+                        <ProtectedRoute>
+                            <TemplateManagementPage />
                         </ProtectedRoute>
                     }
                 />

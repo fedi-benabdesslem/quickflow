@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { generateMinutes } from '../lib/api'
@@ -14,6 +14,9 @@ import type {
     ActionItem,
     OutputPreferences
 } from '../types'
+import { createTemplate, getUserTemplates, getTemplate, trackTemplateUsage } from '../lib/api'
+import type { MeetingTemplate, CreateMeetingTemplateRequest } from '../types/template'
+import SaveTemplateModal from '../components/templates/SaveTemplateModal'
 
 const LOCATION_OPTIONS = ['Office Room 1', 'Zoom', 'Google Meet', 'Microsoft Teams', 'Other']
 const OBJECTIVE_OPTIONS: AgendaItem['objective'][] = ['Discussion', 'Decision', 'Review', 'Information']
@@ -42,6 +45,8 @@ const getDefaultPreferences = (): OutputPreferences => {
 const generateId = () => Math.random().toString(36).substring(2, 9)
 
 export default function StructuredModePage() {
+    const navigate = useNavigate()
+    const location = useLocation()
     const [formData, setFormData] = useState<StructuredModeData>({
         meetingInfo: {
             title: '',
@@ -74,8 +79,117 @@ export default function StructuredModePage() {
     const [showClearModal, setShowClearModal] = useState(false)
     const [error, setError] = useState('')
 
+    // Template State
+    const [templates, setTemplates] = useState<MeetingTemplate[]>([])
+    const [selectedTemplateId, setSelectedTemplateId] = useState('')
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false)
+    const [loadedTemplateName, setLoadedTemplateName] = useState('')
+
+    useEffect(() => {
+        loadTemplates()
+    }, [])
+
+    const loadTemplates = async () => {
+        const result = await getUserTemplates()
+        if (result.success && result.templates) {
+            setTemplates(result.templates)
+        }
+    }
+
+    useEffect(() => {
+        if (location.state?.templateId) {
+            loadTemplateById(location.state.templateId)
+            // Clear state
+            window.history.replaceState({}, document.title)
+        }
+    }, [location.state])
+
+    const loadTemplateById = async (id: string, shouldConfirm = false) => {
+        if (shouldConfirm && completed > 0 && !window.confirm('Loading a template will replace current form data. Continue?')) {
+            return
+        }
+
+        setSelectedTemplateId(id)
+        setLoading(true)
+
+        try {
+            const result = await getTemplate(id)
+            if (result.success && result.template) {
+                const t = result.template.templateData
+                const info = t.meetingInfo
+
+                setFormData(prev => ({
+                    ...prev,
+                    meetingInfo: {
+                        ...prev.meetingInfo,
+                        title: info.title || prev.meetingInfo.title,
+                        location: info.location || prev.meetingInfo.location,
+                        startTime: info.defaultStartTime || prev.meetingInfo.startTime,
+                        endTime: info.defaultStartTime && info.defaultDuration
+                            ? calculateEndTime(info.defaultStartTime, info.defaultDuration)
+                            : prev.meetingInfo.endTime,
+                        organizer: info.organizer || prev.meetingInfo.organizer,
+                    },
+                    participants: t.participants.map(p => ({
+                        id: generateId(),
+                        name: p.name,
+                        email: p.email,
+                        role: p.role as any || undefined,
+                        present: true
+                    })),
+                    agenda: t.agendaStructure.map(a => ({
+                        id: generateId(),
+                        title: a.title,
+                        objective: a.objective as any,
+                        keyPoints: ''
+                    })),
+                    outputPreferences: t.outputPreferences || prev.outputPreferences,
+                    decisions: [],
+                    actionItems: [],
+                    absentParticipants: []
+                }))
+
+                setLoadedTemplateName(result.template.name)
+                await trackTemplateUsage(id)
+            }
+        } catch (err) {
+            console.error('Failed to load template', err)
+            setError('Failed to load template')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleSaveTemplate = async (request: CreateMeetingTemplateRequest) => {
+        const result = await createTemplate(request)
+        if (result.success) {
+            await loadTemplates()
+            // Optional: select the new template
+        } else {
+            console.error(result.message)
+            setError(result.message || 'Failed to save template')
+        }
+    }
+
+    const handleTemplateLoad = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const templateId = e.target.value
+        if (!templateId) return
+        loadTemplateById(templateId, true)
+    }
+
+    const calculateEndTime = (start: string, durationMinutes: number): string => {
+        try {
+            const [hours, minutes] = start.split(':').map(Number)
+            const date = new Date()
+            date.setHours(hours, minutes)
+            date.setMinutes(date.getMinutes() + durationMinutes)
+            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+        } catch {
+            return ''
+        }
+    }
+
     const { signOut } = useAuth()
-    const navigate = useNavigate()
 
     // Save preferences to localStorage
     useEffect(() => {
@@ -404,13 +518,41 @@ export default function StructuredModePage() {
                         </p>
                     </div>
 
-                    {/* Template Placeholder */}
+                    {/* Template Loader */}
                     <div className="mb-6 p-4 border border-slate-700/50 rounded-lg bg-slate-900/30">
-                        <div className="flex items-center gap-3">
-                            <span className="text-slate-400">Load Template:</span>
-                            <select disabled className="input-nebula flex-1 opacity-50 cursor-not-allowed">
-                                <option>Select template... (Coming soon)</option>
-                            </select>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+                            <div className="flex items-center gap-3 w-full sm:w-auto flex-1">
+                                <span className="text-slate-400 whitespace-nowrap">Load Template:</span>
+                                <select
+                                    value={selectedTemplateId}
+                                    onChange={handleTemplateLoad}
+                                    className="input-nebula w-full sm:max-w-xs"
+                                >
+                                    <option value="">Select template...</option>
+                                    {templates.map(t => (
+                                        <option key={t.id} value={t.id}>
+                                            {t.name} (Used {t.usageCount} times)
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {loadedTemplateName && (
+                                <div className="text-sm text-green-400 flex items-center gap-2 bg-green-900/20 px-3 py-1.5 rounded-full border border-green-500/30">
+                                    <span>📋 Loaded: {loadedTemplateName}</span>
+                                    <button
+                                        onClick={() => {
+                                            setLoadedTemplateName('')
+                                            setSelectedTemplateId('')
+                                            clearForm()
+                                        }}
+                                        className="text-slate-400 hover:text-white ml-1"
+                                        title="Clear template"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -1004,11 +1146,10 @@ export default function StructuredModePage() {
                     <div className="flex flex-wrap gap-4 justify-between">
                         <div className="flex gap-3">
                             <button
-                                disabled
-                                className="btn-secondary opacity-50 cursor-not-allowed"
-                                title="Coming in Step 5"
+                                onClick={() => setIsSaveModalOpen(true)}
+                                className="btn-secondary border-blue-400/30 text-blue-400 hover:bg-blue-500/10"
                             >
-                                Save Draft
+                                Save as Template
                             </button>
                             <button
                                 onClick={() => setShowClearModal(true)}
@@ -1034,6 +1175,15 @@ export default function StructuredModePage() {
                     </div>
                 </div>
             </motion.div>
+
+
+            {/* Save Template Modal */}
+            <SaveTemplateModal
+                isOpen={isSaveModalOpen}
+                onClose={() => setIsSaveModalOpen(false)}
+                currentFormData={formData}
+                onSave={handleSaveTemplate}
+            />
 
             {/* Clear Form Modal */}
             {showClearModal && (

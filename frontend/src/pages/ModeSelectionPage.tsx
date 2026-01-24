@@ -158,21 +158,7 @@ export default function ModeSelectionPage() {
                 </motion.div>
             </div>
 
-            {/* Back Link */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-center"
-            >
-                <button
-                    onClick={() => navigate('/home')}
-                    className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2"
-                >
-                    <span>←</span>
-                    <span>Back to Home</span>
-                </button>
-            </motion.div>
+
         </div>
     )
 }
