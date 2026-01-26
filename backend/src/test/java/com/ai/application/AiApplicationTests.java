@@ -23,10 +23,8 @@ class AiApplicationTests {
 	}
 
 	static boolean isMongoDbUnavailable() {
-		try {
-			java.net.Socket socket = new java.net.Socket();
+		try (java.net.Socket socket = new java.net.Socket()) {
 			socket.connect(new java.net.InetSocketAddress("localhost", 27017), 1000);
-			socket.close();
 			return false; // MongoDB is available
 		} catch (Exception e) {
 			return true; // MongoDB is unavailable, skip test

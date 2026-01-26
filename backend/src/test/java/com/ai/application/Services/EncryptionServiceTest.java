@@ -23,11 +23,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class EncryptionServiceTest {
 
     private EncryptionService encryptionService;
+    
+    // Exactly 32 bytes for AES-256
+    private static final String TEST_ENCRYPTION_KEY = "TestKey32BytesExactlyForAES256!!";
 
     @BeforeEach
     void setUp() {
-        // Use a test encryption key
-        encryptionService = new EncryptionService("TestEncryptionKeyForUnitTests32!");
+        // Use a test encryption key (exactly 32 bytes)
+        encryptionService = new EncryptionService(TEST_ENCRYPTION_KEY);
     }
 
     @Nested

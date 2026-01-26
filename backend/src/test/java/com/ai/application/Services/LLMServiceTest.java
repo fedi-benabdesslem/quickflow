@@ -40,6 +40,24 @@ class LLMServiceTest {
     private LlMClient llmClient;
 
     private LLMService llmService;
+    
+    // Test JSON response constants for readability
+    private static final String VALID_EXTRACTED_DATA_JSON = """
+        {
+            "meetingTitle": "Sprint Planning",
+            "date": "2024-01-15",
+            "time": "10:00 AM",
+            "participants": ["John", "Jane"],
+            "discussionPoints": ["Point 1", "Point 2"],
+            "decisions": [{"statement": "Decision made", "status": "Approved"}],
+            "actionItems": [{"task": "Complete report", "owner": "John", "deadline": "2024-01-20"}],
+            "confidence": "high"
+        }
+        """;
+    
+    private static final String MINIMAL_JSON_RESPONSE = """
+        {"meetingTitle": "Test", "confidence": "high"}
+        """;
 
     @BeforeEach
     void setUp() {
@@ -53,20 +71,7 @@ class LLMServiceTest {
         @Test
         @DisplayName("Should parse valid JSON response")
         void parseValidJsonResponse() {
-            String validJson = """
-                {
-                    "meetingTitle": "Sprint Planning",
-                    "date": "2024-01-15",
-                    "time": "10:00 AM",
-                    "participants": ["John", "Jane"],
-                    "discussionPoints": ["Point 1", "Point 2"],
-                    "decisions": [{"statement": "Decision made", "status": "Approved"}],
-                    "actionItems": [{"task": "Complete report", "owner": "John", "deadline": "2024-01-20"}],
-                    "confidence": "high"
-                }
-                """;
-            
-            when(llmClient.callLLM(anyString(), anyString())).thenReturn(validJson);
+            when(llmClient.callLLM(anyString(), anyString())).thenReturn(VALID_EXTRACTED_DATA_JSON);
 
             ExtractedData result = llmService.extractFromNotes("Meeting notes content", null, null);
 
@@ -81,14 +86,9 @@ class LLMServiceTest {
         @Test
         @DisplayName("Should handle JSON wrapped in markdown code blocks")
         void handleMarkdownCodeBlocks() {
-            String wrappedJson = """
-                ```json
-                {
-                    "meetingTitle": "Test Meeting",
-                    "confidence": "medium"
-                }
-                ```
-                """;
+            String wrappedJson = "```json\n" + 
+                "{\"meetingTitle\": \"Test Meeting\", \"confidence\": \"medium\"}\n" + 
+                "```";
             
             when(llmClient.callLLM(anyString(), anyString())).thenReturn(wrappedJson);
 
@@ -118,7 +118,7 @@ class LLMServiceTest {
         @DisplayName("Should append date hint when provided")
         void appendDateHint() {
             when(llmClient.callLLM(anyString(), anyString()))
-                .thenReturn("{\"meetingTitle\": \"Test\", \"confidence\": \"high\"}");
+                .thenReturn(MINIMAL_JSON_RESPONSE);
 
             llmService.extractFromNotes("notes", "2024-02-01", null);
 
@@ -129,7 +129,7 @@ class LLMServiceTest {
         @DisplayName("Should append time hint when provided")
         void appendTimeHint() {
             when(llmClient.callLLM(anyString(), anyString()))
-                .thenReturn("{\"meetingTitle\": \"Test\", \"confidence\": \"high\"}");
+                .thenReturn(MINIMAL_JSON_RESPONSE);
 
             llmService.extractFromNotes("notes", null, "14:30");
 
@@ -140,7 +140,7 @@ class LLMServiceTest {
         @DisplayName("Should append both date and time hints")
         void appendBothHints() {
             when(llmClient.callLLM(anyString(), anyString()))
-                .thenReturn("{\"meetingTitle\": \"Test\", \"confidence\": \"high\"}");
+                .thenReturn(MINIMAL_JSON_RESPONSE);
 
             llmService.extractFromNotes("notes", "2024-02-01", "14:30");
 

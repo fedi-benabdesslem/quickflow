@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,8 +48,8 @@ class PdfGenerationServiceTest {
             
             assertNotNull(pdfBytes);
             assertTrue(pdfBytes.length > 0);
-            // PDF files start with %PDF
-            assertTrue(new String(pdfBytes, 0, 4).startsWith("%PDF"));
+            // PDF files start with %PDF (using ISO-8859-1 for binary content)
+            assertTrue(new String(pdfBytes, 0, 4, StandardCharsets.ISO_8859_1).startsWith("%PDF"));
         }
 
         @Test
