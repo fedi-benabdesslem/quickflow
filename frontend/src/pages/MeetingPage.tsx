@@ -1,7 +1,7 @@
 import { useState, FormEvent, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
 import { useReview } from '../contexts/ReviewContext'
 import { generateMeeting } from '../lib/api'
 import type { MeetingFormData } from '../types'
@@ -19,7 +19,7 @@ export default function MeetingPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
-    const { signOut } = useAuth()
+
     const { reviewData, setReviewData } = useReview()
     const navigate = useNavigate()
 
@@ -38,10 +38,7 @@ export default function MeetingPage() {
         }
     }, [reviewData])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
@@ -100,9 +97,7 @@ export default function MeetingPage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back</span>
                 </button>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Form Card */}

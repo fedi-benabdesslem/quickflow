@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useReview } from '../contexts/ReviewContext'
 import { sendEmail, type Contact } from '../lib/api'
 import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
+import TechSupportButton from '../components/TechSupportButton'
 
 interface Recipient {
     id: string
@@ -44,10 +45,7 @@ export default function EmailPage() {
         }
     }, [reviewData])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     const isValidEmail = (email: string): boolean => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -146,9 +144,7 @@ export default function EmailPage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back</span>
                 </button>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Form Card */}

@@ -1,7 +1,8 @@
 import { useState, useRef, DragEvent, ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
+
 import { extractFromNotes, extractFromFile } from '../lib/api'
 import type { QuickModeData } from '../types'
 
@@ -26,13 +27,10 @@ export default function QuickModePage() {
     const [error, setError] = useState('')
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const { signOut } = useAuth()
+
     const navigate = useNavigate()
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     const isValidContent = formData.content.length >= MIN_CHARS
     const isValidFile = formData.file !== undefined
@@ -166,9 +164,7 @@ export default function QuickModePage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back</span>
                 </button>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Breadcrumb */}

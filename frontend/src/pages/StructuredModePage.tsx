@@ -1,7 +1,8 @@
 import { useState, KeyboardEvent, useEffect, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
+
 import { generateMinutes } from '../lib/api'
 import CollapsibleSection from '../components/minutes/CollapsibleSection'
 import ParticipantTag from '../components/minutes/ParticipantTag'
@@ -190,17 +191,14 @@ export default function StructuredModePage() {
         }
     }
 
-    const { signOut } = useAuth()
+
 
     // Save preferences to localStorage
     useEffect(() => {
         localStorage.setItem('minutesOutputPreferences', JSON.stringify(formData.outputPreferences))
     }, [formData.outputPreferences])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     // Calculate required fields completion
     const calculateProgress = useCallback(() => {
@@ -476,9 +474,7 @@ export default function StructuredModePage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back</span>
                 </button>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Breadcrumb */}

@@ -750,5 +750,23 @@ export const getGroupCount = async (): Promise<number> => {
     }
 }
 
+// ============ Support Email API ============
+
+/**
+ * Send a support report email to QuickFlow support team.
+ */
+export const sendSupportEmail = async (message: string): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/support/report', { message })
+        return response.data
+    } catch (error) {
+        console.error('Support email error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as ApiResponse
+        }
+        return { status: 'error', message: 'Failed to send support report' }
+    }
+}
+
 export default api
 

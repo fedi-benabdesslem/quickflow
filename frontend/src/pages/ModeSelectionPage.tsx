@@ -1,15 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
+
 
 export default function ModeSelectionPage() {
-    const { signOut } = useAuth()
+
     const navigate = useNavigate()
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     return (
         <div className="min-h-screen p-4 sm:p-6 relative z-10">
@@ -24,9 +22,7 @@ export default function ModeSelectionPage() {
                     <span className="hidden sm:inline">Back</span>
                 </button>
                 <div className="flex gap-3">
-                    <button onClick={handleLogout} className="btn-logout">
-                        <span className="hidden sm:inline">Logout</span>
-                    </button>
+                    <TechSupportButton />
                 </div>
             </motion.header>
 

@@ -17,3 +17,4 @@ oauth_creds.txt
 *realm-export*.json
 keycloak-data/
 prompt.md
+TECHNICAL_AUDIT_REPORT.md

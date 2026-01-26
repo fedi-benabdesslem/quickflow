@@ -17,6 +17,7 @@ import ContentEditorPage from './pages/ContentEditorPage'
 import TemplateManagementPage from './pages/TemplateManagementPage'
 import ContactsPage from './pages/ContactsPage'
 import GroupsPage from './pages/GroupsPage'
+import TechSupportPage from './pages/TechSupportPage'
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -184,6 +185,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <GroupsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/tech-support"
+                    element={
+                        <ProtectedRoute>
+                            <TechSupportPage />
                         </ProtectedRoute>
                     }
                 />

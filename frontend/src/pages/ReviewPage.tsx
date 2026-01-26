@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
 import { useReview } from '../contexts/ReviewContext'
 import { sendFinal } from '../lib/api'
 import { showToast } from '../components/Toast'
@@ -17,7 +17,7 @@ export default function ReviewPage() {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
-    const { signOut } = useAuth()
+
     const { reviewData, setReviewData } = useReview()
     const navigate = useNavigate()
 
@@ -39,10 +39,7 @@ export default function ReviewPage() {
         }
     }, [reviewData, navigate])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     const handleBack = () => {
         setReviewData(null)
@@ -124,9 +121,7 @@ export default function ReviewPage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back</span>
                 </button>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Review Card */}

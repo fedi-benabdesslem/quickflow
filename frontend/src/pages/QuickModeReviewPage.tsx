@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
+
 import { generateFromExtracted, getContacts, type Contact } from '../lib/api'
 import type { ExtractedMeetingData, ExtractedDecision, ExtractedActionItem, ExtractedParticipant } from '../types'
 import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
@@ -16,7 +17,7 @@ interface LocationState {
 export default function QuickModeReviewPage() {
     const navigate = useNavigate()
     const location = useLocation()
-    const { signOut } = useAuth()
+
 
     const state = location.state as LocationState | null
 
@@ -86,10 +87,7 @@ export default function QuickModeReviewPage() {
         loadAndMatchContacts()
     }, [state, navigate])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     // Participant handlers
     const addParticipant = () => {
@@ -265,9 +263,7 @@ export default function QuickModeReviewPage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back to Notes</span>
                 </button>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Breadcrumb */}

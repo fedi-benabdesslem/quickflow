@@ -35,6 +35,7 @@ REST endpoints that handle HTTP requests and responses.
 -   **`QuickModeController`**: Handles the unstructured-to-structured data transformation pipeline.
 -   **`StructuredModeController`**: Handles validation and processing of structured form submissions.
 -   **`TemplateController`**: (Legacy/Base) Generic template handling.
+-   **`SupportController`**: Handles the "Tech Support" feature.
 
 ### 2.3 Services (Business Logic)
 Encapsulates the core business rules and integration logic.
@@ -135,6 +136,11 @@ A comprehensive reference of all available backend endpoints.
 | `GET` | `/preview/{id}` | Streams PDF for browser preview (inline). | - |
 | `GET` | `/download/{id}` | Downloads PDF file (attachment). | - |
 
+#### Tech Support (`/api/support/report`)
+| Method | Endpoint | Description | Request Body |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/send` | Sends a support email. | `SupportEmailRequest` |
+
 #### System (`/api`)
 | Method | Endpoint | Description | Request Body |
 | :--- | :--- | :--- | :--- |
@@ -165,6 +171,7 @@ A React application structured for component reusability and type safety.
 -   **`ContentEditorPage`**: Rich text editor (Quill) for polishing generated content.
 -   **`TemplateManagementPage`**: CRUD interface for managing Meeting Templates.
 -   **`EmailPage`**: Interface for the "AI Email Writer" feature with contact autocomplete recipients.
+-   **`TechSupportPage`**: Interface for the "Tech Support" feature with contact autocomplete recipients.
 
 ### 3.3 Core Components
 -   **`NebulaBackground`**: A canvas-based animated background component creating the immersive star/nebula effect.

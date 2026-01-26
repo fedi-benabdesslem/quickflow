@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
+
 import RichTextEditor from '../components/RichTextEditor'
 import PdfPreviewModal from '../components/PdfPreviewModal'
 import { generateFromExtracted, generateMinutes, generatePdf } from '../lib/api'
@@ -18,7 +19,7 @@ interface LocationState {
 export default function ContentEditorPage() {
     const navigate = useNavigate()
     const location = useLocation()
-    const { signOut } = useAuth()
+
 
     const state = location.state as LocationState | null
 
@@ -79,10 +80,7 @@ export default function ContentEditorPage() {
         return () => clearInterval(interval)
     }, [content])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     const handleRegenerate = async () => {
         if (!state?.sourceData) {
@@ -309,9 +307,7 @@ export default function ContentEditorPage() {
                             Saved at {formatTime(lastSaved)}
                         </span>
                     )}
-                    <button onClick={handleLogout} className="btn-logout">
-                        <span className="hidden sm:inline">Logout</span>
-                    </button>
+                    <TechSupportButton />
                 </div>
             </motion.header>
 

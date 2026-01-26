@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useSidebar } from '../contexts/SidebarContext'
 import UserAvatar from '../components/UserAvatar'
 import UserProfileSidebar from '../components/UserProfileSidebar'
+import TechSupportButton from '../components/TechSupportButton'
 
 export default function HomePage() {
     const { user } = useAuth()
@@ -30,7 +31,7 @@ export default function HomePage() {
                     />
                 </div>
                 <div className="flex items-center gap-3">
-                    <img src="/tech-support-logo.png" alt="QuickFlow" className="h-8 w-auto object-contain opacity-70" />
+                    <TechSupportButton />
                 </div>
             </motion.header>
 
