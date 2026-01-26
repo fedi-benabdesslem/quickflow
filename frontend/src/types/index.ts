@@ -152,11 +152,16 @@ export interface ExtractedActionItem {
     deadline?: string;
 }
 
+export interface ExtractedParticipant {
+    name: string;
+    email?: string;
+}
+
 export interface ExtractedMeetingData {
     meetingTitle?: string;
     date?: string;
     time?: string;
-    participants: string[];
+    participants: (string | ExtractedParticipant)[];
     discussionPoints: string[];
     decisions: ExtractedDecision[];
     actionItems: ExtractedActionItem[];

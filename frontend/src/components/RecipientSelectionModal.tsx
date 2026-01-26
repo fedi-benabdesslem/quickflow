@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { sendMinutesEmail, getEmailCapability } from '../lib/api'
+import { sendMinutesEmail, getEmailCapability, type Contact } from '../lib/api'
+import ContactAutocomplete from './contacts/ContactAutocomplete'
 
 interface RecipientSelectionModalProps {
     isOpen: boolean
@@ -71,9 +72,18 @@ export default function RecipientSelectionModal({
 
     const handleAddRecipient = () => {
         if (newRecipient && newRecipient.includes('@')) {
-            setAdditionalRecipients(prev => [...prev, newRecipient.trim()])
+            if (!additionalRecipients.includes(newRecipient.trim().toLowerCase())) {
+                setAdditionalRecipients(prev => [...prev, newRecipient.trim()])
+            }
             setNewRecipient('')
         }
+    }
+
+    const handleContactSelect = (contact: Contact) => {
+        if (!additionalRecipients.some(r => r.toLowerCase() === contact.email.toLowerCase())) {
+            setAdditionalRecipients(prev => [...prev, contact.email])
+        }
+        setNewRecipient('')
     }
 
     const handleParticipantToggle = (email: string) => {
@@ -268,19 +278,20 @@ export default function RecipientSelectionModal({
                                 Additional Recipients
                             </h4>
                             <div className="flex gap-2 mb-2">
-                                <input
-                                    type="email"
-                                    value={newRecipient}
-                                    onChange={(e) => setNewRecipient(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleAddRecipient()}
-                                    placeholder="Enter email address..."
-                                    className="flex-1 bg-slate-800/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none"
-                                    disabled={!!providerWarning}
-                                />
+                                <div className="flex-1">
+                                    <ContactAutocomplete
+                                        value={newRecipient}
+                                        onChange={setNewRecipient}
+                                        onSelect={handleContactSelect}
+                                        onEnterManual={handleAddRecipient}
+                                        placeholder="Search contacts or type email..."
+                                        disabled={!!providerWarning}
+                                    />
+                                </div>
                                 <button
                                     onClick={handleAddRecipient}
                                     className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white text-sm transition-colors"
-                                    disabled={!!providerWarning}
+                                    disabled={!!providerWarning || !newRecipient.includes('@')}
                                 >
                                     Add
                                 </button>

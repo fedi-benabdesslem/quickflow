@@ -5,15 +5,19 @@ import './index.css'
 import App from './App'
 import { AuthProvider } from './contexts/AuthContext'
 import { ReviewProvider } from './contexts/ReviewContext'
+import { SidebarProvider } from './contexts/SidebarContext'
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
             <AuthProvider>
-                <ReviewProvider>
-                    <App />
-                </ReviewProvider>
+                <SidebarProvider>
+                    <ReviewProvider>
+                        <App />
+                    </ReviewProvider>
+                </SidebarProvider>
             </AuthProvider>
         </BrowserRouter>
     </StrictMode>,
 )
+

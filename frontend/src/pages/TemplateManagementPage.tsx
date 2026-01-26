@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
+
 import { getUserTemplates, deleteTemplate, updateTemplate } from '../lib/api'
 import type { MeetingTemplate, UpdateMeetingTemplateRequest } from '../types/template'
 import EditTemplateModal from '../components/templates/EditTemplateModal'
@@ -12,7 +13,7 @@ export default function TemplateManagementPage() {
     const [error, setError] = useState('')
     const [editingTemplate, setEditingTemplate] = useState<MeetingTemplate | null>(null)
 
-    const { signOut } = useAuth()
+
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -54,10 +55,7 @@ export default function TemplateManagementPage() {
         }
     }
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     // Format date helper
     const formatDate = (dateString?: string) => {
@@ -82,9 +80,7 @@ export default function TemplateManagementPage() {
                     </button>
                     <h1 className="text-xl font-bold text-white">My Templates</h1>
                 </div>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Error Message */}

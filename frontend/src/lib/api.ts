@@ -436,5 +436,337 @@ export const trackTemplateUsage = async (templateId: string): Promise<TemplateRe
     }
 }
 
+// ============ Contact APIs (Phase 2) ============
+
+export interface Contact {
+    id: string
+    userId: string
+    name: string
+    email: string
+    phone?: string
+    photo?: string
+    source: 'google' | 'microsoft' | 'manual'
+    sourceId?: string
+    usesQuickFlow: boolean
+    quickflowUserId?: string
+    groups: string[]
+    isFavorite: boolean
+    usageCount: number
+    lastUsed?: string
+    lastSynced?: string
+    createdAt: string
+    updatedAt: string
+}
+
+export interface ContactsResponse {
+    contacts: Contact[]
+    total: number
+    lastSync?: string
+}
+
+export interface ImportResponse {
+    success?: number
+    imported: number
+    updated: number
+    deleted?: number
+    total: number
+    error?: string
+}
+
+export const getContacts = async (
+    filter?: string,
+    source?: string,
+    sortBy?: string
+): Promise<ContactsResponse> => {
+    try {
+        const params = new URLSearchParams()
+        if (filter) params.append('filter', filter)
+        if (source) params.append('source', source)
+        if (sortBy) params.append('sortBy', sortBy)
+
+        const response = await api.get<ContactsResponse>(`/contacts?${params.toString()}`)
+        return response.data
+    } catch (error) {
+        console.error('Get contacts error:', error)
+        return { contacts: [], total: 0 }
+    }
+}
+
+export const searchContacts = async (query: string, limit: number = 10): Promise<Contact[]> => {
+    try {
+        const response = await api.get<Contact[]>(`/contacts/search?q=${encodeURIComponent(query)}&limit=${limit}`)
+        return response.data
+    } catch (error) {
+        console.error('Search contacts error:', error)
+        return []
+    }
+}
+
+export const getRecentContacts = async (limit: number = 5): Promise<Contact[]> => {
+    try {
+        const response = await api.get<Contact[]>(`/contacts/recent?limit=${limit}`)
+        return response.data
+    } catch (error) {
+        console.error('Get recent contacts error:', error)
+        return []
+    }
+}
+
+export const importContacts = async (provider?: string): Promise<ImportResponse> => {
+    try {
+        const url = provider ? `/contacts/import?provider=${provider}` : '/contacts/import'
+        console.log('Importing contacts from:', url)
+        const response = await api.post<ImportResponse>(url)
+        console.log('Import response:', response.data)
+        return response.data
+    } catch (error) {
+        console.error('Import contacts error:', error)
+        if (axios.isAxiosError(error)) {
+            console.error('Response status:', error.response?.status)
+            console.error('Response data:', error.response?.data)
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Failed to import contacts'
+            return { imported: 0, updated: 0, total: 0, error: errorMsg }
+        }
+        return { imported: 0, updated: 0, total: 0, error: 'Failed to import contacts' }
+    }
+}
+
+export const syncContacts = async (): Promise<ImportResponse> => {
+    try {
+        const response = await api.post<ImportResponse>('/contacts/sync')
+        return response.data
+    } catch (error) {
+        console.error('Sync contacts error:', error)
+        if (axios.isAxiosError(error)) {
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Failed to sync contacts'
+            return { imported: 0, updated: 0, total: 0, error: errorMsg }
+        }
+        return { imported: 0, updated: 0, total: 0, error: 'Failed to sync contacts' }
+    }
+}
+
+export const createContact = async (contact: {
+    name: string
+    email: string
+    phone?: string
+    photo?: string
+}): Promise<{ contact?: Contact; error?: string }> => {
+    try {
+        console.log('Creating contact:', contact)
+        const response = await api.post<Contact>('/contacts', contact)
+        console.log('Create contact response:', response.data)
+        return { contact: response.data }
+    } catch (error) {
+        console.error('Create contact error:', error)
+        if (axios.isAxiosError(error)) {
+            console.error('Response status:', error.response?.status)
+            console.error('Response data:', error.response?.data)
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Failed to create contact'
+            return { error: errorMsg }
+        }
+        return { error: 'Failed to create contact' }
+    }
+}
+
+export const updateContact = async (
+    id: string,
+    updates: {
+        name?: string
+        email?: string
+        phone?: string
+        photo?: string
+        groups?: string[]
+        isFavorite?: boolean
+    }
+): Promise<{ contact?: Contact; error?: string }> => {
+    try {
+        const response = await api.put<Contact>(`/contacts/${id}`, updates)
+        return { contact: response.data }
+    } catch (error) {
+        console.error('Update contact error:', error)
+        if (axios.isAxiosError(error) && error.response?.data?.error) {
+            return { error: error.response.data.error }
+        }
+        return { error: 'Failed to update contact' }
+    }
+}
+
+export const deleteContact = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+        await api.delete(`/contacts/${id}`)
+        return { success: true }
+    } catch (error) {
+        console.error('Delete contact error:', error)
+        return { success: false, error: 'Failed to delete contact' }
+    }
+}
+
+export const toggleContactFavorite = async (id: string): Promise<{ contact?: Contact; error?: string }> => {
+    try {
+        const response = await api.post<Contact>(`/contacts/${id}/favorite`)
+        return { contact: response.data }
+    } catch (error) {
+        console.error('Toggle favorite error:', error)
+        return { error: 'Failed to toggle favorite' }
+    }
+}
+
+export const incrementContactUsage = async (id: string): Promise<void> => {
+    try {
+        await api.post(`/contacts/${id}/use`)
+    } catch (error) {
+        // Silent fail - usage tracking is not critical
+    }
+}
+
+export const getContactCount = async (): Promise<number> => {
+    try {
+        const response = await api.get<{ count: number }>('/contacts/count')
+        return response.data.count
+    } catch (error) {
+        return 0
+    }
+}
+
+// ============ Group APIs (Phase 2) ============
+
+export interface Group {
+    id: string
+    userId: string
+    name: string
+    description?: string
+    memberIds: string[]
+    memberCount?: number
+    memberPreview?: Array<{ id: string; name: string; email: string }>
+    quickflowMemberCount?: number
+    createdAt: string
+    updatedAt: string
+}
+
+export interface GroupsResponse {
+    groups: Group[]
+    total: number
+}
+
+export const getGroups = async (): Promise<GroupsResponse> => {
+    try {
+        const response = await api.get<GroupsResponse>('/groups')
+        return response.data
+    } catch (error) {
+        console.error('Get groups error:', error)
+        return { groups: [], total: 0 }
+    }
+}
+
+export const getGroup = async (id: string): Promise<{ group?: Group; members?: Contact[] }> => {
+    try {
+        const response = await api.get<{ id: string; name: string; members: Contact[] }>(`/groups/${id}`)
+        return { group: response.data as unknown as Group, members: response.data.members }
+    } catch (error) {
+        console.error('Get group error:', error)
+        return {}
+    }
+}
+
+export const createGroup = async (group: {
+    name: string
+    description?: string
+    memberIds?: string[]
+}): Promise<{ group?: Group; error?: string }> => {
+    try {
+        const response = await api.post<Group>('/groups', group)
+        return { group: response.data }
+    } catch (error) {
+        console.error('Create group error:', error)
+        if (axios.isAxiosError(error) && error.response?.data?.error) {
+            return { error: error.response.data.error }
+        }
+        return { error: 'Failed to create group' }
+    }
+}
+
+export const updateGroup = async (
+    id: string,
+    updates: {
+        name?: string
+        description?: string
+        memberIds?: string[]
+    }
+): Promise<{ group?: Group; error?: string }> => {
+    try {
+        const response = await api.put<Group>(`/groups/${id}`, updates)
+        return { group: response.data }
+    } catch (error) {
+        console.error('Update group error:', error)
+        if (axios.isAxiosError(error) && error.response?.data?.error) {
+            return { error: error.response.data.error }
+        }
+        return { error: 'Failed to update group' }
+    }
+}
+
+export const deleteGroup = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+        await api.delete(`/groups/${id}`)
+        return { success: true }
+    } catch (error) {
+        console.error('Delete group error:', error)
+        return { success: false, error: 'Failed to delete group' }
+    }
+}
+
+export const addGroupMembers = async (
+    groupId: string,
+    memberIds: string[]
+): Promise<{ group?: Group; error?: string }> => {
+    try {
+        const response = await api.post<Group>(`/groups/${groupId}/members`, { memberIds })
+        return { group: response.data }
+    } catch (error) {
+        console.error('Add members error:', error)
+        return { error: 'Failed to add members' }
+    }
+}
+
+export const removeGroupMember = async (
+    groupId: string,
+    memberId: string
+): Promise<{ group?: Group; error?: string }> => {
+    try {
+        const response = await api.delete<Group>(`/groups/${groupId}/members/${memberId}`)
+        return { group: response.data }
+    } catch (error) {
+        console.error('Remove member error:', error)
+        return { error: 'Failed to remove member' }
+    }
+}
+
+export const getGroupCount = async (): Promise<number> => {
+    try {
+        const response = await api.get<{ count: number }>('/groups/count')
+        return response.data.count
+    } catch (error) {
+        return 0
+    }
+}
+
+// ============ Support Email API ============
+
+/**
+ * Send a support report email to QuickFlow support team.
+ */
+export const sendSupportEmail = async (message: string): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/support/report', { message })
+        return response.data
+    } catch (error) {
+        console.error('Support email error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as ApiResponse
+        }
+        return { status: 'error', message: 'Failed to send support report' }
+    }
+}
+
 export default api
 
