@@ -23,6 +23,7 @@ The backend is structured as a layered Spring Boot application.
 ### 2.2 Controllers (API Layer)
 REST endpoints that handle HTTP requests and responses.
 -   **`AuthController`**: Manages user authentication flows.
+-   **`ContactsController`**: Manages contact CRUD operations, sync with Google/Microsoft, and search/autocomplete.
 -   **`EmailController`**: Handles general email sending operations via Gmail/Outlook.
 -   **`HealthController`**: Provides a simple liveness probe endpoint (`/health`).
 -   **`MeetingController`**: Core logic for meeting management (CRUD).
@@ -37,27 +38,32 @@ REST endpoints that handle HTTP requests and responses.
 
 ### 2.3 Services (Business Logic)
 Encapsulates the core business rules and integration logic.
+-   **`ContactService`**: Manages contact CRUD, syncing with Google/Microsoft People APIs, search/autocomplete logic, and usage tracking.
 -   **`EmailProviderService`**: Abstract factory/strategy pattern to switch between Gmail and Outlook providers efficiently.
 -   **`EncryptionService`**: Handles symmetric encryption (AES) for sensitive tokens at rest.
 -   **`FileProcessingService`**: Utilities for parsing uploaded files (PDF/DOCX) for Quick Mode.
 -   **`GmailService`**: Implementation of Google Gmail API interactions (Draft creation, Sending).
+-   **`GooglePeopleService`**: Fetches contacts from Google People API for sync operations.
 -   **`GridFsService`**: manages large file storage in MongoDB (for potential attachment scaling).
 -   **`LLMService`**: The bridge to the AI engine. Orchestrates prompts sent to Ollama/Spring AI.
 -   **`MeetingTemplateService`**: Business logic for the Template System (Create, Read, Update, Delete).
--   **`MicrosoftGraphService`**: Implementation of Azure/Microsoft Graph API for Outlook integration.
+-   **`MicrosoftGraphService`**: Implementation of Azure/Microsoft Graph API for Outlook and Contacts integration.
 -   **`PdfGenerationService`**: Uses iText 7 to render HTML/Markdown content into professional PDF documents.
 -   **`PdfService`**: Helper service for low-level PDF manipulation.
+-   **`QuickFlowDetectionService`**: Detects if a contact uses QuickFlow by checking user database.
 -   **`TemplateService`**: Manages the prompt templates used by the LLM.
 -   **`TokenRefreshService`**: Background service (or on-demand) to handle OAuth2 token rotation for Google/Microsoft.
 -   **`TokenStorageService`**: Securely stores and retrieves encrypted OAuth tokens from the database.
 
 ### 2.4 Repositories (Data Access)
 Interfaces extending `MongoRepository` for abstracted database operations.
+-   **`ContactRepository`**: CRUD for synced contacts with support for search, favorites, and usage tracking.
 -   **`EmailRepository`**: CRUD for email logs/metadata.
 -   **`GeneratedOutputRepository`**: Stores history of AI-generated content.
 -   **`MeetingRepository`**: Persistence for meeting records.
 -   **`MeetingTemplateRepository`**: Persistence for user-defined templates.
 -   **`TemplateRepository`**: Persistence for system prompt templates.
+-   **`UserRepository`**: Stores user profiles and QuickFlow detection.
 -   **`UserTokenRepository`**: Stores user-specific OAuth tokens (encrypted).
 
 ### 2.5 Security & Configuration
@@ -111,6 +117,17 @@ A comprehensive reference of all available backend endpoints.
 | `POST` | `/send` | Generates an AI email draft. | `EmailRequest` |
 | `POST` | `/send-final` | Sends the finalized email via Gmail/Outlook. | `{ id, subject, content, recipients }` |
 
+#### Contacts (`/api/contacts`)
+| Method | Endpoint | Description | Request Body |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Lists all contacts for user (with optional filter/source/sortBy). | - |
+| `GET` | `/search` | Search contacts by query string for autocomplete. | `?q=&limit=` |
+| `GET` | `/recent` | Get recently used contacts. | `?limit=` |
+| `POST` | `/sync` | Sync contacts from Google/Microsoft provider. | - |
+| `GET` | `/sync/status` | Get sync status and last sync timestamp. | - |
+| `POST` | `/{id}/usage` | Increment usage counter for contact (used for sorting). | - |
+| `PUT` | `/{id}/favorite` | Toggle favorite status for a contact. | - |
+
 #### PDF (`/api/pdf`)
 | Method | Endpoint | Description | Request Body |
 | :--- | :--- | :--- | :--- |
@@ -138,21 +155,25 @@ A React application structured for component reusability and type safety.
 -   **State Management**: React Context API (`AuthContext`, `ReviewContext`).
 
 ### 3.2 Key Pages (Routes)
--   **`HomePage`**: Dashboard with action cards (Create Minutes, Email, Templates).
+-   **`HomePage`**: Dashboard with action cards (Create Minutes, Email, Templates, Contacts).
 -   **`AuthPage`**: Login/Register interface integration with Supabase Auth UI.
+-   **`ContactsPage`**: Contact management with sync, search, favorites, and QuickFlow user detection.
 -   **`ModeSelectionPage`**: Choice between "Quick Mode" and "Structured Mode".
 -   **`StructuredModePage`**: A complex form with dynamic fields (participants, agenda) and Template loading support.
 -   **`QuickModePage`**: File upload and text area for raw note input.
--   **`QuickModeReviewPage`**: Intermediate step to review AI-extracted data before final generation.
+-   **`QuickModeReviewPage`**: Intermediate step to review AI-extracted data with contact autocomplete for participants.
 -   **`ContentEditorPage`**: Rich text editor (Quill) for polishing generated content.
 -   **`TemplateManagementPage`**: CRUD interface for managing Meeting Templates.
--   **`EmailPage`**: Interface for the "AI Email Writer" feature.
+-   **`EmailPage`**: Interface for the "AI Email Writer" feature with contact autocomplete recipients.
 
 ### 3.3 Core Components
 -   **`NebulaBackground`**: A canvas-based animated background component creating the immersive star/nebula effect.
 -   **`RichTextEditor`**: Wrapper around `react-quill` for WYSIWYG editing.
 -   **`PdfPreview`**: real-time PDF rendering component using `@react-pdf/renderer`.
 -   **`SaveTemplateModal` / `EditTemplateModal`**: Modals for the Template System interaction.
+-   **`ContactAutocomplete`**: Smart search input with dropdown for selecting contacts from synced list.
+-   **`RecipientSelectionModal`**: Modal for selecting meeting participants as email recipients with autocomplete.
+-   **`UserAvatar`**: Dynamic avatar component with initials fallback and QuickFlow user indicator.
 
 ### 3.4 Lib & Integration
 -   **`api.ts`**: Centralized Axios instance with interceptors for error handling and injecting the Supabase Authorization header.

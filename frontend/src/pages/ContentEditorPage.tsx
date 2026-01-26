@@ -201,13 +201,18 @@ export default function ContentEditorPage() {
 
         if (state.mode === 'quick') {
             const data = state.sourceData as ExtractedMeetingData
+            // Map participants - they could be strings or objects with name/email
+            const participantsList = data.participants?.map(p => {
+                if (typeof p === 'string') {
+                    return { name: p, email: undefined }
+                }
+                return { name: p.name, email: p.email }
+            }) || []
             return {
                 title: data.meetingTitle || 'Untitled',
                 date: data.date || 'Not specified',
-                participants: data.participants?.map(p =>
-                    typeof p === 'string' ? { name: p } : { name: p, email: undefined }
-                ) || [],
-                participantNames: data.participants || [],
+                participants: participantsList,
+                participantNames: participantsList.map(p => p.name),
                 decisions: data.decisions?.length || 0,
                 actionItems: data.actionItems?.length || 0,
             }

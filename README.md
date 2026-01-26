@@ -17,11 +17,19 @@
 - **Quick Mode**: Paste rough notes and let AI extract the structure automatically.
 - **Template System**: Save and reuse meeting structures for recurring syncs.
 - **PDF Generation**: Export professional PDF reports in one click.
+- **Smart Contact Matching**: Extracted participant names are auto-matched to your contacts with emails.
 
 ### ✉️ AI Email Writer
 - **Smart Drafting**: Describe your intent ("ask for a budget increase") and get a polished email.
 - **Tone Adjustment**: Switch between Formal, Casual, or Urgent tones instantly.
 - **Direct Sending**: Integrated with Gmail and Outlook for seamless delivery.
+- **Contact Autocomplete**: Search and select recipients from your synced contacts.
+
+### 👥 Contact Management
+- **Cloud Sync**: Import contacts from Google or Microsoft accounts.
+- **Smart Search**: Autocomplete dropdown across all forms (participants, recipients).
+- **Favorites & Usage**: Mark favorites and track frequently used contacts.
+- **QuickFlow Detection**: See which contacts also use QuickFlow.
 
 ## 🛠️ Tech Stack
 
@@ -33,7 +41,7 @@ Built with cutting-edge technologies for performance and experience:
 - **AI Engine**: [Ollama](https://ollama.ai/) (Local Mistral-Nemo model)
 - **Auth**: [Supabase](https://supabase.com/)
 
-> **[Click here for the full Techmical report](./tech-report.md)**
+> **[Click here for the full Technical report](./tech-report.md)**
 
 ## 🚀 Getting Started
 
@@ -44,7 +52,7 @@ QuickFlow is designed to be easy to set up.
 ## 🗺️ Roadmap
 
 We are constantly improving QuickFlow. Here's what's coming next:
-- [ ] **Autocomplete**: Smart suggestions for participants and agenda items.
+- [x] **Contact Autocomplete**: Smart suggestions for participants and recipients.
 - [ ] **Calendar Integration**: Sync meetings directly from Google/Outlook Calendar.
 - [ ] **Voice Mode**: Real-time transcription and summarization.
 - [ ] **Team Workspaces**: Share templates and minutes with your team.

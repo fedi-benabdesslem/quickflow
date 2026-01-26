@@ -1,9 +1,10 @@
-import { useState, useEffect, KeyboardEvent } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
-import { generateFromExtracted } from '../lib/api'
-import type { ExtractedMeetingData, ExtractedDecision, ExtractedActionItem } from '../types'
+import { generateFromExtracted, getContacts, type Contact } from '../lib/api'
+import type { ExtractedMeetingData, ExtractedDecision, ExtractedActionItem, ExtractedParticipant } from '../types'
+import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
 
 interface LocationState {
     extractedData: ExtractedMeetingData
@@ -34,13 +35,55 @@ export default function QuickModeReviewPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
+    // Match participant names to contacts when data loads
     useEffect(() => {
-        if (state?.extractedData) {
+        const loadAndMatchContacts = async () => {
+            if (!state?.extractedData) {
+                navigate('/minutes/quick')
+                return
+            }
+
+            // Set the data first
             setData(state.extractedData)
-        } else {
-            // No data, redirect back
-            navigate('/minutes/quick')
+
+            // Then try to match participants to contacts
+            try {
+                const result = await getContacts()
+                const contacts = result.contacts || []
+                if (contacts.length > 0 && state.extractedData.participants.length > 0) {
+                    // Match extracted participant names to contacts
+                    const matchedParticipants: ExtractedParticipant[] = state.extractedData.participants.map(p => {
+                        const name = typeof p === 'string' ? p : p.name
+                        const existingEmail = typeof p === 'object' ? p.email : undefined
+
+                        // If already has email, keep it
+                        if (existingEmail) {
+                            return { name, email: existingEmail }
+                        }
+
+                        // Try to find a matching contact (case-insensitive)
+                        const matchedContact = contacts.find((c: Contact) =>
+                            c.name.toLowerCase() === name.toLowerCase() ||
+                            c.name.toLowerCase().includes(name.toLowerCase()) ||
+                            name.toLowerCase().includes(c.name.toLowerCase())
+                        )
+
+                        if (matchedContact) {
+                            return { name: matchedContact.name, email: matchedContact.email }
+                        }
+
+                        return { name, email: undefined }
+                    })
+
+                    setData(prev => ({ ...prev, participants: matchedParticipants }))
+                }
+            } catch (err) {
+                console.log('Could not match contacts:', err)
+                // Continue without matching - not critical
+            }
         }
+
+        loadAndMatchContacts()
     }, [state, navigate])
 
     const handleLogout = async () => {
@@ -53,10 +96,26 @@ export default function QuickModeReviewPage() {
         if (newParticipant.trim()) {
             setData(prev => ({
                 ...prev,
-                participants: [...prev.participants, newParticipant.trim()],
+                participants: [...prev.participants, { name: newParticipant.trim(), email: undefined }],
             }))
             setNewParticipant('')
         }
+    }
+
+    const handleContactSelect = (contact: Contact) => {
+        // Check if already added
+        const exists = data.participants.some(p => {
+            const name = typeof p === 'string' ? p : p.name
+            return name.toLowerCase() === contact.name.toLowerCase()
+        })
+
+        if (!exists) {
+            setData(prev => ({
+                ...prev,
+                participants: [...prev.participants, { name: contact.name, email: contact.email }],
+            }))
+        }
+        setNewParticipant('')
     }
 
     const removeParticipant = (index: number) => {
@@ -64,13 +123,6 @@ export default function QuickModeReviewPage() {
             ...prev,
             participants: prev.participants.filter((_, i) => i !== index),
         }))
-    }
-
-    const handleParticipantKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            addParticipant()
-        }
     }
 
     // Discussion point handlers
@@ -324,30 +376,41 @@ export default function QuickModeReviewPage() {
                         </svg> Participants
                     </h2>
                     <div className="flex flex-wrap gap-2 mb-3">
-                        {data.participants.map((p, i) => (
-                            <span
-                                key={i}
-                                className="inline-flex items-center gap-1 px-3 py-1 bg-slate-700/50 rounded-full text-sm"
-                            >
-                                {p}
-                                <button
-                                    onClick={() => removeParticipant(i)}
-                                    className="text-slate-400 hover:text-red-400 ml-1"
+                        {data.participants.map((p, i) => {
+                            const name = typeof p === 'string' ? p : p.name
+                            const email = typeof p === 'object' ? p.email : undefined
+                            return (
+                                <span
+                                    key={i}
+                                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${email ? 'bg-green-700/30 border border-green-500/30' : 'bg-slate-700/50'}`}
+                                    title={email || 'No email linked'}
                                 >
-                                    ×
-                                </button>
-                            </span>
-                        ))}
+                                    {email && (
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-green-400">
+                                            <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+                                        </svg>
+                                    )}
+                                    {name}
+                                    <button
+                                        onClick={() => removeParticipant(i)}
+                                        className="text-slate-400 hover:text-red-400 ml-1"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            )
+                        })}
                     </div>
                     <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newParticipant}
-                            onChange={(e) => setNewParticipant(e.target.value)}
-                            onKeyDown={handleParticipantKeyDown}
-                            className="input-nebula flex-1"
-                            placeholder="Add participant name..."
-                        />
+                        <div className="flex-1">
+                            <ContactAutocomplete
+                                value={newParticipant}
+                                onChange={setNewParticipant}
+                                onSelect={handleContactSelect}
+                                onEnterManual={addParticipant}
+                                placeholder="Search contacts or type name..."
+                            />
+                        </div>
                         <button onClick={addParticipant} className="btn-secondary px-4">Add</button>
                     </div>
                 </section>
