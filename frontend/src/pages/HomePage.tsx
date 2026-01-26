@@ -30,7 +30,7 @@ export default function HomePage() {
                     />
                 </div>
                 <div className="flex items-center gap-3">
-                    <img src="/logo.png" alt="QuickFlow" className="h-8 w-auto object-contain opacity-70" />
+                    <img src="/tech-support-logo.png" alt="QuickFlow" className="h-8 w-auto object-contain opacity-70" />
                 </div>
             </motion.header>
 
@@ -47,7 +47,7 @@ export default function HomePage() {
                     className="mb-6 inline-block"
                 >
                     <img
-                        src="/intro.png"
+                        src="/logo.png"
                         alt="Welcome"
                         className="w-24 h-24 object-contain drop-shadow-[0_0_20px_rgba(168,85,247,0.5)]"
                     />
