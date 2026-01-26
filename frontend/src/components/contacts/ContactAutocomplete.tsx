@@ -6,6 +6,7 @@ interface ContactAutocompleteProps {
     value: string
     onChange: (value: string) => void
     onSelect?: (contact: Contact) => void
+    onEnterManual?: () => void // Called when Enter is pressed with no dropdown selection
     placeholder?: string
     className?: string
     disabled?: boolean
@@ -15,6 +16,7 @@ export default function ContactAutocomplete({
     value,
     onChange,
     onSelect,
+    onEnterManual,
     placeholder = 'Search contacts...',
     className = '',
     disabled = false,
@@ -79,7 +81,8 @@ export default function ContactAutocomplete({
 
     // Handle selection
     const handleSelect = async (contact: Contact) => {
-        onChange(contact.email)
+        // Clear input after selection (don't set to email, parent handles that)
+        onChange('')
         if (onSelect) {
             onSelect(contact)
         }
@@ -119,6 +122,10 @@ export default function ContactAutocomplete({
                 e.preventDefault()
                 if (highlightedIndex >= 0 && highlightedIndex < displayItems.length) {
                     handleSelect(displayItems[highlightedIndex])
+                } else if (onEnterManual && value.trim()) {
+                    // No selection, trigger manual entry
+                    onEnterManual()
+                    setIsOpen(false)
                 }
                 break
             case 'Escape':
@@ -172,8 +179,8 @@ export default function ContactAutocomplete({
                                     type="button"
                                     onClick={() => handleSelect(contact)}
                                     className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${highlightedIndex === index
-                                            ? 'bg-purple-500/20'
-                                            : 'hover:bg-white/5'
+                                        ? 'bg-purple-500/20'
+                                        : 'hover:bg-white/5'
                                         }`}
                                 >
                                     <UserAvatar

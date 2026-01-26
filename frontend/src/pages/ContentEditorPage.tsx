@@ -204,7 +204,10 @@ export default function ContentEditorPage() {
             return {
                 title: data.meetingTitle || 'Untitled',
                 date: data.date || 'Not specified',
-                participants: data.participants || [],
+                participants: data.participants?.map(p =>
+                    typeof p === 'string' ? { name: p } : { name: p, email: undefined }
+                ) || [],
+                participantNames: data.participants || [],
                 decisions: data.decisions?.length || 0,
                 actionItems: data.actionItems?.length || 0,
             }
@@ -213,7 +216,8 @@ export default function ContentEditorPage() {
             return {
                 title: data.meetingInfo?.title || 'Untitled',
                 date: data.meetingInfo?.date || 'Not specified',
-                participants: data.participants?.map(p => p.name) || [],
+                participants: data.participants?.map(p => ({ name: p.name, email: p.email })) || [],
+                participantNames: data.participants?.map(p => p.name) || [],
                 decisions: data.decisions?.length || 0,
                 actionItems: data.actionItems?.length || 0,
             }
@@ -431,14 +435,14 @@ export default function ContentEditorPage() {
                                     <div>
                                         <span className="text-slate-400">Participants:</span>
                                         <div className="flex flex-wrap gap-1 mt-1">
-                                            {summary.participants.slice(0, 5).map((p, i) => (
+                                            {summary.participantNames.slice(0, 5).map((p, i) => (
                                                 <span key={i} className="px-2 py-0.5 bg-slate-700/50 rounded text-xs">
                                                     {p}
                                                 </span>
                                             ))}
-                                            {summary.participants.length > 5 && (
+                                            {summary.participantNames.length > 5 && (
                                                 <span className="text-slate-500 text-xs">
-                                                    +{summary.participants.length - 5} more
+                                                    +{summary.participantNames.length - 5} more
                                                 </span>
                                             )}
                                         </div>
