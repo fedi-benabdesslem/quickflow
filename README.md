@@ -33,6 +33,8 @@ Built with cutting-edge technologies for performance and experience:
 - **AI Engine**: [Ollama](https://ollama.ai/) (Local Mistral-Nemo model)
 - **Auth**: [Supabase](https://supabase.com/)
 
+> **[Click here for the full Techmical report](./tech-report.md)**
+
 ## 🚀 Getting Started
 
 QuickFlow is designed to be easy to set up.
@@ -47,6 +49,3 @@ We are constantly improving QuickFlow. Here's what's coming next:
 - [ ] **Voice Mode**: Real-time transcription and summarization.
 - [ ] **Team Workspaces**: Share templates and minutes with your team.
 
-## License
-
-[MIT](./LICENSE)
