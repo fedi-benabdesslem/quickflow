@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { useReview } from '../contexts/ReviewContext'
-import { sendEmail } from '../lib/api'
+import { sendEmail, type Contact } from '../lib/api'
+import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
 
 export default function EmailPage() {
     const [recipients, setRecipients] = useState('')
@@ -130,14 +131,19 @@ export default function EmailPage() {
                             </svg>
                             Recipient Email(s)
                         </label>
-                        <input
-                            type="text"
+                        <ContactAutocomplete
                             value={recipients}
-                            onChange={(e) => setRecipients(e.target.value)}
-                            placeholder="email@example.com, another@example.com"
-                            className="input-nebula"
+                            onChange={setRecipients}
+                            onSelect={(contact: Contact) => {
+                                // Append to existing or set as new
+                                setRecipients(prev =>
+                                    prev ? `${prev}, ${contact.email}` : contact.email
+                                )
+                            }}
+                            placeholder="Search contacts or type email@example.com"
                             disabled={loading}
                         />
+                        <p className="text-xs text-slate-500 mt-1">Separate multiple emails with commas</p>
                     </div>
 
                     {/* Content */}

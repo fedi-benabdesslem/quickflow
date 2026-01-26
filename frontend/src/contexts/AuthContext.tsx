@@ -153,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 provider: 'google',
                 options: {
                     redirectTo: `${window.location.origin}/`,
-                    scopes: 'https://www.googleapis.com/auth/gmail.send',
+                    scopes: 'https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/contacts.readonly',
                     queryParams: {
                         access_type: 'offline',
                         prompt: 'consent',
@@ -179,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 provider: 'azure',
                 options: {
                     redirectTo: `${window.location.origin}/`,
-                    scopes: 'email Mail.Send offline_access',
+                    scopes: 'email Mail.Send Contacts.Read offline_access',
                 },
             })
 

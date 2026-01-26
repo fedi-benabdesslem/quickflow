@@ -6,6 +6,7 @@ import { generateMinutes } from '../lib/api'
 import CollapsibleSection from '../components/minutes/CollapsibleSection'
 import ParticipantTag from '../components/minutes/ParticipantTag'
 import FormProgress from '../components/minutes/FormProgress'
+import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
 import type {
     StructuredModeData,
     Participant,
@@ -14,7 +15,7 @@ import type {
     ActionItem,
     OutputPreferences
 } from '../types'
-import { createTemplate, getUserTemplates, getTemplate, trackTemplateUsage } from '../lib/api'
+import { createTemplate, getUserTemplates, getTemplate, trackTemplateUsage, type Contact } from '../lib/api'
 import type { MeetingTemplate, CreateMeetingTemplateRequest } from '../types/template'
 import SaveTemplateModal from '../components/templates/SaveTemplateModal'
 
@@ -220,11 +221,12 @@ export default function StructuredModePage() {
     const canSubmit = completed === total
 
     // Participant handlers
-    const addParticipant = (name: string, isAbsent: boolean = false) => {
+    const addParticipant = (name: string, isAbsent: boolean = false, email?: string) => {
         if (!name.trim()) return
         const newParticipant: Participant = {
             id: generateId(),
             name: name.trim(),
+            email: email,
             present: !isAbsent,
         }
 
@@ -241,6 +243,10 @@ export default function StructuredModePage() {
             }))
             setParticipantInput('')
         }
+    }
+
+    const handleContactSelect = (contact: Contact) => {
+        addParticipant(contact.name, false, contact.email)
     }
 
     const removeParticipant = (id: string, isAbsent: boolean = false) => {
@@ -704,15 +710,13 @@ export default function StructuredModePage() {
                             <label className="block text-sm font-medium text-slate-300 mb-2">
                                 Add Participants
                             </label>
-                            <input
-                                type="text"
+                            <ContactAutocomplete
                                 value={participantInput}
-                                onChange={(e) => setParticipantInput(e.target.value)}
-                                onKeyDown={(e) => handleParticipantKeyDown(e)}
-                                placeholder="Type name and press Enter..."
-                                className="input-nebula"
+                                onChange={setParticipantInput}
+                                onSelect={handleContactSelect}
+                                placeholder="Search contacts or type name and press Enter..."
                             />
-                            <p className="text-xs text-slate-500 mt-1">Autocomplete will be added in Phase 2</p>
+                            <p className="text-xs text-slate-500 mt-1">Search your contacts or type a name and press Enter to add manually</p>
                         </div>
 
                         {formData.participants.length > 0 && (
