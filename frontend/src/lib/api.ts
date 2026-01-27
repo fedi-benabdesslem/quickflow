@@ -741,6 +741,25 @@ export const removeGroupMember = async (
     }
 }
 
+export interface GroupSearchResult {
+    id: string
+    name: string
+    memberCount: number
+    members: Contact[]
+}
+
+export const searchGroups = async (query: string, limit: number = 5): Promise<GroupSearchResult[]> => {
+    try {
+        const response = await api.get<GroupSearchResult[]>('/groups/search', {
+            params: { q: query, limit }
+        })
+        return response.data
+    } catch (error) {
+        console.error('Search groups error:', error)
+        return []
+    }
+}
+
 export const getGroupCount = async (): Promise<number> => {
     try {
         const response = await api.get<{ count: number }>('/groups/count')
