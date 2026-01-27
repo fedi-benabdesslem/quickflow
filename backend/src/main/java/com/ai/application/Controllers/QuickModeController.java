@@ -51,7 +51,8 @@ public class QuickModeController {
             ExtractedData extracted = llmService.extractFromNotes(
                     request.getContent(),
                     request.getDate(),
-                    request.getTime());
+                    request.getTime(),
+                    request.getLocation());
 
             return ResponseEntity.ok(Map.of(
                     "status", "success",
@@ -72,7 +73,8 @@ public class QuickModeController {
     public ResponseEntity<?> extractFromFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "date", required = false) String date,
-            @RequestParam(value = "time", required = false) String time) {
+            @RequestParam(value = "time", required = false) String time,
+            @RequestParam(value = "location", required = false) String location) {
 
         logger.info("Received file extraction request: {}", file.getOriginalFilename());
 
@@ -93,7 +95,7 @@ public class QuickModeController {
             }
 
             // Extract structured data using LLM
-            ExtractedData extracted = llmService.extractFromNotes(content, date, time);
+            ExtractedData extracted = llmService.extractFromNotes(content, date, time, location);
 
             return ResponseEntity.ok(Map.of(
                     "status", "success",
@@ -125,8 +127,32 @@ public class QuickModeController {
             String tone = (String) request.getOrDefault("tone", "Formal");
             String length = (String) request.getOrDefault("length", "Standard");
 
-            // Convert map to ExtractedData
-            com.google.gson.Gson gson = new com.google.gson.Gson();
+            // Convert map to ExtractedData using custom Gson with participant deserializer
+            com.google.gson.GsonBuilder gsonBuilder = new com.google.gson.GsonBuilder();
+            gsonBuilder.registerTypeAdapter(
+                    ExtractedData.ExtractedParticipant.class,
+                    new com.google.gson.JsonDeserializer<ExtractedData.ExtractedParticipant>() {
+                        @Override
+                        public ExtractedData.ExtractedParticipant deserialize(
+                                com.google.gson.JsonElement json,
+                                java.lang.reflect.Type typeOfT,
+                                com.google.gson.JsonDeserializationContext context) {
+                            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
+                                // Handle string format: "John Doe"
+                                return new ExtractedData.ExtractedParticipant(json.getAsString());
+                            } else if (json.isJsonObject()) {
+                                // Handle object format: {"name": "John Doe", "email": "john@example.com"}
+                                com.google.gson.JsonObject obj = json.getAsJsonObject();
+                                String name = obj.has("name") ? obj.get("name").getAsString() : null;
+                                String email = obj.has("email") && !obj.get("email").isJsonNull()
+                                        ? obj.get("email").getAsString()
+                                        : null;
+                                return new ExtractedData.ExtractedParticipant(name, email);
+                            }
+                            return new ExtractedData.ExtractedParticipant();
+                        }
+                    });
+            com.google.gson.Gson gson = gsonBuilder.create();
             String json = gson.toJson(dataMap);
             ExtractedData data = gson.fromJson(json, ExtractedData.class);
 

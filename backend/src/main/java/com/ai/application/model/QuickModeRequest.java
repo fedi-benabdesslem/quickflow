@@ -7,14 +7,16 @@ public class QuickModeRequest {
     private String content;
     private String date;
     private String time;
+    private String location;
 
     public QuickModeRequest() {
     }
 
-    public QuickModeRequest(String content, String date, String time) {
+    public QuickModeRequest(String content, String date, String time, String location) {
         this.content = content;
         this.date = date;
         this.time = time;
+        this.location = location;
     }
 
     public String getContent() {
@@ -39,5 +41,13 @@ public class QuickModeRequest {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

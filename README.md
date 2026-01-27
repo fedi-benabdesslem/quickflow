@@ -24,12 +24,14 @@
 - **Tone Adjustment**: Switch between Formal, Casual, or Urgent tones instantly.
 - **Direct Sending**: Integrated with Gmail and Outlook for seamless delivery.
 - **Contact Autocomplete**: Search and select recipients from your synced contacts.
+- **Manual Recipient Entry**: Support for adding any email address, even if not in contacts.
 
 ### 👥 Contact Management
 - **Cloud Sync**: Import contacts from Google or Microsoft accounts.
 - **Smart Search**: Autocomplete dropdown across all forms (participants, recipients).
 - **Favorites & Usage**: Mark favorites and track frequently used contacts.
 - **QuickFlow Detection**: See which contacts also use QuickFlow.
+- **Manual Entry**: Type any name or email and press Enter to add them, even if not in your synced list.
 
 ## 🛠️ Tech Stack
 

@@ -393,6 +393,19 @@ export default function QuickModePage() {
                                 disabled={loading}
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                                Location (optional)
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.location || ''}
+                                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                                placeholder="e.g. Zoom, Boardroom"
+                                className="input-nebula"
+                                disabled={loading}
+                            />
+                        </div>
                     </div>
                 </div>
 

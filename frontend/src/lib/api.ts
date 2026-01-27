@@ -164,13 +164,15 @@ interface GenerationResponse {
 export const extractFromNotes = async (
     content: string,
     date?: string,
-    time?: string
+    time?: string,
+    location?: string
 ): Promise<ExtractionResponse> => {
     try {
         const response = await api.post<ExtractionResponse>('/minutes/quick/extract', {
             content,
             date,
             time,
+            location,
         })
         return response.data
     } catch (error) {
@@ -185,13 +187,15 @@ export const extractFromNotes = async (
 export const extractFromFile = async (
     file: File,
     date?: string,
-    time?: string
+    time?: string,
+    location?: string
 ): Promise<ExtractionResponse> => {
     try {
         const formData = new FormData()
         formData.append('file', file)
         if (date) formData.append('date', date)
         if (time) formData.append('time', time)
+        if (location) formData.append('location', location)
 
         const response = await api.post<ExtractionResponse>(
             '/minutes/quick/extract-file',
@@ -738,6 +742,25 @@ export const removeGroupMember = async (
     } catch (error) {
         console.error('Remove member error:', error)
         return { error: 'Failed to remove member' }
+    }
+}
+
+export interface GroupSearchResult {
+    id: string
+    name: string
+    memberCount: number
+    members: Contact[]
+}
+
+export const searchGroups = async (query: string, limit: number = 5): Promise<GroupSearchResult[]> => {
+    try {
+        const response = await api.get<GroupSearchResult[]>('/groups/search', {
+            params: { q: query, limit }
+        })
+        return response.data
+    } catch (error) {
+        console.error('Search groups error:', error)
+        return []
     }
 }
 

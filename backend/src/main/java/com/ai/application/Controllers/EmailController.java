@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -120,6 +121,7 @@ public class EmailController {
 
         if (result.isSuccess()) {
             email.setStatus("sent");
+            email.setSentAt(LocalDateTime.now());
             emailRepository.save(email);
             return ResponseEntity.ok(Map.of(
                     "status", "success",

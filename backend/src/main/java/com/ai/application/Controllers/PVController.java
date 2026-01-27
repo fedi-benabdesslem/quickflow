@@ -61,14 +61,13 @@ public class PVController {
             }
         }
         meeting.setStatus("sent");
+        meeting.setSentAt(LocalDateTime.now());
         meetingRepository.save(meeting);
 
         // TODO: Actually send meeting summary (e.g., via email or notification)
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "message", "Meeting summary sent successfully"
-        ));
+                "message", "Meeting summary sent successfully"));
     }
 }
-
