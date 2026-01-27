@@ -22,6 +22,11 @@ public class Meeting {
     private String status = "draft"; // "draft" or "sent"
     private String generatedContent; // Generated meeting summary content
 
+    @Indexed
+    private LocalDateTime sentAt; // Timestamp when minutes were sent/shared
+    private boolean deleted = false; // Soft delete flag
+    private LocalDateTime deletedAt; // Timestamp when minutes were deleted
+
     // Constructors
     public Meeting() {
     }
@@ -118,6 +123,14 @@ public class Meeting {
         this.generatedContent = generatedContent;
     }
 
+    public LocalDateTime getSentAt() {
+        return sentAt;
+    }
+
+    public void setSentAt(LocalDateTime sentAt) {
+        this.sentAt = sentAt;
+    }
+
     private String pdfFileId; // GridFS file ID for attached PDF
 
     public String getPdfFileId() {
@@ -126,5 +139,21 @@ public class Meeting {
 
     public void setPdfFileId(String pdfFileId) {
         this.pdfFileId = pdfFileId;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

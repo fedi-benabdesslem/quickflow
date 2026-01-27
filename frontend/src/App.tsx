@@ -18,6 +18,8 @@ import TemplateManagementPage from './pages/TemplateManagementPage'
 import ContactsPage from './pages/ContactsPage'
 import GroupsPage from './pages/GroupsPage'
 import TechSupportPage from './pages/TechSupportPage'
+import HistoryPage from './pages/HistoryPage'
+import HistorySidebar from './components/history/HistorySidebar'
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -82,6 +84,7 @@ function App() {
         <>
             <NebulaBackground />
             <ToastProvider />
+            <HistorySidebar />
             <Routes>
                 <Route path="/" element={<RootRedirect />} />
                 <Route
@@ -185,6 +188,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <GroupsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/history"
+                    element={
+                        <ProtectedRoute>
+                            <HistoryPage />
                         </ProtectedRoute>
                     }
                 />
