@@ -89,16 +89,16 @@ export default function UserProfileSidebar() {
             label: 'History',
             icon: <HistoryIcon />,
             path: '/history',
-            disabled: true,
-            disabledLabel: 'Phase 3',
         },
         {
             id: 'bookmarks',
             label: 'Bookmarks',
             icon: <BookmarksIcon />,
-            path: '/bookmarks',
-            disabled: true,
-            disabledLabel: 'Phase 3',
+            onClick: () => {
+                closeSidebar()
+                // Navigate to history with filter
+                navigate('/history?filter=bookmarks')
+            },
         },
         {
             id: 'inbox',
@@ -106,7 +106,7 @@ export default function UserProfileSidebar() {
             icon: <InboxIcon />,
             path: '/inbox',
             disabled: true,
-            disabledLabel: 'Phase 4',
+            disabledLabel: 'Coming Soon',
         },
         {
             id: 'templates',
@@ -201,14 +201,22 @@ export default function UserProfileSidebar() {
                                 {menuItems.map((item) => (
                                     <li key={item.id}>
                                         <button
-                                            onClick={() => !item.disabled && item.path && handleNavigation(item.path)}
+                                            onClick={() => {
+                                                if (!item.disabled) {
+                                                    if (item.onClick) {
+                                                        item.onClick()
+                                                    } else if (item.path) {
+                                                        handleNavigation(item.path)
+                                                    }
+                                                }
+                                            }}
                                             disabled={item.disabled}
                                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all
                                                 ${item.disabled
                                                     ? 'text-slate-600 cursor-not-allowed'
                                                     : 'text-slate-300 hover:text-white hover:bg-white/5'
                                                 }
-                                                ${location.pathname === item.path ? 'bg-purple-500/20 text-purple-300' : ''}
+                                                ${item.path && location.pathname === item.path ? 'bg-purple-500/20 text-purple-300' : ''}
                                             `}
                                         >
                                             <span className="w-5 h-5">

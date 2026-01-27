@@ -17,7 +17,9 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     const toggleSidebar = () => setIsOpen(prev => !prev)
 
     return (
-        <SidebarContext.Provider value={{ isOpen, openSidebar, closeSidebar, toggleSidebar }}>
+        <SidebarContext.Provider value={{
+            isOpen, openSidebar, closeSidebar, toggleSidebar
+        }}>
             {children}
         </SidebarContext.Provider>
     )

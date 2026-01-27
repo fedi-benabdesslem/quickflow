@@ -17,7 +17,37 @@ import java.util.ArrayList;
 public class LLMService {
     private static final Logger logger = LoggerFactory.getLogger(LLMService.class);
     private final LlMClient llmclient;
-    private final Gson gson = new Gson();
+    private final Gson gson;
+
+    {
+        // Initialize Gson with custom deserializer for ExtractedParticipant
+        // This handles both string format (from AI) and object format (from frontend)
+        com.google.gson.GsonBuilder gsonBuilder = new com.google.gson.GsonBuilder();
+        gsonBuilder.registerTypeAdapter(
+                ExtractedData.ExtractedParticipant.class,
+                new com.google.gson.JsonDeserializer<ExtractedData.ExtractedParticipant>() {
+                    @Override
+                    public ExtractedData.ExtractedParticipant deserialize(
+                            com.google.gson.JsonElement json,
+                            java.lang.reflect.Type typeOfT,
+                            com.google.gson.JsonDeserializationContext context) {
+                        if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
+                            // Handle string format: "John Doe"
+                            return new ExtractedData.ExtractedParticipant(json.getAsString());
+                        } else if (json.isJsonObject()) {
+                            // Handle object format: {"name": "John Doe", "email": "john@example.com"}
+                            com.google.gson.JsonObject obj = json.getAsJsonObject();
+                            String name = obj.has("name") ? obj.get("name").getAsString() : null;
+                            String email = obj.has("email") && !obj.get("email").isJsonNull()
+                                    ? obj.get("email").getAsString()
+                                    : null;
+                            return new ExtractedData.ExtractedParticipant(name, email);
+                        }
+                        return new ExtractedData.ExtractedParticipant();
+                    }
+                });
+        gson = gsonBuilder.create();
+    }
 
     @Autowired
     public LLMService(LlMClient llmclient) {
@@ -27,7 +57,7 @@ public class LLMService {
     /**
      * Quick Mode: Extract structured data from unstructured meeting notes.
      */
-    public ExtractedData extractFromNotes(String content, String date, String time) {
+    public ExtractedData extractFromNotes(String content, String date, String time, String location) {
         String systemPrompt = """
                 You are a meeting notes analyzer. Extract structured information from unstructured meeting notes.
 
@@ -47,6 +77,7 @@ public class LLMService {
                     "meetingTitle": "string or null",
                     "date": "YYYY-MM-DD or null",
                     "time": "HH:MM AM/PM or null",
+                    "location": "string or null",
                     "participants": ["name1", "name2"],
                     "discussionPoints": ["point1", "point2"],
                     "decisions": [{"statement": "decision text", "status": "Approved|Rejected|Deferred|No Decision"}],
@@ -57,13 +88,16 @@ public class LLMService {
                 Return ONLY the JSON object, nothing else.
                 """;
 
-        // Add date/time hints if provided
+        // Add date/time/location hints if provided
         StringBuilder userInput = new StringBuilder(content);
         if (date != null && !date.isEmpty()) {
             userInput.append("\n\n[User provided date: ").append(date).append("]");
         }
         if (time != null && !time.isEmpty()) {
             userInput.append("\n[User provided time: ").append(time).append("]");
+        }
+        if (location != null && !location.isEmpty()) {
+            userInput.append("\n[User provided location: ").append(location).append("]");
         }
 
         String response = llmclient.callLLM(systemPrompt, userInput.toString());
@@ -356,9 +390,16 @@ public class LLMService {
         if (data.getTime() != null) {
             sb.append("Time: ").append(data.getTime()).append("\n");
         }
+        if (data.getLocation() != null) {
+            sb.append("Location: ").append(data.getLocation()).append("\n");
+        }
 
         if (data.getParticipants() != null && !data.getParticipants().isEmpty()) {
-            sb.append("\nParticipants: ").append(String.join(", ", data.getParticipants())).append("\n");
+            String participantNames = data.getParticipants().stream()
+                    .map(p -> p.getName())
+                    .filter(name -> name != null && !name.isEmpty())
+                    .collect(java.util.stream.Collectors.joining(", "));
+            sb.append("\nParticipants: ").append(participantNames).append("\n");
         }
 
         if (data.getDiscussionPoints() != null && !data.getDiscussionPoints().isEmpty()) {

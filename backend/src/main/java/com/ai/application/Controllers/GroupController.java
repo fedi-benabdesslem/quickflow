@@ -160,6 +160,24 @@ public class GroupController {
     }
 
     /**
+     * Search groups by name for autocomplete.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<?> searchGroups(
+            Authentication authentication,
+            @RequestParam String q,
+            @RequestParam(defaultValue = "5") int limit) {
+        try {
+            String userId = authentication.getName();
+            List<Map<String, Object>> groups = groupService.searchGroups(userId, q, limit);
+            return ResponseEntity.ok(groups);
+        } catch (Exception e) {
+            logger.error("Error searching groups", e);
+            return ResponseEntity.ok(List.of());
+        }
+    }
+
+    /**
      * Get group count for sidebar badge.
      */
     @GetMapping("/count")

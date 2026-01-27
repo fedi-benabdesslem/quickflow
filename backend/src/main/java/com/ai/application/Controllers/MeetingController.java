@@ -101,6 +101,7 @@ public class MeetingController {
                 request.getSubject(),
                 request.getDetails());
         draft.setStatus("draft");
+        draft.setUserId(userId); // NEW: Save user ID
         Meeting saved = meetingRepository.save(draft);
 
         return ResponseEntity.ok(Map.of(
@@ -135,6 +136,15 @@ public class MeetingController {
         }
 
         Meeting meeting = optionalMeeting.get();
+
+        // Security check: Ensure user owns this meeting
+        String currentUserId = principal.getName();
+        if (meeting.getUserId() != null && !meeting.getUserId().equals(currentUserId)) {
+            return ResponseEntity.status(403).body(Map.of(
+                    "status", "error",
+                    "message", "You do not have permission to modify this meeting"));
+        }
+
         if (finalPeople != null) {
             meeting.setPeople(finalPeople);
         }
@@ -196,6 +206,7 @@ public class MeetingController {
 
                 if (result.isSuccess()) {
                     meeting.setStatus("sent");
+                    meeting.setSentAt(LocalDateTime.now());
                     meetingRepository.save(meeting);
                     return ResponseEntity.ok(Map.of(
                             "status", "success",
@@ -217,6 +228,7 @@ public class MeetingController {
 
         // No recipients - just save the meeting
         meeting.setStatus("sent");
+        meeting.setSentAt(LocalDateTime.now());
         meetingRepository.save(meeting);
 
         return ResponseEntity.ok(Map.of(

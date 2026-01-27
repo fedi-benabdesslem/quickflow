@@ -9,8 +9,53 @@ public class ExtractedData {
     private String meetingTitle;
     private String date;
     private String time;
-    private List<String> participants;
+    private List<ExtractedParticipant> participants;
     private List<String> discussionPoints;
+    private String location;
+
+    /**
+     * Represents a participant with name and optional email.
+     * Supports both string-only format (from AI extraction) and object format (from
+     * frontend).
+     */
+    public static class ExtractedParticipant {
+        private String name;
+        private String email;
+
+        public ExtractedParticipant() {
+        }
+
+        public ExtractedParticipant(String name) {
+            this.name = name;
+        }
+
+        public ExtractedParticipant(String name, String email) {
+            this.name = name;
+            this.email = email;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        @Override
+        public String toString() {
+            return name != null ? name : "";
+        }
+    }
+
     private List<ExtractedDecision> decisions;
     private List<ExtractedActionItem> actionItems;
     private String confidence; // "high", "medium", "low"
@@ -111,11 +156,19 @@ public class ExtractedData {
         this.time = time;
     }
 
-    public List<String> getParticipants() {
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public List<ExtractedParticipant> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<String> participants) {
+    public void setParticipants(List<ExtractedParticipant> participants) {
         this.participants = participants;
     }
 

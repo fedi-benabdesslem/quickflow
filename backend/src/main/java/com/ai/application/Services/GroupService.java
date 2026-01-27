@@ -177,6 +177,31 @@ public class GroupService {
     }
 
     /**
+     * Search groups by name for autocomplete.
+     */
+    public List<Map<String, Object>> searchGroups(String userId, String query, int limit) {
+        List<Group> groups = groupRepository.findByUserId(userId);
+
+        String lowerQuery = query.toLowerCase();
+        return groups.stream()
+                .filter(group -> group.getName().toLowerCase().contains(lowerQuery))
+                .limit(limit)
+                .map(group -> {
+                    Map<String, Object> groupData = new HashMap<>();
+                    groupData.put("id", group.getId());
+                    groupData.put("name", group.getName());
+                    groupData.put("memberCount", group.getMemberCount());
+
+                    // Get full member details for selection
+                    List<Contact> members = getGroupMembers(group);
+                    groupData.put("members", members);
+
+                    return groupData;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Get full member details for a group.
      */
     private List<Contact> getGroupMembers(Group group) {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { useReview } from '../contexts/ReviewContext'
-import { sendEmail, type Contact } from '../lib/api'
+import { sendEmail, type Contact, type GroupSearchResult } from '../lib/api'
 import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
 import TechSupportButton from '../components/TechSupportButton'
 
@@ -24,7 +24,7 @@ export default function EmailPage() {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
-    const { user, signOut } = useAuth()
+    const { user } = useAuth()
     const { reviewData, setReviewData } = useReview()
     const navigate = useNavigate()
 
@@ -64,6 +64,30 @@ export default function EmailPage() {
             email: contact.email,
             isContact: true
         }])
+        setInputValue('')
+    }
+
+    // Add all members from a group
+    const handleGroupSelect = (group: GroupSearchResult) => {
+        const newRecipients: Recipient[] = []
+
+        for (const member of group.members) {
+            // Skip if already added
+            if (recipientList.some(r => r.email.toLowerCase() === member.email.toLowerCase())) {
+                continue
+            }
+
+            newRecipients.push({
+                id: generateId(),
+                name: member.name,
+                email: member.email,
+                isContact: true
+            })
+        }
+
+        if (newRecipients.length > 0) {
+            setRecipientList(prev => [...prev, ...newRecipients])
+        }
         setInputValue('')
     }
 
@@ -223,12 +247,13 @@ export default function EmailPage() {
                             value={inputValue}
                             onChange={setInputValue}
                             onSelect={handleContactSelect}
+                            onSelectGroup={handleGroupSelect}
                             onEnterManual={handleManualAdd}
-                            placeholder={recipientList.length > 0 ? "Add more recipients..." : "Search contacts or type email..."}
+                            placeholder={recipientList.length > 0 ? "Add more recipients..." : "Search contacts, groups, or type email..."}
                             disabled={loading}
                         />
                         <p className="text-xs text-slate-500 mt-1">
-                            Search contacts or type an email and press Enter
+                            Search contacts/groups or type an email and press Enter
                         </p>
                     </div>
 
