@@ -15,7 +15,9 @@ import QuickModeReviewPage from './pages/QuickModeReviewPage'
 import StructuredModePage from './pages/StructuredModePage'
 import ContentEditorPage from './pages/ContentEditorPage'
 import TemplateManagementPage from './pages/TemplateManagementPage'
-
+import ContactsPage from './pages/ContactsPage'
+import GroupsPage from './pages/GroupsPage'
+import TechSupportPage from './pages/TechSupportPage'
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -167,6 +169,30 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <TemplateManagementPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/contacts"
+                    element={
+                        <ProtectedRoute>
+                            <ContactsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/groups"
+                    element={
+                        <ProtectedRoute>
+                            <GroupsPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/tech-support"
+                    element={
+                        <ProtectedRoute>
+                            <TechSupportPage />
                         </ProtectedRoute>
                     }
                 />

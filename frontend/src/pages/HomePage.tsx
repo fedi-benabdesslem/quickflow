@@ -1,18 +1,21 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import { useSidebar } from '../contexts/SidebarContext'
+import UserAvatar from '../components/UserAvatar'
+import UserProfileSidebar from '../components/UserProfileSidebar'
+import TechSupportButton from '../components/TechSupportButton'
 
 export default function HomePage() {
-    const { user, signOut } = useAuth()
+    const { user } = useAuth()
+    const { openSidebar } = useSidebar()
     const navigate = useNavigate()
-
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
 
     return (
         <div className="min-h-screen p-4 sm:p-6 relative z-10">
+            {/* Profile Sidebar */}
+            <UserProfileSidebar />
+
             {/* Header */}
             <motion.header
                 initial={{ opacity: 0, y: -20 }}
@@ -20,12 +23,15 @@ export default function HomePage() {
                 className="flex justify-between items-center mb-8 sm:mb-12"
             >
                 <div className="flex items-center gap-3">
-                    <img src="/logo.png" alt="QuickFlow" className="h-10 w-auto object-contain" />
+                    <UserAvatar
+                        fullName={user?.username || user?.email}
+                        size="md"
+                        showOnlineIndicator
+                        onClick={openSidebar}
+                    />
                 </div>
-                <div className="flex gap-3">
-                    <button onClick={handleLogout} className="btn-logout">
-                        <span className="hidden sm:inline">Logout</span>
-                    </button>
+                <div className="flex items-center gap-3">
+                    <TechSupportButton />
                 </div>
             </motion.header>
 
@@ -42,7 +48,7 @@ export default function HomePage() {
                     className="mb-6 inline-block"
                 >
                     <img
-                        src="/intro.png"
+                        src="/logo.png"
                         alt="Welcome"
                         className="w-24 h-24 object-contain drop-shadow-[0_0_20px_rgba(168,85,247,0.5)]"
                     />

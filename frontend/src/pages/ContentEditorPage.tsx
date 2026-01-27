@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
+import TechSupportButton from '../components/TechSupportButton'
+
 import RichTextEditor from '../components/RichTextEditor'
 import PdfPreviewModal from '../components/PdfPreviewModal'
 import { generateFromExtracted, generateMinutes, generatePdf } from '../lib/api'
@@ -18,7 +19,7 @@ interface LocationState {
 export default function ContentEditorPage() {
     const navigate = useNavigate()
     const location = useLocation()
-    const { signOut } = useAuth()
+
 
     const state = location.state as LocationState | null
 
@@ -79,10 +80,7 @@ export default function ContentEditorPage() {
         return () => clearInterval(interval)
     }, [content])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     const handleRegenerate = async () => {
         if (!state?.sourceData) {
@@ -201,10 +199,18 @@ export default function ContentEditorPage() {
 
         if (state.mode === 'quick') {
             const data = state.sourceData as ExtractedMeetingData
+            // Map participants - they could be strings or objects with name/email
+            const participantsList = data.participants?.map(p => {
+                if (typeof p === 'string') {
+                    return { name: p, email: undefined }
+                }
+                return { name: p.name, email: p.email }
+            }) || []
             return {
                 title: data.meetingTitle || 'Untitled',
                 date: data.date || 'Not specified',
-                participants: data.participants || [],
+                participants: participantsList,
+                participantNames: participantsList.map(p => p.name),
                 decisions: data.decisions?.length || 0,
                 actionItems: data.actionItems?.length || 0,
             }
@@ -213,7 +219,8 @@ export default function ContentEditorPage() {
             return {
                 title: data.meetingInfo?.title || 'Untitled',
                 date: data.meetingInfo?.date || 'Not specified',
-                participants: data.participants?.map(p => p.name) || [],
+                participants: data.participants?.map(p => ({ name: p.name, email: p.email })) || [],
+                participantNames: data.participants?.map(p => p.name) || [],
                 decisions: data.decisions?.length || 0,
                 actionItems: data.actionItems?.length || 0,
             }
@@ -300,9 +307,7 @@ export default function ContentEditorPage() {
                             Saved at {formatTime(lastSaved)}
                         </span>
                     )}
-                    <button onClick={handleLogout} className="btn-logout">
-                        <span className="hidden sm:inline">Logout</span>
-                    </button>
+                    <TechSupportButton />
                 </div>
             </motion.header>
 
@@ -431,14 +436,14 @@ export default function ContentEditorPage() {
                                     <div>
                                         <span className="text-slate-400">Participants:</span>
                                         <div className="flex flex-wrap gap-1 mt-1">
-                                            {summary.participants.slice(0, 5).map((p, i) => (
+                                            {summary.participantNames.slice(0, 5).map((p, i) => (
                                                 <span key={i} className="px-2 py-0.5 bg-slate-700/50 rounded text-xs">
                                                     {p}
                                                 </span>
                                             ))}
-                                            {summary.participants.length > 5 && (
+                                            {summary.participantNames.length > 5 && (
                                                 <span className="text-slate-500 text-xs">
-                                                    +{summary.participants.length - 5} more
+                                                    +{summary.participantNames.length - 5} more
                                                 </span>
                                             )}
                                         </div>

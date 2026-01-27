@@ -3,10 +3,22 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { useReview } from '../contexts/ReviewContext'
-import { sendEmail } from '../lib/api'
+import { sendEmail, type Contact } from '../lib/api'
+import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
+import TechSupportButton from '../components/TechSupportButton'
+
+interface Recipient {
+    id: string
+    name: string
+    email: string
+    isContact: boolean // true if from contacts, false if manually entered
+}
+
+const generateId = () => Math.random().toString(36).substring(2, 9)
 
 export default function EmailPage() {
-    const [recipients, setRecipients] = useState('')
+    const [recipientList, setRecipientList] = useState<Recipient[]>([])
+    const [inputValue, setInputValue] = useState('')
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -19,18 +31,69 @@ export default function EmailPage() {
     // Load from review data if editing
     useEffect(() => {
         if (reviewData?.type === 'email') {
-            setRecipients(reviewData.recipients || '')
+            // Parse emails back into recipients
+            if (reviewData.recipients) {
+                const emails = reviewData.recipients.split(',').map(e => e.trim()).filter(Boolean)
+                setRecipientList(emails.map(email => ({
+                    id: generateId(),
+                    name: email,
+                    email: email,
+                    isContact: false
+                })))
+            }
             setContent(reviewData.details || '')
         }
     }, [reviewData])
 
-    const handleLogout = async () => {
-        await signOut()
-        navigate('/auth')
-    }
+
 
     const isValidEmail = (email: string): boolean => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    }
+
+    // Add recipient from contact
+    const handleContactSelect = (contact: Contact) => {
+        // Check if already added
+        if (recipientList.some(r => r.email.toLowerCase() === contact.email.toLowerCase())) {
+            return
+        }
+
+        setRecipientList(prev => [...prev, {
+            id: generateId(),
+            name: contact.name,
+            email: contact.email,
+            isContact: true
+        }])
+        setInputValue('')
+    }
+
+    // Add recipient from manual email entry (called when Enter is pressed)
+    const handleManualAdd = () => {
+        const email = inputValue.trim()
+        if (!email) return
+
+        if (!isValidEmail(email)) {
+            setError('Please enter a valid email address')
+            return
+        }
+
+        if (recipientList.some(r => r.email.toLowerCase() === email.toLowerCase())) {
+            setInputValue('')
+            return
+        }
+
+        setRecipientList(prev => [...prev, {
+            id: generateId(),
+            name: email,
+            email: email,
+            isContact: false
+        }])
+        setInputValue('')
+        setError('')
+    }
+
+    const removeRecipient = (id: string) => {
+        setRecipientList(prev => prev.filter(r => r.id !== id))
     }
 
     const handleSubmit = async (e: FormEvent) => {
@@ -38,18 +101,12 @@ export default function EmailPage() {
         setError('')
         setSuccess('')
 
-        if (!recipients.trim() || !content.trim()) {
-            setError('Please fill in all fields')
+        if (recipientList.length === 0 || !content.trim()) {
+            setError('Please add at least one recipient and enter a message')
             return
         }
 
-        const emailList = recipients.split(',').map((email) => email.trim())
-        for (const email of emailList) {
-            if (!isValidEmail(email)) {
-                setError(`Invalid email: ${email}`)
-                return
-            }
-        }
+        const recipients = recipientList.map(r => r.email).join(', ')
 
         setLoading(true)
 
@@ -87,9 +144,7 @@ export default function EmailPage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back</span>
                 </button>
-                <button onClick={handleLogout} className="btn-logout">
-                    <span className="hidden sm:inline">Logout</span>
-                </button>
+                <TechSupportButton />
             </motion.header>
 
             {/* Form Card */}
@@ -128,16 +183,53 @@ export default function EmailPage() {
                                 <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
                                 <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
                             </svg>
-                            Recipient Email(s)
+                            Recipients
                         </label>
-                        <input
-                            type="text"
-                            value={recipients}
-                            onChange={(e) => setRecipients(e.target.value)}
-                            placeholder="email@example.com, another@example.com"
-                            className="input-nebula"
+
+                        {/* Selected Recipients as Tags */}
+                        {recipientList.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {recipientList.map(recipient => (
+                                    <div
+                                        key={recipient.id}
+                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm ${recipient.isContact
+                                            ? 'bg-pink-500/20 border border-pink-500/30 text-pink-300'
+                                            : 'bg-slate-700/50 border border-slate-600 text-slate-300'
+                                            }`}
+                                    >
+                                        {recipient.isContact && (
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-pink-400">
+                                                <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
+                                            </svg>
+                                        )}
+                                        <span className="max-w-[200px] truncate">{recipient.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeRecipient(recipient.id)}
+                                            className="text-current opacity-60 hover:opacity-100 transition-opacity"
+                                            disabled={loading}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Autocomplete Input */}
+                        <ContactAutocomplete
+                            value={inputValue}
+                            onChange={setInputValue}
+                            onSelect={handleContactSelect}
+                            onEnterManual={handleManualAdd}
+                            placeholder={recipientList.length > 0 ? "Add more recipients..." : "Search contacts or type email..."}
                             disabled={loading}
                         />
+                        <p className="text-xs text-slate-500 mt-1">
+                            Search contacts or type an email and press Enter
+                        </p>
                     </div>
 
                     {/* Content */}
