@@ -89,10 +89,10 @@ class UserTokenTest {
         }
 
         @Test
-        @DisplayName("Should return true when exactly at 5-minute boundary")
+        @DisplayName("Should return true when token expires in less than 5 minutes")
         void returnTrueAtBoundary() {
             UserToken token = new UserToken("id", "email@test.com", "google");
-            // Set to just under 5 minutes from now
+            // Set to just under 5 minutes from now - this should be treated as "expiring soon"
             token.setExpiresAt(LocalDateTime.now().plusMinutes(4).plusSeconds(59));
             
             assertTrue(token.isTokenExpiredOrExpiringSoon());
@@ -168,29 +168,33 @@ class UserTokenTest {
         @DisplayName("Should update updatedAt when access token is set")
         void updateUpdatedAtOnAccessTokenChange() throws InterruptedException {
             UserToken token = new UserToken("id", "email@test.com", "google");
-            LocalDateTime originalUpdatedAt = token.getUpdatedAt();
+            LocalDateTime beforeSet = LocalDateTime.now();
             
             // Small delay to ensure time difference
-            Thread.sleep(10);
+            Thread.sleep(15);
             
             token.setAccessToken("new-token");
             
-            assertTrue(token.getUpdatedAt().isAfter(originalUpdatedAt) || 
-                       token.getUpdatedAt().isEqual(originalUpdatedAt));
+            // The updatedAt should be set to now() which is after beforeSet
+            assertTrue(token.getUpdatedAt().isAfter(beforeSet) || 
+                       token.getUpdatedAt().isEqual(beforeSet),
+                       "updatedAt should be at or after the time before setAccessToken was called");
         }
 
         @Test
         @DisplayName("Should update updatedAt when refresh token is set")
         void updateUpdatedAtOnRefreshTokenChange() throws InterruptedException {
             UserToken token = new UserToken("id", "email@test.com", "google");
-            LocalDateTime originalUpdatedAt = token.getUpdatedAt();
+            LocalDateTime beforeSet = LocalDateTime.now();
             
-            Thread.sleep(10);
+            Thread.sleep(15);
             
             token.setRefreshToken("new-refresh-token");
             
-            assertTrue(token.getUpdatedAt().isAfter(originalUpdatedAt) || 
-                       token.getUpdatedAt().isEqual(originalUpdatedAt));
+            // The updatedAt should be set to now() which is after beforeSet
+            assertTrue(token.getUpdatedAt().isAfter(beforeSet) || 
+                       token.getUpdatedAt().isEqual(beforeSet),
+                       "updatedAt should be at or after the time before setRefreshToken was called");
         }
     }
 }
