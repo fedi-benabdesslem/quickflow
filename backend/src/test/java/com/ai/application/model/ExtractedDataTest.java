@@ -48,7 +48,9 @@ class ExtractedDataTest {
             data.setMeetingTitle("Team Meeting");
             data.setDate("2024-01-15");
             data.setTime("10:00 AM");
-            data.setParticipants(Arrays.asList("Alice", "Bob"));
+            data.setParticipants(Arrays.asList(
+                new ExtractedData.ExtractedParticipant("Alice"),
+                new ExtractedData.ExtractedParticipant("Bob")));
             data.setDiscussionPoints(Arrays.asList("Point 1", "Point 2"));
             data.setConfidence("high");
             
@@ -56,7 +58,7 @@ class ExtractedDataTest {
             assertEquals("2024-01-15", data.getDate());
             assertEquals("10:00 AM", data.getTime());
             assertEquals(2, data.getParticipants().size());
-            assertEquals("Alice", data.getParticipants().get(0));
+            assertEquals("Alice", data.getParticipants().get(0).getName());
             assertEquals(2, data.getDiscussionPoints().size());
             assertEquals("high", data.getConfidence());
         }
@@ -80,6 +82,58 @@ class ExtractedDataTest {
             
             assertTrue(data.getParticipants().isEmpty());
             assertTrue(data.getDiscussionPoints().isEmpty());
+        }
+    }
+
+    @Nested
+    @DisplayName("ExtractedParticipant")
+    class ExtractedParticipantTests {
+
+        @Test
+        @DisplayName("Should create with default constructor")
+        void createWithDefaultConstructor() {
+            ExtractedData.ExtractedParticipant participant = new ExtractedData.ExtractedParticipant();
+            
+            assertNull(participant.getName());
+            assertNull(participant.getEmail());
+        }
+
+        @Test
+        @DisplayName("Should create with name-only constructor")
+        void createWithNameOnlyConstructor() {
+            ExtractedData.ExtractedParticipant participant = 
+                new ExtractedData.ExtractedParticipant("John Doe");
+            
+            assertEquals("John Doe", participant.getName());
+            assertNull(participant.getEmail());
+        }
+
+        @Test
+        @DisplayName("Should create with name and email constructor")
+        void createWithNameAndEmailConstructor() {
+            ExtractedData.ExtractedParticipant participant = 
+                new ExtractedData.ExtractedParticipant("John Doe", "john@example.com");
+            
+            assertEquals("John Doe", participant.getName());
+            assertEquals("john@example.com", participant.getEmail());
+        }
+
+        @Test
+        @DisplayName("Should return name as toString")
+        void toStringShouldReturnName() {
+            ExtractedData.ExtractedParticipant participant = 
+                new ExtractedData.ExtractedParticipant("Alice");
+            
+            assertEquals("Alice", participant.toString());
+        }
+
+        @Test
+        @DisplayName("Should return empty string for null name in toString")
+        void toStringShouldReturnEmptyForNullName() {
+            ExtractedData.ExtractedParticipant participant = 
+                new ExtractedData.ExtractedParticipant();
+            
+            assertEquals("", participant.toString());
         }
     }
 
@@ -219,7 +273,10 @@ class ExtractedDataTest {
             data.setMeetingTitle("Sprint Planning");
             data.setDate("2024-01-15");
             data.setTime("10:00 AM");
-            data.setParticipants(Arrays.asList("Alice", "Bob", "Charlie"));
+            data.setParticipants(Arrays.asList(
+                new ExtractedData.ExtractedParticipant("Alice"),
+                new ExtractedData.ExtractedParticipant("Bob"),
+                new ExtractedData.ExtractedParticipant("Charlie")));
             data.setDiscussionPoints(Arrays.asList(
                 "Review sprint goals",
                 "Discuss blockers",

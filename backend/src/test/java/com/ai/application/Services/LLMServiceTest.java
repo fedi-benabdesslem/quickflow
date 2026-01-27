@@ -73,7 +73,7 @@ class LLMServiceTest {
         void parseValidJsonResponse() {
             when(llmClient.callLLM(anyString(), anyString())).thenReturn(VALID_EXTRACTED_DATA_JSON);
 
-            ExtractedData result = llmService.extractFromNotes("Meeting notes content", null, null);
+            ExtractedData result = llmService.extractFromNotes("Meeting notes content", null, null, null);
 
             assertNotNull(result);
             assertEquals("Sprint Planning", result.getMeetingTitle());
@@ -92,7 +92,7 @@ class LLMServiceTest {
             
             when(llmClient.callLLM(anyString(), anyString())).thenReturn(wrappedJson);
 
-            ExtractedData result = llmService.extractFromNotes("notes", null, null);
+            ExtractedData result = llmService.extractFromNotes("notes", null, null, null);
 
             assertNotNull(result);
             assertEquals("Test Meeting", result.getMeetingTitle());
@@ -105,7 +105,7 @@ class LLMServiceTest {
             when(llmClient.callLLM(anyString(), anyString()))
                 .thenReturn("This is not valid JSON at all");
 
-            ExtractedData result = llmService.extractFromNotes("notes", null, null);
+            ExtractedData result = llmService.extractFromNotes("notes", null, null, null);
 
             assertNotNull(result);
             assertEquals("low", result.getConfidence());
@@ -120,7 +120,7 @@ class LLMServiceTest {
             when(llmClient.callLLM(anyString(), anyString()))
                 .thenReturn(MINIMAL_JSON_RESPONSE);
 
-            llmService.extractFromNotes("notes", "2024-02-01", null);
+            llmService.extractFromNotes("notes", "2024-02-01", null, null);
 
             verify(llmClient).callLLM(anyString(), contains("[User provided date: 2024-02-01]"));
         }
@@ -131,7 +131,7 @@ class LLMServiceTest {
             when(llmClient.callLLM(anyString(), anyString()))
                 .thenReturn(MINIMAL_JSON_RESPONSE);
 
-            llmService.extractFromNotes("notes", null, "14:30");
+            llmService.extractFromNotes("notes", null, "14:30", null);
 
             verify(llmClient).callLLM(anyString(), contains("[User provided time: 14:30]"));
         }
@@ -142,7 +142,7 @@ class LLMServiceTest {
             when(llmClient.callLLM(anyString(), anyString()))
                 .thenReturn(MINIMAL_JSON_RESPONSE);
 
-            llmService.extractFromNotes("notes", "2024-02-01", "14:30");
+            llmService.extractFromNotes("notes", "2024-02-01", "14:30", null);
 
             verify(llmClient).callLLM(anyString(), argThat(prompt ->
                 prompt.contains("[User provided date: 2024-02-01]") &&
@@ -459,7 +459,9 @@ class LLMServiceTest {
             data.setMeetingTitle("Team Sync");
             data.setDate("2024-01-20");
             data.setTime("2:00 PM");
-            data.setParticipants(Arrays.asList("Alice", "Bob"));
+            data.setParticipants(Arrays.asList(
+                new ExtractedData.ExtractedParticipant("Alice"),
+                new ExtractedData.ExtractedParticipant("Bob")));
             data.setDiscussionPoints(Arrays.asList("Topic A", "Topic B"));
             data.setDecisions(Collections.emptyList());
             data.setActionItems(Collections.emptyList());
