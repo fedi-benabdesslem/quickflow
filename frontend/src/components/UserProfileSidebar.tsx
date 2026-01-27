@@ -20,7 +20,7 @@ export default function UserProfileSidebar() {
     const navigate = useNavigate()
     const location = useLocation()
     const { user, session, signOut } = useAuth()
-    const { isOpen, closeSidebar, openHistorySidebar } = useSidebar()
+    const { isOpen, closeSidebar } = useSidebar()
 
     // Get provider from session metadata
     const provider = session ? getProviderFromSession() : 'email'
@@ -88,10 +88,7 @@ export default function UserProfileSidebar() {
             id: 'history',
             label: 'History',
             icon: <HistoryIcon />,
-            onClick: () => {
-                closeSidebar()
-                openHistorySidebar()
-            },
+            path: '/history',
         },
         {
             id: 'bookmarks',

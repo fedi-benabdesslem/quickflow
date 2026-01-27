@@ -131,7 +131,7 @@ export default function HomePage() {
                         </motion.div>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-pink-300 transition-colors">
-                        Draft Email
+                        Send an Email
                     </h3>
                     <p className="text-slate-400">
                         Create polished emails with AI-powered assistance

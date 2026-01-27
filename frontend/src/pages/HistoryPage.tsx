@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../lib/api'
 import EmailPreviewModal from '../components/history/EmailPreviewModal'
@@ -19,6 +19,7 @@ interface HistoryItem {
 }
 
 export default function HistoryPage() {
+    const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
     const [filter, setFilter] = useState<HistoryFilter>('all')
     const [searchQuery, setSearchQuery] = useState('')
@@ -138,10 +139,20 @@ export default function HistoryPage() {
         <div className="h-full flex flex-col bg-slate-900/50">
             {/* Header */}
             <div className="flex-none p-8 pb-4">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-white mb-2">History & Archives</h1>
-                        <p className="text-slate-400">View and manage your past communications</p>
+                <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-start gap-4">
+                        <button
+                            onClick={() => navigate('/home')}
+                            className="p-2 mt-1 -ml-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                                <path fillRule="evenodd" d="M11.03 3.97a.75.75 0 010 1.06l-6.22 6.22H21a.75.75 0 010 1.5H4.81l6.22 6.22a.75.75 0 11-1.06 1.06l-7.5-7.5a.75.75 0 010-1.06l7.5-7.5a.75.75 0 011.06 0z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 className="text-2xl font-bold text-white mb-2">History & Archives</h1>
+                            <p className="text-slate-400">View and manage your past communications</p>
+                        </div>
                     </div>
                     <div className="flex gap-4">
                         {/* Summary Stats or Action Buttons */}

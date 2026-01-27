@@ -117,6 +117,7 @@ export interface OutputPreferences {
 export interface QuickModeData {
     content: string;
     file?: File;
+    location?: string;
     date?: string;
     time?: string;
 }
@@ -159,6 +160,7 @@ export interface ExtractedParticipant {
 
 export interface ExtractedMeetingData {
     meetingTitle?: string;
+    location?: string;
     date?: string;
     time?: string;
     participants: (string | ExtractedParticipant)[];

@@ -5,30 +5,20 @@ interface SidebarContextType {
     openSidebar: () => void
     closeSidebar: () => void
     toggleSidebar: () => void
-    isHistoryOpen: boolean
-    openHistorySidebar: () => void
-    closeHistorySidebar: () => void
-    toggleHistorySidebar: () => void
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined)
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
     const [isOpen, setIsOpen] = useState(false)
-    const [isHistoryOpen, setIsHistoryOpen] = useState(false)
 
     const openSidebar = () => setIsOpen(true)
     const closeSidebar = () => setIsOpen(false)
     const toggleSidebar = () => setIsOpen(prev => !prev)
 
-    const openHistorySidebar = () => setIsHistoryOpen(true)
-    const closeHistorySidebar = () => setIsHistoryOpen(false)
-    const toggleHistorySidebar = () => setIsHistoryOpen(prev => !prev)
-
     return (
         <SidebarContext.Provider value={{
-            isOpen, openSidebar, closeSidebar, toggleSidebar,
-            isHistoryOpen, openHistorySidebar, closeHistorySidebar, toggleHistorySidebar
+            isOpen, openSidebar, closeSidebar, toggleSidebar
         }}>
             {children}
         </SidebarContext.Provider>

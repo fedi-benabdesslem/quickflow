@@ -152,6 +152,12 @@ export default function ContactAutocomplete({
                 setIsOpen(true)
                 loadRecent()
             }
+            // Allow Enter for manual entry even if list is empty/closed
+            if (e.key === 'Enter' && onEnterManual && value.trim()) {
+                e.preventDefault()
+                onEnterManual()
+                setIsOpen(false)
+            }
             return
         }
 

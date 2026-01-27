@@ -361,6 +361,16 @@ export default function QuickModeReviewPage() {
                                 className="input-nebula"
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Location</label>
+                            <input
+                                type="text"
+                                value={data.location || ''}
+                                onChange={(e) => setData(prev => ({ ...prev, location: e.target.value }))}
+                                className="input-nebula"
+                                placeholder="Enter location"
+                            />
+                        </div>
                     </div>
                 </section>
 

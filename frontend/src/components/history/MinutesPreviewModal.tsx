@@ -22,6 +22,8 @@ interface MinuteDetails {
 export default function MinutesPreviewModal({ minuteId, isOpen, onClose }: MinutesPreviewModalProps) {
     const [minute, setMinute] = useState<MinuteDetails | null>(null)
     const [loading, setLoading] = useState(false)
+    const [pdfLoading, setPdfLoading] = useState(false)
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
@@ -29,20 +31,52 @@ export default function MinutesPreviewModal({ minuteId, isOpen, onClose }: Minut
             fetchMinuteDetails()
         } else {
             setMinute(null)
+            if (pdfUrl) {
+                URL.revokeObjectURL(pdfUrl)
+                setPdfUrl(null)
+            }
+        }
+        return () => {
+            if (pdfUrl) URL.revokeObjectURL(pdfUrl)
         }
     }, [isOpen, minuteId])
 
     const fetchMinuteDetails = async () => {
         setLoading(true)
         setError(null)
+        setPdfUrl(null)
+
         try {
             const response = await api.get(`/history/minute/${minuteId}`)
-            setMinute(response.data)
+            const details = response.data
+            setMinute(details)
+
+            // If PDF exists, fetch it securely
+            if (details.pdfFileId) {
+                fetchPdfBlob(details.pdfFileId)
+            }
         } catch (err) {
             console.error('Failed to fetch minute details:', err)
             setError('Failed to load meeting minutes')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const fetchPdfBlob = async (fileId: string) => {
+        setPdfLoading(true)
+        try {
+            const response = await api.get(`/pdf/preview/${fileId}`, {
+                responseType: 'blob'
+            })
+            const blob = new Blob([response.data], { type: 'application/pdf' })
+            const url = URL.createObjectURL(blob)
+            setPdfUrl(url)
+        } catch (err) {
+            console.error('Failed to fetch PDF blob:', err)
+            // Don't set main error, just log. Preview will show fallback.
+        } finally {
+            setPdfLoading(false)
         }
     }
 
@@ -58,6 +92,25 @@ export default function MinutesPreviewModal({ minuteId, isOpen, onClose }: Minut
             }
         } catch (err) {
             console.error('Failed to toggle bookmark:', err)
+        }
+    }
+
+    const handleDownload = () => {
+        if (!minute?.pdfFileId) return
+
+        // If we already have the blob, use it
+        if (pdfUrl) {
+            const a = document.createElement('a')
+            a.href = pdfUrl
+            a.download = `${minute.subject || 'minutes'}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+        } else {
+            // Fallback to api helper if blob missing (shouldn't happen if preview loaded)
+            import('../../lib/api').then(({ downloadPdf }) => {
+                downloadPdf(minute.pdfFileId)
+            })
         }
     }
 
@@ -83,7 +136,7 @@ export default function MinutesPreviewModal({ minuteId, isOpen, onClose }: Minut
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
                     >
-                        <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col pointer-events-auto">
+                        <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col pointer-events-auto">
                             {/* Header */}
                             <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5 rounded-t-xl">
                                 <div className="flex items-center gap-3">
@@ -125,9 +178,16 @@ export default function MinutesPreviewModal({ minuteId, isOpen, onClose }: Minut
                                             </button>
                                         </div>
                                     </div>
-                                ) : minute && minute.pdfFileId ? (
+                                ) : pdfLoading ? (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                                            <p className="text-slate-400 text-sm">Loading PDF safely...</p>
+                                        </div>
+                                    </div>
+                                ) : pdfUrl ? (
                                     <iframe
-                                        src={`/api/pdf/preview/${minute.pdfFileId}`}
+                                        src={pdfUrl}
                                         className="w-full h-full border-none"
                                         title="PDF Preview"
                                     />
@@ -143,8 +203,8 @@ export default function MinutesPreviewModal({ minuteId, isOpen, onClose }: Minut
                                 <button
                                     onClick={handleToggleBookmark}
                                     className={`px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${minute?.isBookmarked
-                                            ? 'text-yellow-400 bg-yellow-400/10 hover:bg-yellow-400/20'
-                                            : 'text-slate-400 hover:text-white hover:bg-white/10'
+                                        ? 'text-yellow-400 bg-yellow-400/10 hover:bg-yellow-400/20'
+                                        : 'text-slate-400 hover:text-white hover:bg-white/10'
                                         }`}
                                 >
                                     <span>{minute?.isBookmarked ? '★' : '📌'}</span>
@@ -152,12 +212,12 @@ export default function MinutesPreviewModal({ minuteId, isOpen, onClose }: Minut
                                 </button>
                                 <div className="flex gap-2">
                                     <button
-                                        className="px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors border border-white/10"
-                                        onClick={() => {
-                                            if (minute?.pdfFileId) {
-                                                window.open(`/api/pdf/download/${minute.pdfFileId}`, '_blank')
-                                            }
-                                        }}
+                                        className={`px-4 py-2 text-sm rounded-lg transition-colors border border-white/10 ${minute?.pdfFileId
+                                            ? 'text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer'
+                                            : 'text-slate-600 cursor-not-allowed opacity-50'
+                                            }`}
+                                        disabled={!minute?.pdfFileId}
+                                        onClick={handleDownload}
                                     >
                                         Download PDF
                                     </button>

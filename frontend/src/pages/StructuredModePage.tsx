@@ -20,7 +20,7 @@ import { createTemplate, getUserTemplates, getTemplate, trackTemplateUsage, type
 import type { MeetingTemplate, CreateMeetingTemplateRequest } from '../types/template'
 import SaveTemplateModal from '../components/templates/SaveTemplateModal'
 
-const LOCATION_OPTIONS = ['Office Room 1', 'Zoom', 'Google Meet', 'Microsoft Teams', 'Other']
+
 const OBJECTIVE_OPTIONS: AgendaItem['objective'][] = ['Discussion', 'Decision', 'Review', 'Information']
 const DECISION_STATUS_OPTIONS: Decision['status'][] = ['Approved', 'Rejected', 'Deferred', 'No Decision']
 const PRIORITY_OPTIONS: ActionItem['priority'][] = ['High', 'Medium', 'Low']
@@ -70,7 +70,7 @@ export default function StructuredModePage() {
     const [participantInput, setParticipantInput] = useState('')
     const [absentInput, setAbsentInput] = useState('')
     const [showRoles, setShowRoles] = useState(false)
-    const [customLocation, setCustomLocation] = useState('')
+
 
     const [agendaOpen, setAgendaOpen] = useState(false)
     const [notesOpen, setNotesOpen] = useState(false)
@@ -245,6 +245,12 @@ export default function StructuredModePage() {
 
     const handleContactSelect = (contact: Contact) => {
         addParticipant(contact.name, false, contact.email)
+    }
+
+    const handleManualParticipantAdd = () => {
+        if (participantInput.trim()) {
+            addParticipant(participantInput.trim())
+        }
     }
 
     const removeParticipant = (id: string, isAbsent: boolean = false) => {
@@ -639,37 +645,17 @@ export default function StructuredModePage() {
                                 <label className="block text-sm font-medium text-slate-300 mb-2">
                                     Location / Platform <span className="text-red-400">*</span>
                                 </label>
-                                <select
+                                <input
+                                    type="text"
                                     value={formData.meetingInfo.location}
-                                    onChange={(e) => {
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            meetingInfo: { ...prev.meetingInfo, location: e.target.value }
-                                        }))
-                                        if (e.target.value !== 'Other') setCustomLocation('')
-                                    }}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        meetingInfo: { ...prev.meetingInfo, location: e.target.value }
+                                    }))}
+                                    placeholder="Enter location or platform"
                                     className="input-nebula"
-                                >
-                                    <option value="">Select location...</option>
-                                    {LOCATION_OPTIONS.map(loc => (
-                                        <option key={loc} value={loc}>{loc}</option>
-                                    ))}
-                                </select>
-                                {formData.meetingInfo.location === 'Other' && (
-                                    <input
-                                        type="text"
-                                        value={customLocation}
-                                        onChange={(e) => {
-                                            setCustomLocation(e.target.value)
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                meetingInfo: { ...prev.meetingInfo, location: e.target.value || 'Other' }
-                                            }))
-                                        }}
-                                        placeholder="Specify location..."
-                                        className="input-nebula mt-2"
-                                    />
-                                )}
+                                />
+
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -710,6 +696,7 @@ export default function StructuredModePage() {
                                 value={participantInput}
                                 onChange={setParticipantInput}
                                 onSelect={handleContactSelect}
+                                onEnterManual={handleManualParticipantAdd}
                                 placeholder="Search contacts or type name and press Enter..."
                             />
                             <p className="text-xs text-slate-500 mt-1">Search your contacts or type a name and press Enter to add manually</p>

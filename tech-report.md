@@ -36,6 +36,7 @@ REST endpoints that handle HTTP requests and responses.
 -   **`StructuredModeController`**: Handles validation and processing of structured form submissions.
 -   **`TemplateController`**: (Legacy/Base) Generic template handling.
 -   **`SupportController`**: Handles the "Tech Support" feature.
+-   **`HistoryController`**: Manages user history data retrieval and deletion.
 
 ### 2.3 Services (Business Logic)
 Encapsulates the core business rules and integration logic.
@@ -46,6 +47,7 @@ Encapsulates the core business rules and integration logic.
 -   **`GmailService`**: Implementation of Google Gmail API interactions (Draft creation, Sending).
 -   **`GooglePeopleService`**: Fetches contacts from Google People API for sync operations.
 -   **`GridFsService`**: manages large file storage in MongoDB (for potential attachment scaling).
+-   **`HistoryService`**: Manages retrieval and deletion of user history records, ensuring data isolation.
 -   **`LLMService`**: The bridge to the AI engine. Orchestrates prompts sent to Ollama/Spring AI.
 -   **`MeetingTemplateService`**: Business logic for the Template System (Create, Read, Update, Delete).
 -   **`MicrosoftGraphService`**: Implementation of Azure/Microsoft Graph API for Outlook and Contacts integration.
@@ -140,6 +142,12 @@ A comprehensive reference of all available backend endpoints.
 | Method | Endpoint | Description | Request Body |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/send` | Sends a support email. | `SupportEmailRequest` |
+143: 
+144: #### History (`/api/history`)
+145: | Method | Endpoint | Description | Request Body |
+146: | :--- | :--- | :--- | :--- |
+147: | `GET` | `/` | Retrieves user-specific history of generated content. | - |
+148: | `DELETE` | `/{id}` | Deletes a history record. | - |
 
 #### System (`/api`)
 | Method | Endpoint | Description | Request Body |
@@ -172,6 +180,7 @@ A React application structured for component reusability and type safety.
 -   **`TemplateManagementPage`**: CRUD interface for managing Meeting Templates.
 -   **`EmailPage`**: Interface for the "AI Email Writer" feature with contact autocomplete recipients.
 -   **`TechSupportPage`**: Interface for the "Tech Support" feature with contact autocomplete recipients.
+-   **`HistoryPage`**: Displays user-specific history of generated minutes and emails with delete functionality.
 
 ### 3.3 Core Components
 -   **`NebulaBackground`**: A canvas-based animated background component creating the immersive star/nebula effect.

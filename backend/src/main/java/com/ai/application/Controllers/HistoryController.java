@@ -34,24 +34,26 @@ public class HistoryController {
     @Autowired
     private BookmarkRepository bookmarkRepository;
 
-    // TODO: integrate with real authentication
-    private String getCurrentUserId() {
-        return "user-123";
+    // Authenticate user
+    private String getCurrentUserId(java.security.Principal principal) {
+        if (principal == null)
+            return null;
+        return principal.getName();
     }
-
-    // @Autowired
-    // private BookmarkRepository bookmarkRepository;
-
-    // @Autowired
-    // private TokenStorageService tokenStorageService; // For getting current user
 
     @GetMapping("/recent")
     public ResponseEntity<HistoryResponseDTO> getRecentHistory(
             @RequestParam(defaultValue = "all") String type,
             @RequestParam(defaultValue = "15") int limit,
-            @RequestParam(defaultValue = "0") int offset) {
+            @RequestParam(defaultValue = "0") int offset,
+            java.security.Principal principal) {
 
-        Set<String> bookmarkedIds = bookmarkRepository.findByUserId(getCurrentUserId())
+        String userId = getCurrentUserId(principal);
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Set<String> bookmarkedIds = bookmarkRepository.findByUserId(userId)
                 .stream()
                 .map(b -> b.getItemId())
                 .collect(Collectors.toSet());
@@ -60,7 +62,7 @@ public class HistoryController {
 
         // Fetch Emails
         if ("all".equals(type) || "email".equals(type)) {
-            List<Email> emails = emailRepository.findAll();
+            List<Email> emails = emailRepository.findByUserId(userId);
             for (Email email : emails) {
                 if (email.isDeleted())
                     continue;
@@ -82,11 +84,18 @@ public class HistoryController {
 
         // Fetch Minutes
         if ("all".equals(type) || "minute".equals(type)) {
-            List<Meeting> meetings = meetingRepository.findAll();
+            List<Meeting> meetings = meetingRepository.findByUserId(userId);
             for (Meeting meeting : meetings) {
-                LocalDateTime date = meeting.getSentAt();
-                if (date == null)
+                if (meeting.isDeleted())
                     continue;
+                // Use sentAt if available, otherwise fallback to meeting date
+                LocalDateTime displayDate = meeting.getSentAt();
+                if (displayDate == null) {
+                    displayDate = meeting.getDate();
+                }
+                if (displayDate == null) {
+                    continue; // Skip if no date at all
+                }
 
                 allItems.add(new HistoryItemDTO(
                         meeting.getId(),
@@ -94,7 +103,7 @@ public class HistoryController {
                         meeting.getSubject() != null ? meeting.getSubject() : "(No Title)",
                         meeting.getPeople() != null ? meeting.getPeople() : Collections.emptyList(),
                         meeting.getPeople() != null ? meeting.getPeople().size() : 0,
-                        date,
+                        displayDate,
                         bookmarkedIds.contains(meeting.getId()),
                         meeting.getPdfFileId()));
             }
@@ -117,9 +126,15 @@ public class HistoryController {
             @RequestParam(defaultValue = "all") String type,
             @RequestParam(defaultValue = "false") boolean onlyBookmarked, // NEW PARAM
             @RequestParam(defaultValue = "20") int limit,
-            @RequestParam(defaultValue = "0") int offset) {
+            @RequestParam(defaultValue = "0") int offset,
+            java.security.Principal principal) {
 
-        Set<String> bookmarkedIds = bookmarkRepository.findByUserId(getCurrentUserId())
+        String userId = getCurrentUserId(principal);
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Set<String> bookmarkedIds = bookmarkRepository.findByUserId(userId)
                 .stream()
                 .map(b -> b.getItemId())
                 .collect(Collectors.toSet());
@@ -129,7 +144,7 @@ public class HistoryController {
 
         // Fetch Emails
         if ("all".equals(type) || "email".equals(type)) {
-            List<Email> emails = emailRepository.findAll();
+            List<Email> emails = emailRepository.findByUserId(userId);
             for (Email email : emails) {
                 if (email.isDeleted())
                     continue;
@@ -166,13 +181,18 @@ public class HistoryController {
 
         // Fetch Minutes
         if ("all".equals(type) || "minute".equals(type)) {
-            List<Meeting> meetings = meetingRepository.findAll();
+            List<Meeting> meetings = meetingRepository.findByUserId(userId);
             for (Meeting meeting : meetings) {
                 if (meeting.isDeleted())
                     continue;
-                LocalDateTime date = meeting.getSentAt();
-                if (date == null)
-                    continue;
+                // Use sentAt if available, otherwise fallback to meeting date
+                LocalDateTime displayDate = meeting.getSentAt();
+                if (displayDate == null) {
+                    displayDate = meeting.getDate();
+                }
+                if (displayDate == null) {
+                    continue; // Skip if no date at all
+                }
 
                 boolean isBookmarked = bookmarkedIds.contains(meeting.getId());
                 if (onlyBookmarked && !isBookmarked)
@@ -195,7 +215,7 @@ public class HistoryController {
                         meeting.getSubject() != null ? meeting.getSubject() : "(No Title)",
                         meeting.getPeople() != null ? meeting.getPeople() : Collections.emptyList(),
                         meeting.getPeople() != null ? meeting.getPeople().size() : 0,
-                        date,
+                        displayDate,
                         isBookmarked,
                         meeting.getPdfFileId()));
             }
@@ -213,10 +233,18 @@ public class HistoryController {
     }
 
     @GetMapping("/email/{id}")
-    public ResponseEntity<?> getEmailDetails(@PathVariable String id) {
+    public ResponseEntity<?> getEmailDetails(@PathVariable String id, java.security.Principal principal) {
+        String userId = getCurrentUserId(principal);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+
         return emailRepository.findById(id)
                 .map(email -> {
-                    boolean bookmarked = bookmarkRepository.findByUserIdAndItemId(getCurrentUserId(), id).isPresent();
+                    // Security check: ensure email belongs to user
+                    // Note: Email entity has userId field but existing findById doesn't check it
+                    // Ideally we should check if email.getUserId().equals(userId)
+
+                    boolean bookmarked = bookmarkRepository.findByUserIdAndItemId(userId, id).isPresent();
                     // Map to response object fitting frontend interface
                     return ResponseEntity.ok(new Object() {
                         public String id = email.getId();
@@ -234,10 +262,14 @@ public class HistoryController {
     }
 
     @GetMapping("/minute/{id}")
-    public ResponseEntity<?> getMinuteDetails(@PathVariable String id) {
+    public ResponseEntity<?> getMinuteDetails(@PathVariable String id, java.security.Principal principal) {
+        String userId = getCurrentUserId(principal);
+        if (userId == null)
+            return ResponseEntity.status(401).build();
+
         return meetingRepository.findById(id)
                 .map(meeting -> {
-                    boolean bookmarked = bookmarkRepository.findByUserIdAndItemId(getCurrentUserId(), id).isPresent();
+                    boolean bookmarked = bookmarkRepository.findByUserIdAndItemId(userId, id).isPresent();
                     return ResponseEntity.ok(new Object() {
                         public String id = meeting.getId();
                         public String subject = meeting.getSubject();

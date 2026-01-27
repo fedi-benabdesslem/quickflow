@@ -11,6 +11,7 @@ public class Meeting {
     @Id
     private String id;
 
+    private String userId; // Owner of the meeting
     private List<String> people; // Changed to List for multiple attendees
     private String location;
     private LocalDateTime timeBegin; // Improved: Use LocalDateTime
@@ -49,6 +50,14 @@ public class Meeting {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public List<String> getPeople() {
