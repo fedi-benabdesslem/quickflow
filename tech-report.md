@@ -142,14 +142,13 @@ A comprehensive reference of all available backend endpoints.
 | Method | Endpoint | Description | Request Body |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/send` | Sends a support email. | `SupportEmailRequest` |
-143: 
-144: #### History (`/api/history`)
-145: | Method | Endpoint | Description | Request Body |
-146: | :--- | :--- | :--- | :--- |
-147: | `GET` | `/` | Retrieves user-specific history of generated content. | - |
-148: | `DELETE` | `/{id}` | Deletes a history record. | - |
+#### History (`/api/history`)
+| Method | Endpoint | Description | Request Body |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Retrieves user-specific history of generated content. | - |
+| `DELETE` | `/{id}` | Deletes a history record. | - |
 
-#### System (`/api`)
+#### System (`/api`) 
 | Method | Endpoint | Description | Request Body |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/health` | Liveness probe to check if backend is running. | - |
