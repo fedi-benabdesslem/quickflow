@@ -44,10 +44,12 @@ The testing framework stack:
 | `FileProcessingServiceTest.java` | Unit | FileProcessingService | Text extraction from .txt/.md files, file validation (null, empty, size limits, unsupported types), file extension handling |
 | `EncryptionServiceTest.java` | Unit | EncryptionService | AES-256 encryption/decryption round-trips, null/empty handling, Base64 encoding, key length handling |
 | `PdfGenerationServiceTest.java` | Unit | PdfGenerationService | PDF generation from HTML/markdown, metadata handling, footer preferences, XSS escaping, Unicode support |
+| `PdfServiceTest.java` | Unit | PdfService | PDF generation from HTML, meeting minutes formatting, filename generation, null/malformed HTML handling |
 | `MeetingTemplateServiceTest.java` | Unit | MeetingTemplateService | CRUD operations for templates, user authorization checks, duplicate name validation, usage tracking |
 | `LLMServiceTest.java` | Unit | LLMService | JSON parsing from LLM responses, tone/length instructions, structured input building, quick mode extraction |
 | `TemplateServiceTest.java` | Unit | TemplateService | Email subject extraction, request hash computation, caching behavior, user prompt building |
 | `TokenStorageServiceTest.java` | Unit | TokenStorageService | Token encryption/storage, token retrieval/decryption, expiration checking, token refresh updates |
+| `TokenRefreshServiceTest.java` | Unit | TokenRefreshService | OAuth token refresh logic, provider routing (Google/Azure), credential validation, expired token handling |
 | `ContactServiceTest.java` | Unit | ContactService | Contact CRUD, import/sync operations, search/filtering, favorite toggling, usage tracking |
 | `GroupServiceTest.java` | Unit | GroupService | Group CRUD, member management, duplicate name validation, search functionality |
 | `EmailProviderServiceTest.java` | Unit | EmailProviderService | Provider routing (Google/Azure), error handling, capability checking |
@@ -71,10 +73,12 @@ backend/src/test/java/com/ai/application/
 │   ├── FileProcessingServiceTest.java
 │   ├── EncryptionServiceTest.java
 │   ├── PdfGenerationServiceTest.java
+│   ├── PdfServiceTest.java                   # NEW
 │   ├── MeetingTemplateServiceTest.java
 │   ├── LLMServiceTest.java
 │   ├── TemplateServiceTest.java
 │   ├── TokenStorageServiceTest.java          # NEW
+│   ├── TokenRefreshServiceTest.java          # NEW
 │   ├── ContactServiceTest.java               # NEW
 │   ├── GroupServiceTest.java                 # NEW
 │   ├── EmailProviderServiceTest.java         # NEW
@@ -137,26 +141,40 @@ backend/src/test/java/com/ai/application/
    - Token refresh updates
    - Provider type validation
 
-8. **Contact Management** (NEW)
+8. **OAuth Token Refresh** (NEW)
+   - Token refresh logic for expired tokens
+   - Provider routing (Google OAuth, Microsoft Azure)
+   - Credential validation before refresh attempts
+   - Missing/empty refresh token handling
+   - Case-insensitive provider matching
+
+9. **PDF Service** (NEW)
+   - HTML to PDF conversion with styling
+   - Meeting minutes PDF generation with title/date formatting
+   - Filename generation with date formatting
+   - Null and malformed HTML handling
+   - Unicode character support
+
+10. **Contact Management** (NEW)
    - Contact CRUD operations
    - Import/sync from OAuth providers (Google/Microsoft)
    - Favorite toggling and usage tracking
    - Search and filtering by source, favorites, QuickFlow status
    - Soft delete with ignore flag for OAuth contacts
 
-9. **Group Management** (NEW)
+11. **Group Management** (NEW)
    - Group CRUD with duplicate name validation
    - Member add/remove operations
    - Search functionality with case-insensitive matching
    - Member count tracking
 
-10. **Email Provider Routing** (NEW)
+12. **Email Provider Routing** (NEW)
     - Provider detection (Google, Azure, email)
     - Routing to appropriate service (Gmail/Microsoft Graph)
     - Error handling for missing tokens
     - Attachment support routing
 
-11. **QuickFlow User Detection** (NEW)
+13. **QuickFlow User Detection** (NEW)
     - Detection of QuickFlow users among contacts
     - Case-insensitive email matching
     - Status update when users join/leave QuickFlow
@@ -219,7 +237,7 @@ mvn test
 ./mvnw test -Dtest=*ServiceTest
 
 # Run new service tests only
-./mvnw test -Dtest=TokenStorageServiceTest,ContactServiceTest,GroupServiceTest,EmailProviderServiceTest,QuickFlowDetectionServiceTest
+./mvnw test -Dtest=TokenStorageServiceTest,TokenRefreshServiceTest,ContactServiceTest,GroupServiceTest,EmailProviderServiceTest,QuickFlowDetectionServiceTest,PdfServiceTest
 ```
 
 ### Running Specific Test Methods
