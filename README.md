@@ -1,6 +1,7 @@
 # QuickFlow
 
 > **Intelligent Meetings, Effortless Emails.**
+> 
 > Transform your workflow with AI-powered meeting summaries, structured minutes, and instant email drafting.
 
 <img src="frontend/public/banner.png" alt="QuickFlow Banner" width="100%">
@@ -58,4 +59,7 @@ We are constantly improving QuickFlow. Here's what's coming next:
 - [ ] **Calendar Integration**: Sync meetings directly from Google/Outlook Calendar.
 - [ ] **Voice Mode**: Real-time transcription and summarization.
 - [ ] **Team Workspaces**: Share templates and minutes with your team.
+## ⚙️ Automated Tests
+Built-in automated tests in the backend and frontend to ensure reliability and stability.
 
+👉 **[Click here for the Test Guide](./tests.md)**
