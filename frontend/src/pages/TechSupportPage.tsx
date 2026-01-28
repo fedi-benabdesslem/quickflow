@@ -2,7 +2,6 @@ import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { sendSupportEmail } from '../lib/api'
-import TechSupportButton from '../components/TechSupportButton'
 
 export default function TechSupportPage() {
     const [message, setMessage] = useState('')
@@ -49,7 +48,11 @@ export default function TechSupportPage() {
                     <span>←</span>
                     <span className="hidden sm:inline">Back</span>
                 </button>
-                <TechSupportButton />
+                <img
+                    src="/tech-support-logo.png"
+                    alt="Tech Support"
+                    className="h-8 w-auto object-contain opacity-70"
+                />
             </motion.header>
 
             {/* Form Card */}
