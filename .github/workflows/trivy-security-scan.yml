@@ -1,0 +1,237 @@
+name: Trivy Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run daily at 2 AM UTC to catch newly disclosed CVEs
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  trivy-backend-scan:
+    name: Backend Security Scan (Java/Maven)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner on backend
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './backend'
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          vuln-type: 'os,library'
+          exit-code: '0'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-backend-results.sarif'
+          category: 'trivy-backend'
+
+      - name: Run Trivy scan with table output
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './backend'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Fail build on HIGH/CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './backend'
+          format: 'json'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true  # Only fail on fixable issues
+
+  trivy-frontend-scan:
+    name: Frontend Security Scan (Node.js/npm)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner on frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './frontend'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          vuln-type: 'library'
+          exit-code: '0'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-frontend-results.sarif'
+          category: 'trivy-frontend'
+
+      - name: Run Trivy scan with table output
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './frontend'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Fail build on HIGH/CRITICAL vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './frontend'
+          format: 'json'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true
+
+  trivy-config-scan:
+    name: Configuration & IaC Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy misconfiguration scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-config-results.sarif'
+          exit-code: '0'
+
+      - name: Upload Trivy config results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-config-results.sarif'
+          category: 'trivy-config'
+
+      - name: Run Trivy config scan with table output
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'table'
+
+      - name: Fail on critical misconfigurations
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'json'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+  trivy-secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy secret scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'secret'
+          format: 'sarif'
+          output: 'trivy-secret-results.sarif'
+          exit-code: '0'
+
+      - name: Upload Trivy secret results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-secret-results.sarif'
+          category: 'trivy-secrets'
+
+      - name: Run Trivy secret scan with table output
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'secret'
+          format: 'table'
+
+      - name: Fail build if secrets found
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'secret'
+          format: 'json'
+          exit-code: '1'
+
+  trivy-license-scan:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy license scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'license'
+          format: 'table'
+          severity: 'UNKNOWN,HIGH,CRITICAL'
+
+  security-summary:
+    name: Security Scan Summary
+    runs-on: ubuntu-latest
+    needs: [trivy-backend-scan, trivy-frontend-scan, trivy-config-scan, trivy-secret-scan]
+    if: always()
+    
+    steps:
+      - name: Check scan results
+        run: |
+          echo "## Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend | ${{ needs.trivy-backend-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | ${{ needs.trivy-frontend-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Configuration | ${{ needs.trivy-config-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secrets | ${{ needs.trivy-secret-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "View detailed results in the Security tab." >> $GITHUB_STEP_SUMMARY
