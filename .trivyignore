@@ -1,0 +1,74 @@
+# QuickFlow Trivy Ignore File
+# Use this file to suppress specific vulnerabilities or false positives
+# Always add a comment explaining WHY each item is ignored
+
+# ============================================================================
+# FORMAT EXAMPLES:
+# ============================================================================
+# Ignore specific CVE:           CVE-2024-12345
+# Ignore CVE in package:          CVE-2024-12345 pkg:npm/package-name
+# Ignore by file path:            CVE-2024-12345 frontend/src/file.ts
+# Ignore entire package:          pkg:npm/package-name
+# Ignore secrets in file:         secret:rule-name path/to/file
+# ============================================================================
+
+# ============================================================================
+# DEPENDENCY VULNERABILITIES
+# ============================================================================
+
+# Example: Spring Boot 3.3.0 - Known false positive, fixed in 3.3.1
+# CVE-2024-XXXXX pkg:maven/org.springframework.boot/spring-boot-starter-web
+
+# Example: React 18 - Low severity issue with no exploit available
+# CVE-2024-XXXXX pkg:npm/react
+
+# Example: Development dependency - Only used in tests
+# CVE-2024-XXXXX pkg:npm/jest
+
+# ============================================================================
+# CONFIGURATION MISCONFIGURATIONS
+# ============================================================================
+
+# Example: MongoDB connection - Using environment variables in production
+# config:mongodb backend/src/main/resources/application.properties
+
+# Example: CORS configuration - Intentionally permissive for localhost development
+# config:cors backend/src/main/java/com/ai/application/config/WebConfig.java
+
+# ============================================================================
+# SECRET SCANNING FALSE POSITIVES
+# ============================================================================
+
+# Example: Documentation containing example API keys
+# secret:generic-api-key README.md
+# secret:generic-api-key SETUP.md
+
+# Example: Test files with mock JWT tokens
+# secret:jwt-token-full backend/src/test/
+
+# Example: Configuration templates with placeholders
+# secret:supabase-anon-key frontend/.env.example
+
+# ============================================================================
+# LICENSE COMPLIANCE
+# ============================================================================
+
+# Example: Acceptable license for specific use case
+# license:GPL-3.0 pkg:npm/some-gpl-package
+
+# ============================================================================
+# ACCEPTED RISKS
+# ============================================================================
+
+# Example: Risk accepted by security team - scheduled fix in Q2 2026
+# CVE-2024-XXXXX
+# Reason: No known exploit exists, awaiting upstream patch
+# Accepted by: Security Team
+# Review date: 2026-04-01
+
+# ============================================================================
+# YOUR IGNORES BELOW THIS LINE
+# ============================================================================
+
+# Add your project-specific ignores here with clear documentation
+# Format: CVE/rule identifier followed by explanation comment
