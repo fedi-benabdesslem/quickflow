@@ -43,7 +43,7 @@ WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library
 WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
 WARNING: Restricted methods will be blocked in a future release unless native access is enabled
 
-2026-01-20T00:46:16.993+01:00  INFO 27892 --- [Ai-application] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-01-20T00:46:16.993+01:00  INFO 27892 --- [Ai-application] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8069 (http)
 2026-01-20T00:46:17.001+01:00  INFO 27892 --- [Ai-application] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
 2026-01-20T00:46:17.001+01:00  INFO 27892 --- [Ai-application] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
 2026-01-20T00:46:17.037+01:00  INFO 27892 --- [Ai-application] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext

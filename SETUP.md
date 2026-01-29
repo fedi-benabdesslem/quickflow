@@ -32,7 +32,7 @@ mvnw spring-boot:run
 # Mac/Linux
 ./mvnw spring-boot:run
 ```
-*The server will start on `http://localhost:8080`.*
+*The server will start on `http://localhost:8069`.*
 
 ### 3. Start the Frontend
 Open a new terminal in the `frontend` folder:
