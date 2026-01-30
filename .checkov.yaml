@@ -1,0 +1,6 @@
+directory:
+  - infra/k8s
+quiet: true
+soft-fail: false
+download-external-modules: true
+log-level: INFO

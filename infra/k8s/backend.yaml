@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quickflow-backend
+  labels:
+    app: quickflow-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quickflow-backend
+  template:
+    metadata:
+      labels:
+        app: quickflow-backend
+    spec:
+      containers:
+      - name: backend
+        image: quickflow-backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:h2:file:/app/data/test;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE"
+        volumeMounts:
+        - name: backend-data
+          mountPath: /app/data
+      volumes:
+      - name: backend-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quickflow-backend
+spec:
+  selector:
+    app: quickflow-backend
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP

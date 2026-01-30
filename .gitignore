@@ -1,0 +1,34 @@
+# Large Binaries
+trivy.exe
+*.exe
+*.bin
+
+# Java/Maven (Backend)
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS Files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Node/Frontend
+frontend/node_modules/
+.env

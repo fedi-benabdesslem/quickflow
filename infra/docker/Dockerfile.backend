@@ -1,0 +1,21 @@
+# Build stage
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+WORKDIR /app
+COPY Ai-Application/Ai-application/pom.xml .
+COPY Ai-Application/Ai-application/checkstyle.xml .
+RUN mvn dependency:go-offline
+COPY Ai-Application/Ai-application/src ./src
+RUN mvn package -DskipTests
+
+# Run stage
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+
+# Set environment variables for DB path to be container-compatible
+# This overrides the local Windows path in application.properties
+ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/app/data/test;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
+RUN mkdir -p /app/data
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,5 +1,5 @@
 # Trivy Configuration File for QuickFlow
-# This file customizes Trivy's behavior for the project
+# Compatible with Trivy v0.68+
 
 # Scan settings
 scan:
@@ -15,13 +15,7 @@ scan:
     - "**/target/**"
     - "**/dist/**"
     - "**/build/**"
-    - "**/.git/**"
-    - "**/coverage/**"
-    - "**/*.test.js"
-    - "**/*.test.ts"
-    - "**/*.spec.js"
-    - "**/*.spec.ts"
-  
+
   # Skip entire directories
   skip-dirs:
     - node_modules
@@ -37,7 +31,14 @@ scan:
     - tmp
     - temp
 
-# Vulnerability detection settings
+# Package (vulnerability) settings - UPDATED from 'vulnerability'
+pkg:
+  # Vulnerability types to detect (UPDATED KEY)
+  types:
+    - os
+    - library
+
+# Vulnerability settings
 vulnerability:
   # Severity levels to report
   severity:
@@ -46,74 +47,52 @@ vulnerability:
     - MEDIUM
     - HIGH
     - CRITICAL
-  
-  # Vulnerability types to detect
-  type:
-    - os
-    - library
-  
-  # Ignore unfixed vulnerabilities (no patch available)
+
+  # Ignore unfixed vulnerabilities
   ignore-unfixed: false
 
 # Database settings
 db:
-  # Skip database update (useful for CI with caching)
   skip-update: false
-  
-  # Download DB only
-  download-only: false
-  
-  # No progress bar (cleaner CI logs)
   no-progress: false
-  
-  # Use Java DB for better Java scanning
   java-db: true
 
 # Cache settings
 cache:
-  # Cache directory
   dir: .trivycache/
-  
-  # Clear cache before scanning
-  clear: false
 
 # Output format
 format: table
 
-# Report settings
-report:
-  # Format for reports
-  format: all
-
-# Timeout settings
+# Timeout
 timeout: 5m0s
 
-# Secret scanning settings (loaded from separate file)
+# Secret scanning
 secret:
   config: trivy-secret.yaml
 
-# Exit codes
-exit-code: 0  # Don't fail by default, let specific scans decide
+# Exit code
+exit-code: 0
 
 # Parallel scanning
 parallel: 5
 
-# Offline mode (useful when DB is pre-downloaded)
+# Offline mode
 offline: false
 
-# Quiet mode (reduce output)
+# Quiet mode
 quiet: false
 
 # Debug mode
 debug: false
 
-# Severity filter for output
+# Severity filter
 severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
 
-# Ignore policy file
+# Ignore policy
 ignore-policy: .trivyignore
 
-# Scanners to use
+# Scanners
 scanners:
   - vuln
   - secret
