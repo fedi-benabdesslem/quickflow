@@ -1,4 +1,5 @@
 # Large Binaries
+trivy.db
 trivy.exe
 *.exe
 *.bin
