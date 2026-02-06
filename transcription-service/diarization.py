@@ -34,11 +34,23 @@ class SpeakerDiarizer:
     
     def __init__(self):
         self.pipeline = None
-        # Use config device, fallback to CPU if CUDA requested but not available
+        
+        # Determine device based on platform
+        import platform
+        system = platform.system()
+        
         self.device = WHISPER_DEVICE
-        if self.device == "cuda" and not torch.cuda.is_available():
-            logger.warning("CUDA requested but not available, falling back to CPU")
+        
+        # On Windows, force CPU for Diarization to verify stability (unless user really tweaked their environment)
+        # We rely on the logs seen during debugging: Windows GPU = Deadlock.
+        if system == "Windows" and self.device == "cuda":
+            logger.warning("Windows detected: Forcing Diarization to CPU to prevent known deadlocks.")
             self.device = "cpu"
+        elif self.device == "cuda" and not torch.cuda.is_available():
+             logger.warning("CUDA requested but not available, falling back to CPU")
+             self.device = "cpu"
+        
+        logger.info(f"Diarization initialized on device: {self.device}")
         
     def load_model(self) -> None:
         """Load the pyannote diarization pipeline."""

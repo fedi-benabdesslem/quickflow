@@ -242,11 +242,43 @@ async def process_transcription(
         if transcription.duration > max_seconds:
             raise ValueError(f"Audio duration ({transcription.duration/60:.1f} min) exceeds limit ({MAX_DURATION_HOURS} hours)")
         
+        # Convert to WAV for safe Diarization (fixes torchaudio MP3 issues on Windows)
+        # We use strict 16kHz mono PCM which is ideal for both Whisper and Pyannote
+        wav_path = audio_path.with_suffix(".wav")
+        logger.info(f"Converting audio to WAV: {wav_path}", extra=extra)
+        print(f"DEBUG: Job {job_id} - Converting to WAV...", file=sys.stderr)
+        
+        try:
+            import subprocess
+            # ffmpeg -i input -ar 16000 -ac 1 -c:a pcm_s16le output.wav
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-i", str(audio_path),
+                "-ar", "16000",
+                "-ac", "1",
+                "-c:a", "pcm_s16le",
+                str(wav_path)
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"DEBUG: Job {job_id} - Conversion successful.", file=sys.stderr)
+            
+            # Use WAV for diarization (and future steps)
+            # Note: Whisper already ran on MP3, which is fine as it uses ffmpeg internally.
+            # But Diarization needs WAV to avoid torchaudio issues.
+            diarization_audio_path = wav_path
+            
+        except Exception as e:
+            logger.error(f"Failed to convert to WAV: {e}", extra=extra)
+            print(f"DEBUG: Job {job_id} - WAV conversion failed: {e}", file=sys.stderr)
+            # Do NOT fallback to MP3 on Windows, it causes infinite loops/hangs in torchaudio
+            raise RuntimeError(f"Audio conversion failed: {e}. Please ensure ffmpeg is installed and working.")
+            # diarization_audio_path = audio_path
+        
         # Run diarization
+
         logger.info(f"Starting diarization for job {job_id}", extra=extra)
         print(f"DEBUG: Job {job_id} - Calling diarizer.diarize...", file=sys.stderr)
         diar_start = time.time()
-        diarization = diarizer.diarize(audio_path)
+        diarization = diarizer.diarize(diarization_audio_path)
         diar_duration = time.time() - diar_start
         print(f"DEBUG: Job {job_id} - Diarization finished in {diar_duration:.2f}s", file=sys.stderr)
         DIARIZATION_DURATION.observe(diar_duration)
@@ -296,10 +328,17 @@ async def process_transcription(
         ACTIVE_JOBS.dec()
         job_manager.release_slot()
         
-        # Cleanup temp file
+        # Cleanup temp files
         if audio_path.exists():
             try:
                 audio_path.unlink()
+            except Exception:
+                pass
+        
+        # Cleanup WAV if different
+        if 'diarization_audio_path' in locals() and diarization_audio_path != audio_path and diarization_audio_path.exists():
+            try:
+                diarization_audio_path.unlink()
             except Exception:
                 pass
 
