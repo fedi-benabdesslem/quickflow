@@ -31,6 +31,7 @@ interface GenerateRequest {
     meetingTitle: string
     meetingDate: string
     meetingTime: string
+    meetingEndTime: string
     meetingLocation: string
 }
 
@@ -96,6 +97,7 @@ export default function VoiceModePage() {
         title: '',
         date: new Date().toISOString().split('T')[0],
         time: '',
+        endTime: '',
         location: '',
     })
     const [outputPrefs, setOutputPrefs] = useState({ tone: 'Formal', length: 'Standard' })
@@ -186,6 +188,7 @@ export default function VoiceModePage() {
                 meetingTitle: meetingInfo.title,
                 meetingDate: meetingInfo.date,
                 meetingTime: meetingInfo.time,
+                meetingEndTime: meetingInfo.endTime,
                 meetingLocation: meetingInfo.location,
             })
 
@@ -441,13 +444,13 @@ export default function VoiceModePage() {
                                 <div className="space-y-3">
                                     {transcript.speakers?.map((speaker, idx) => (
                                         <div key={speaker}>
-                                            <label className="text-sm text-slate-400">{speaker}</label>
+                                            <label className="block text-sm font-medium text-slate-300 mb-2">{speaker}</label>
                                             <input
                                                 type="text"
                                                 value={speakerMapping[speaker] || ''}
                                                 onChange={e => updateSpeakerName(speaker, e.target.value)}
                                                 placeholder={`Speaker ${idx + 1}`}
-                                                className="input-field mt-1"
+                                                className="input-nebula"
                                             />
                                         </div>
                                     ))}
@@ -459,41 +462,52 @@ export default function VoiceModePage() {
                                 <h3 className="text-lg font-bold text-white mb-4">Meeting Details</h3>
                                 <div className="space-y-3">
                                     <div>
-                                        <label className="text-sm text-slate-400">Title</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-2">Title</label>
                                         <input
                                             type="text"
                                             value={meetingInfo.title}
                                             onChange={e => setMeetingInfo(prev => ({ ...prev, title: e.target.value }))}
                                             placeholder="Team Standup"
-                                            className="input-field mt-1"
+                                            className="input-nebula"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-sm text-slate-400">Date</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-2">Date</label>
                                         <input
                                             type="date"
                                             value={meetingInfo.date}
                                             onChange={e => setMeetingInfo(prev => ({ ...prev, date: e.target.value }))}
-                                            className="input-field mt-1"
+                                            className="input-nebula"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="text-sm text-slate-400">Time</label>
-                                        <input
-                                            type="time"
-                                            value={meetingInfo.time}
-                                            onChange={e => setMeetingInfo(prev => ({ ...prev, time: e.target.value }))}
-                                            className="input-field mt-1"
-                                        />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-300 mb-2">Start Time</label>
+                                            <input
+                                                type="time"
+                                                value={meetingInfo.time}
+                                                onChange={e => setMeetingInfo(prev => ({ ...prev, time: e.target.value }))}
+                                                className="input-nebula"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-300 mb-2">End Time</label>
+                                            <input
+                                                type="time"
+                                                value={meetingInfo.endTime}
+                                                onChange={e => setMeetingInfo(prev => ({ ...prev, endTime: e.target.value }))}
+                                                className="input-nebula"
+                                            />
+                                        </div>
                                     </div>
                                     <div>
-                                        <label className="text-sm text-slate-400">Location</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-2">Location</label>
                                         <input
                                             type="text"
                                             value={meetingInfo.location}
                                             onChange={e => setMeetingInfo(prev => ({ ...prev, location: e.target.value }))}
                                             placeholder="Conference Room A"
-                                            className="input-field mt-1"
+                                            className="input-nebula"
                                         />
                                     </div>
                                 </div>
@@ -504,11 +518,11 @@ export default function VoiceModePage() {
                                 <h3 className="text-lg font-bold text-white mb-4">Output Style</h3>
                                 <div className="space-y-3">
                                     <div>
-                                        <label className="text-sm text-slate-400">Tone</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-2">Tone</label>
                                         <select
                                             value={outputPrefs.tone}
                                             onChange={e => setOutputPrefs(prev => ({ ...prev, tone: e.target.value }))}
-                                            className="input-field mt-1"
+                                            className="input-nebula"
                                         >
                                             <option value="Formal">Formal</option>
                                             <option value="Executive">Executive</option>
@@ -516,11 +530,11 @@ export default function VoiceModePage() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="text-sm text-slate-400">Length</label>
+                                        <label className="block text-sm font-medium text-slate-300 mb-2">Length</label>
                                         <select
                                             value={outputPrefs.length}
                                             onChange={e => setOutputPrefs(prev => ({ ...prev, length: e.target.value }))}
-                                            className="input-field mt-1"
+                                            className="input-nebula"
                                         >
                                             <option value="Summary">Summary</option>
                                             <option value="Standard">Standard</option>

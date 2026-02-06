@@ -173,6 +173,7 @@ public class LLMService {
             String meetingTitle,
             String meetingDate,
             String meetingTime,
+            String meetingEndTime,
             String meetingLocation,
             String tone,
             String length) {
@@ -220,8 +221,13 @@ public class LLMService {
         }
         if (meetingDate != null)
             userInput.append("Date: ").append(meetingDate).append("\n");
-        if (meetingTime != null)
-            userInput.append("Time: ").append(meetingTime).append("\n");
+        if (meetingTime != null) {
+            userInput.append("Time: ").append(meetingTime);
+            if (meetingEndTime != null && !meetingEndTime.isEmpty()) {
+                userInput.append(" - ").append(meetingEndTime);
+            }
+            userInput.append("\n");
+        }
         if (meetingLocation != null)
             userInput.append("Location: ").append(meetingLocation).append("\n");
 

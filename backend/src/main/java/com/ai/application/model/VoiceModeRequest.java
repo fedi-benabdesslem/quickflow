@@ -13,6 +13,7 @@ public class VoiceModeRequest {
     private String meetingTitle;
     private String meetingDate;
     private String meetingTime;
+    private String meetingEndTime;
     private String meetingLocation;
 
     public VoiceModeRequest() {
@@ -83,6 +84,14 @@ public class VoiceModeRequest {
 
     public void setMeetingLocation(String meetingLocation) {
         this.meetingLocation = meetingLocation;
+    }
+
+    public String getMeetingEndTime() {
+        return meetingEndTime;
+    }
+
+    public void setMeetingEndTime(String meetingEndTime) {
+        this.meetingEndTime = meetingEndTime;
     }
 
     /**

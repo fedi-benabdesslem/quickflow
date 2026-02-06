@@ -153,6 +153,7 @@ public class VoiceModeController {
                     request.getMeetingTitle(),
                     request.getMeetingDate(),
                     request.getMeetingTime(),
+                    request.getMeetingEndTime(),
                     request.getMeetingLocation(),
                     request.getTone(),
                     request.getLength());
