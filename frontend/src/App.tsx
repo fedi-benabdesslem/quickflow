@@ -19,6 +19,7 @@ import ContactsPage from './pages/ContactsPage'
 import GroupsPage from './pages/GroupsPage'
 import TechSupportPage from './pages/TechSupportPage'
 import HistoryPage from './pages/HistoryPage'
+import VoiceModePage from './pages/VoiceModePage'
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -146,6 +147,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <StructuredModePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/minutes/voice"
+                    element={
+                        <ProtectedRoute>
+                            <VoiceModePage />
                         </ProtectedRoute>
                     }
                 />
