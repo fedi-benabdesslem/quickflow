@@ -14,6 +14,7 @@
 ## ✨ Features
 
 ### 📝 AI Meeting Minutes
+- **Voice Mode**: **NEW!** Upload audio recordings for automated transcription, speaker identification, and minute generation.
 - **Structured Mode**: Fill in meeting details (attendees, agenda, decisions) and generate formal minutes (PV).
 - **Quick Mode**: Paste rough notes and let AI extract the structure automatically.
 - **Template System**: Save and reuse meeting structures for recurring syncs.
@@ -57,7 +58,7 @@ QuickFlow is designed to be easy to set up.
 We are constantly improving QuickFlow. Here's what's coming next:
 - [x] **Contact Autocomplete**: Smart suggestions for participants and recipients.
 - [ ] **Calendar Integration**: Sync meetings directly from Google/Outlook Calendar.
-- [ ] **Voice Mode**: Real-time transcription and summarization.
+- [x] **Voice Mode**: Real-time transcription and summarization.
 - [ ] **Team Workspaces**: Share templates and minutes with your team.
 ## ⚙️ Automated Tests
 Built-in automated tests in the backend and frontend to ensure reliability and stability.
