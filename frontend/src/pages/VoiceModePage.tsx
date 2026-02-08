@@ -107,6 +107,7 @@ export default function VoiceModePage() {
     const [outputPrefs, setOutputPrefs] = useState({ tone: 'Formal', length: 'Standard' })
     const [generatedMinutes, setGeneratedMinutes] = useState<string>('')
     const [error, setError] = useState<string>('')
+    const [isRetryable, setIsRetryable] = useState(false)
     const [serviceAvailable, setServiceAvailable] = useState<boolean | null>(null)
 
     // PDF Preview state
@@ -172,10 +173,12 @@ export default function VoiceModePage() {
                 setStep('review')
             } else {
                 setError(result.message || 'Transcription failed')
+                setIsRetryable(true)
                 setStep('upload')
             }
         } catch (err) {
             setError('Failed to connect to transcription service. Please try again.')
+            setIsRetryable(true)
             setStep('upload')
         }
     }, [file])
@@ -366,7 +369,7 @@ export default function VoiceModePage() {
                     })}
                 </div>
 
-                {/* Error Display */}
+                {/* Error Display with Retry */}
                 <AnimatePresence>
                     {error && (
                         <motion.div
@@ -375,7 +378,24 @@ export default function VoiceModePage() {
                             exit={{ opacity: 0 }}
                             className="glass-card p-4 mb-6 border-l-4 border-red-500"
                         >
-                            <p className="text-red-400">{error}</p>
+                            <div className="flex items-center justify-between">
+                                <p className="text-red-400">{error}</p>
+                                {isRetryable && file && (
+                                    <button
+                                        onClick={() => {
+                                            setError('')
+                                            setIsRetryable(false)
+                                            handleUpload()
+                                        }}
+                                        className="ml-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                            <path fillRule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm-6.624-6.85a5.5 5.5 0 019.201-2.466l.312.311H15.77a.75.75 0 000 1.5h4.243a.75.75 0 00.75-.75V-1.07a.75.75 0 00-1.5 0v2.43l-.31-.31A7 7 0 007.24 4.188a.75.75 0 101.448.389z" clipRule="evenodd" />
+                                        </svg>
+                                        Retry Transcription
+                                    </button>
+                                )}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
