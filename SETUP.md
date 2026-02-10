@@ -23,7 +23,18 @@ git clone https://github.com/TaherBenAfia/quickflow.git
 cd quickflow
 ```
 
-### 2. Start the Backend
+### 2. Start the Transcription Service
+
+> **Note:** If starting the transcription service for the first time, you may need to install the required dependencies. follow the instructions that are in [HERE](./transcription-service/README.md).
+```bash
+cd transcription-service
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
+venv\Scripts\python main.py
+```
+
+### 3. Start the Backend
 Open a terminal in the `backend` folder:
 ```bash
 cd backend
@@ -34,7 +45,7 @@ mvnw spring-boot:run
 ```
 *The server will start on `http://localhost:8080`.*
 
-### 3. Start the Frontend
+### 4. Start the Frontend
 Open a new terminal in the `frontend` folder:
 ```bash
 cd frontend
