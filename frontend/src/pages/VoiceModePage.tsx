@@ -5,6 +5,7 @@ import { marked } from 'marked'
 import TechSupportButton from '../components/TechSupportButton'
 import PdfPreviewModal from '../components/PdfPreviewModal'
 import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
+import RichTextEditor from '../components/RichTextEditor'
 import { generatePdf, type Contact } from '../lib/api'
 
 // Types
@@ -209,7 +210,9 @@ export default function VoiceModePage() {
             })
 
             if (result.status === 'success' && result.content) {
-                setGeneratedMinutes(result.content)
+                // Convert markdown to HTML for the rich text editor
+                const htmlContent = marked.parse(result.content) as string
+                setGeneratedMinutes(htmlContent)
                 setStep('done')
             } else {
                 setError(result.message || 'Generation failed')
@@ -693,10 +696,12 @@ export default function VoiceModePage() {
                                 </svg>
                                 <h3 className="text-lg font-bold">Minutes Generated Successfully!</h3>
                             </div>
-                            <div className="bg-slate-900/50 rounded-lg p-4 max-h-96 overflow-y-auto">
-                                <pre className="text-slate-300 text-sm whitespace-pre-wrap font-mono">
-                                    {generatedMinutes}
-                                </pre>
+                            <div className="bg-slate-900/50 rounded-lg overflow-hidden">
+                                <RichTextEditor
+                                    value={generatedMinutes}
+                                    onChange={setGeneratedMinutes}
+                                    placeholder="Generated minutes..."
+                                />
                             </div>
                         </div>
 
