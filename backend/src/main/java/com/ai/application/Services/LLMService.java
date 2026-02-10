@@ -162,6 +162,91 @@ public class LLMService {
     }
 
     /**
+     * Voice Mode: Generate meeting minutes from a transcribed audio with speaker
+     * diarization.
+     * This method is specifically designed for transcripts that include speaker
+     * labels and timestamps.
+     */
+    public String generateMinutesFromTranscript(
+            String transcript,
+            java.util.Map<String, String> speakerMapping,
+            String meetingTitle,
+            String meetingDate,
+            String meetingTime,
+            String meetingEndTime,
+            String meetingLocation,
+            String tone,
+            String length) {
+
+        String toneInstruction = getToneInstruction(tone);
+        String lengthInstruction = getLengthInstruction(length);
+
+        String systemPrompt = String.format(
+                """
+                        You are a professional meeting minutes writer. Create formal, polished meeting minutes from an audio transcript.
+
+                        STYLE REQUIREMENTS:
+                        %s
+                        %s
+
+                        IMPORTANT CONTEXT:
+                        - This transcript was generated from an audio recording using speech-to-text with speaker diarization
+                        - Each segment includes a timestamp and speaker label
+                        - Your job is to transform this raw transcript into professional meeting minutes
+                        - Identify key discussion topics, decisions made, and action items
+                        - Attribute statements to the correct speakers where relevant
+                        - Summarize lengthy discussions while preserving key points
+                        - Ignore filler words, repeated phrases, or unclear segments
+
+                        SECTIONS TO INCLUDE:
+                        1. Header with meeting title, date, time, location
+                        2. Attendees (based on speakers identified)
+                        3. Summary of discussions by topic
+                        4. Decisions made (if any)
+                        5. Action items (extract tasks mentioned with owner if stated)
+                        6. Key quotes or important statements (optional)
+
+                        Write in a professional, objective tone. Use complete sentences.
+                        """,
+                toneInstruction, lengthInstruction);
+
+        // Build user input with meeting metadata and transcript
+        StringBuilder userInput = new StringBuilder();
+
+        userInput.append("MEETING INFORMATION:\n");
+        if (meetingTitle != null && !meetingTitle.isEmpty()) {
+            userInput.append("Title: ").append(meetingTitle).append("\n");
+        } else {
+            userInput.append("Title: [Meeting from Audio Recording]\n");
+        }
+        if (meetingDate != null)
+            userInput.append("Date: ").append(meetingDate).append("\n");
+        if (meetingTime != null) {
+            userInput.append("Time: ").append(meetingTime);
+            if (meetingEndTime != null && !meetingEndTime.isEmpty()) {
+                userInput.append(" - ").append(meetingEndTime);
+            }
+            userInput.append("\n");
+        }
+        if (meetingLocation != null)
+            userInput.append("Location: ").append(meetingLocation).append("\n");
+
+        // Add speaker mapping if provided
+        if (speakerMapping != null && !speakerMapping.isEmpty()) {
+            userInput.append("\nSPEAKER IDENTIFICATION:\n");
+            for (var entry : speakerMapping.entrySet()) {
+                userInput.append("- ").append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
+            }
+        }
+
+        userInput.append("\n--- FULL TRANSCRIPT ---\n\n");
+        userInput.append(transcript);
+
+        logger.info("Generating minutes from transcript ({} characters)", transcript.length());
+        return llmclient.callLLM(systemPrompt, userInput.toString());
+    }
+
+    /**
      * Original email/PV generation method (kept for backwards compatibility)
      */
     public String generateContent(String input, TemplateType tempType) {

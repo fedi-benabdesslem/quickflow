@@ -53,7 +53,7 @@ export default function ModeSelectionPage() {
             </motion.div>
 
             {/* Mode Selection Cards */}
-            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {/* Quick Mode Card */}
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -151,6 +151,61 @@ export default function ModeSelectionPage() {
                         Start →
                     </motion.button>
                     <div className="mt-4 h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300" />
+                </motion.div>
+
+                {/* Voice Mode Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    whileHover={{ scale: 1.02, y: -5 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/minutes/voice')}
+                    className="glass-card p-8 cursor-pointer group min-h-[320px] flex flex-col md:col-span-2 lg:col-span-1"
+                >
+                    <div className="flex items-start justify-between mb-4">
+                        <motion.div
+                            className="text-4xl text-purple-400"
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12">
+                                <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
+                                <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
+                            </svg>
+                        </motion.div>
+                        <motion.div
+                            className="text-2xl text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"
+                        >
+                            →
+                        </motion.div>
+                    </div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                            Voice Mode
+                        </h3>
+                        <span className="px-2 py-0.5 text-xs font-semibold bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30">
+                            NEW
+                        </span>
+                    </div>
+                    <p className="text-slate-400 flex-grow">
+                        Upload a meeting recording. AI transcribes with speaker detection
+                        and generates professional minutes automatically.
+                    </p>
+                    <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z" clipRule="evenodd" />
+                        </svg>
+                        ~5-15 minutes (varies by recording length)
+                    </div>
+                    <motion.button
+                        className="mt-4 btn-primary w-full"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        Start →
+                    </motion.button>
+                    <div className="mt-4 h-1 w-0 group-hover:w-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300" />
                 </motion.div>
             </div>
 

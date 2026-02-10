@@ -442,3 +442,53 @@ class FileProcessingServiceTest {
 ```bash
 ./mvnw test -Dtest=UserTokenTest,ContactTest,GroupTest
 ```
+
+---
+
+## 7. Voice Mode Tests
+
+### Python Transcription Service Tests
+
+**Location**: `transcription-service/tests/`
+
+| Test File | Component | Behaviors Validated |
+|-----------|-----------|---------------------|
+| `test_config.py` | Config | Environment variable loading, default values, type validation |
+| `test_transcription.py` | WhisperTranscriber | Model loading, audio transcription, segment extraction, error handling |
+| `test_diarization.py` | SpeakerDiarizer | Pipeline loading, speaker segmentation, device selection (CPU/GPU) |
+| `test_job_manager.py` | JobManager | Job creation, async status updates, concurrency limits, queue management |
+| `test_health.py` | Health Check | Service health status, GPU memory reporting, component availability |
+
+**How to Execute**:
+```bash
+cd transcription-service
+venv\Scripts\python -m pytest tests/ -v
+```
+
+### Backend Voice Mode Tests
+
+**Location**: `backend/src/test/java/com/ai/application/`
+
+| Test File | Component | Behaviors Validated |
+|-----------|-----------|---------------------|
+| `VoiceModeControllerTest.java` | Controller | File upload validation, transcription status polling, minutes generation, error handling |
+| `TranscriptionServiceTest.java` | Service | Integration with Python service, health checks, resilience patterns |
+
+**How to Execute**:
+```bash
+./mvnw test -Dtest=VoiceModeControllerTest,TranscriptionServiceTest
+```
+
+### Frontend Voice Mode Tests
+
+**Location**: `frontend/src/__tests__/`
+
+| Test File | Component | Behaviors Validated |
+|-----------|-----------|---------------------|
+| `VoiceModePage.test.tsx` | VoiceModePage | File upload flow, service status checks, transcription polling, review step, minutes generation |
+
+**How to Execute**:
+```bash
+cd frontend
+npm test -- VoiceModePage
+```

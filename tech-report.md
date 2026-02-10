@@ -10,6 +10,7 @@ QuickFlow implements a modern client-server architecture designed for secure, AI
 -   **AI Layer**: Local LLM inference via Ollama (Mistral-Nemo) for privacy-preserving content generation.
 -   **Authentication**: Supabase Auth (JWT) for secure, managed user identity.
 -   **External Integration**: Google (Gmail API) and Microsoft (Graph API) for email capabilities.
+-   **Transcription Service**: Dedicated Python microservice using OpenAI Whisper and Pyannote for high-fidelity audio transcription and diarization.
 
 ---
 
@@ -37,6 +38,7 @@ REST endpoints that handle HTTP requests and responses.
 -   **`TemplateController`**: (Legacy/Base) Generic template handling.
 -   **`SupportController`**: Handles the "Tech Support" feature.
 -   **`HistoryController`**: Manages user history data retrieval and deletion.
+-   **`VoiceModeController`**: Manages the Voice Mode workflow: audio upload, transcription polling, and minute generation from transcripts.
 
 ### 2.3 Services (Business Logic)
 Encapsulates the core business rules and integration logic.
@@ -57,6 +59,7 @@ Encapsulates the core business rules and integration logic.
 -   **`TemplateService`**: Manages the prompt templates used by the LLM.
 -   **`TokenRefreshService`**: Background service (or on-demand) to handle OAuth2 token rotation for Google/Microsoft.
 -   **`TokenStorageService`**: Securely stores and retrieves encrypted OAuth tokens from the database.
+-   **`TranscriptionService`**: Orchestrates the communication with the Python Transcription Service (upload, polling, result parsing) and integrates with LLMService for minute generation.
 
 ### 2.4 Repositories (Data Access)
 Interfaces extending `MongoRepository` for abstracted database operations.
@@ -155,6 +158,22 @@ A comprehensive reference of all available backend endpoints.
 
 ---
 
+### 2.7 Python Transcription Service (`transcription-service`)
+
+A dedicated microservice optimized for GPU-accelerated audio processing.
+
+#### Core Components
+-   **`main.py`**: FastAPI application entry point defining endpoints (`/transcribe`, `/diarize`, `/health`, `/status/{job_id}`).
+-   **`transcription.py`**: Wraps `openai-whisper` for speech-to-text conversion. Handles model loading and VRAM management.
+-   **`diarization.py`**: Wraps `pyannote.audio` for speaker identification. Segments audio by speaker turns.
+-   **`job_manager.py`**: A robust async job queue using `asyncio.Semaphore` to limit concurrent GPU operations. Manages job lifecycle (Queued -> Processing -> Completed/Failed).
+-   **`config.py`**: Centralized configuration management using environment variables.
+
+#### Architecture
+-   **Concurrency Control**: Uses a semaphore-based locking mechanism to ensure only `MAX_CONCURRENT_JOBS` (default: 1) run on the GPU at a time, preventing Out-Of-Memory (OOM) errors.
+-   **Asynchronous Processing**: Long-running transcription tasks are offloaded to background tasks, returning a Job ID immediately for polling.
+-   **Hardware Acceleration**: Automatically detects CUDA support and moves models to GPU. Falls back to CPU if unavailable (or on Windows for specific stability settings).
+
 ## 3. Frontend Analysis (`quickflow-frontend`)
 
 A React application structured for component reusability and type safety.
@@ -178,6 +197,7 @@ A React application structured for component reusability and type safety.
 -   **`ContentEditorPage`**: Rich text editor (Quill) for polishing generated content.
 -   **`TemplateManagementPage`**: CRUD interface for managing Meeting Templates.
 -   **`EmailPage`**: Interface for the "AI Email Writer" feature with contact autocomplete recipients.
+-   **`VoiceModePage`**: A wizard-style interface for the Voice Mode workflow (Upload -> Transcribe -> Review -> Generate).
 -   **`TechSupportPage`**: Interface for the "Tech Support" feature with contact autocomplete recipients.
 -   **`HistoryPage`**: Displays user-specific history of generated minutes and emails with delete functionality.
 
@@ -187,6 +207,7 @@ A React application structured for component reusability and type safety.
 -   **`PdfPreview`**: real-time PDF rendering component using `@react-pdf/renderer`.
 -   **`SaveTemplateModal` / `EditTemplateModal`**: Modals for the Template System interaction.
 -   **`ContactAutocomplete`**: Smart search input with dropdown for selecting contacts from synced list.
+-   **`PdfPreviewModal`**: A unified modal for previewing generated PDFs and initiating email flows.
 -   **`RecipientSelectionModal`**: Modal for selecting meeting participants as email recipients with autocomplete.
 -   **`UserAvatar`**: Dynamic avatar component with initials fallback and QuickFlow user indicator.
 
@@ -248,6 +269,17 @@ A detailed look at the third-party dependencies powering specific features.
 | **Marked** | **Formatting** | Parses Markdown returned by the AI into HTML for safe display in the UI. |
 | **React Hot Toast** | **Notifications** | feedback popups (Success/Error messages) that appear at the top of the screen. |
 | **Tailwind CSS** | **Styling** | Utility-first CSS framework used for layout, typography, and responsive design. |
+
+### 5.3 Python Service (Transcription & Diarization)
+
+| Library | Purpose | Details |
+| :--- | :--- | :--- |
+| **openai-whisper** | **Speech-to-Text** | The core transcription engine. Uses Transformer-based models to convert audio to text with high accuracy. |
+| **pyannote.audio** | **Speaker Diarization** | Identifies "who spoke when". Uses a pre-trained segmentation model to label different speakers in the audio stream. |
+| **FastAPI** | **API Framework** | Provides the high-performance async web server for the transcription service. |
+| **Torch (PyTorch)** | **Deep Learning** | The underlying tensor library powering both Whisper and Pyannote. Manages CUDA/CPU offloading. |
+| **Prometheus Client** | **Monitoring** | Exposes metrics (job counts, processing time) for potential observability. |
+| **Python-Multipart** | **File Handling** | Handles large file uploads (audio binaries) efficiently in FastAPI. |
 
 ## 6. Summary
 

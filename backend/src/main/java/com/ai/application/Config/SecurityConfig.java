@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/health").permitAll()
+                        .requestMatchers("/api/minutes/voice/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(supabaseJwtFilter, UsernamePasswordAuthenticationFilter.class);
 
