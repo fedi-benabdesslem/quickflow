@@ -159,11 +159,11 @@ export default function VoiceModePage() {
     const [speakerContacts, setSpeakerContacts] = useState<Record<string, Contact | null>>({})
 
     // Check service availability on mount
-    useState(() => {
+    useEffect(() => {
         checkVoiceServiceStatus()
             .then(res => setServiceAvailable(res.available))
             .catch(() => setServiceAvailable(false))
-    })
+    }, [])
 
     // File selection handler
     const handleFileSelect = useCallback((selectedFile: File) => {
