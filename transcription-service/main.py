@@ -143,6 +143,9 @@ class TranscriptionResponse(BaseModel):
     full_text: Optional[str] = None
     processing_time_seconds: Optional[float] = None
     error: Optional[str] = None
+    audio_duration: Optional[float] = None
+    transcription_device: Optional[str] = None
+    diarization_device: Optional[str] = None
 
 
 class JobStatusResponse(BaseModel):
@@ -164,12 +167,35 @@ class ProgressResponse(BaseModel):
     status: str
     progress: int
     stage: str
+    audio_duration: Optional[float] = None
+    transcription_device: Optional[str] = None
+    diarization_device: Optional[str] = None
 
 
 # Helper functions
 def get_correlation_id(header: Optional[str]) -> str:
     """Get or generate correlation ID."""
     return header or str(uuid4())
+
+
+def get_audio_duration(file_path: Path) -> Optional[float]:
+    """Get audio duration in seconds using ffprobe."""
+    try:
+        import subprocess
+        result = subprocess.run(
+            [
+                "ffprobe", "-v", "error",
+                "-show_entries", "format=duration",
+                "-of", "default=noprint_wrappers=1:nokey=1",
+                str(file_path)
+            ],
+            capture_output=True, text=True, timeout=10
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return float(result.stdout.strip())
+    except Exception as e:
+        logger.warning(f"Could not determine audio duration: {e}")
+    return None
 
 
 def merge_transcription_and_diarization(
@@ -221,6 +247,22 @@ def merge_transcription_and_diarization(
     return final_segments
 
 
+# Registry for active asyncio tasks
+_active_tasks: dict[str, asyncio.Task] = {}
+
+
+class CancelledException(Exception):
+    """Raised when a job is cancelled by the user."""
+    pass
+
+
+async def check_cancelled(job_id: str):
+    """Check if a job has been cancelled and raise if so."""
+    job = await job_manager.get_job(job_id)
+    if job and job.cancelled:
+        raise CancelledException(f"Job {job_id} was cancelled by user")
+
+
 async def process_transcription(
     job_id: str,
     audio_path: Path,
@@ -238,12 +280,14 @@ async def process_transcription(
         start_time = time.time()
         
         # Run transcription
+        await check_cancelled(job_id)
         logger.info(f"Starting transcription for job {job_id}", extra=extra)
         await job_manager.update_progress(job_id, 10, "transcribing")
         trans_start = time.time()
         transcription = await asyncio.to_thread(transcriber.transcribe, audio_path)
         trans_duration = time.time() - trans_start
         TRANSCRIPTION_DURATION.observe(trans_duration)
+        await check_cancelled(job_id)
         await job_manager.update_progress(job_id, 40, "transcribing")
         
         # Record audio duration
@@ -255,6 +299,7 @@ async def process_transcription(
             raise ValueError(f"Audio duration ({transcription.duration/60:.1f} min) exceeds limit ({MAX_DURATION_HOURS} hours)")
         
         # Convert to WAV for safe Diarization (fixes torchaudio MP3 issues on Windows)
+        await check_cancelled(job_id)
         await job_manager.update_progress(job_id, 42, "converting")
         wav_path = audio_path.with_suffix(".wav")
         logger.info(f"Converting audio to WAV: {wav_path}", extra=extra)
@@ -282,6 +327,7 @@ async def process_transcription(
             raise RuntimeError(f"Audio conversion failed: {e}. Please ensure ffmpeg is installed and working.")
         
         # Run diarization
+        await check_cancelled(job_id)
         await job_manager.update_progress(job_id, 55, "diarizing")
         logger.info(f"Starting diarization for job {job_id}", extra=extra)
         diar_start = time.time()
@@ -293,10 +339,9 @@ async def process_transcription(
         # Record speaker count
         SPEAKERS_DETECTED.observe(len(diarization.speakers))
         
-        # Merge results
-        await job_manager.update_progress(job_id, 92, "merging")
+        # Merge results (still part of diarizing stage, no separate stage needed)
         segments = merge_transcription_and_diarization(transcription, diarization)
-        await job_manager.update_progress(job_id, 95, "merging")
+        await job_manager.update_progress(job_id, 99, "diarizing")
         
         total_time = time.time() - start_time
         
@@ -322,6 +367,12 @@ async def process_transcription(
         
         return result
         
+    except CancelledException:
+        logger.info(f"Job {job_id} cancelled by user", extra=extra)
+        await job_manager.update_progress(job_id, 0, "cancelled")
+        await job_manager.update_job_status(job_id, JobStatus.CANCELLED, error="Cancelled by user")
+        TRANSCRIPTION_REQUESTS.labels(status="cancelled").inc()
+        
     except Exception as e:
         logger.error(f"Job {job_id} failed: {e}", extra=extra)
         await job_manager.update_progress(job_id, 0, "failed")
@@ -332,6 +383,7 @@ async def process_transcription(
     finally:
         ACTIVE_JOBS.dec()
         job_manager.release_slot()
+        _active_tasks.pop(job_id, None)
         
         # Cleanup temp files
         if audio_path.exists():
@@ -419,6 +471,11 @@ async def transcribe_audio(
         correlation_id=correlation_id
     )
     
+    # Get audio duration via ffprobe for time estimation
+    audio_duration = get_audio_duration(temp_path)
+    job.audio_duration = audio_duration
+    logger.info(f"Audio duration for job {job.job_id}: {audio_duration}s", extra=extra)
+    
     # Try to acquire processing slot
     try:
         await asyncio.wait_for(job_manager.acquire_slot(), timeout=5.0)
@@ -426,15 +483,22 @@ async def transcribe_audio(
         logger.info(f"Job {job.job_id} queued (no slots available)", extra=extra)
         return TranscriptionResponse(
             job_id=job.job_id,
-            status="queued"
+            status="queued",
+            audio_duration=audio_duration,
+            transcription_device=transcriber.device,
+            diarization_device=diarizer.device
         )
     
     # Process asynchronously - return job_id immediately
-    asyncio.create_task(process_transcription(job.job_id, temp_path, correlation_id))
+    task = asyncio.create_task(process_transcription(job.job_id, temp_path, correlation_id))
+    _active_tasks[job.job_id] = task
     
     return TranscriptionResponse(
         job_id=job.job_id,
-        status="processing"
+        status="processing",
+        audio_duration=audio_duration,
+        transcription_device=transcriber.device,
+        diarization_device=diarizer.device
     )
 
 
@@ -450,8 +514,34 @@ async def get_job_progress(job_id: str):
         job_id=job.job_id,
         status=job.status.value,
         progress=job.progress,
-        stage=job.stage
+        stage=job.stage,
+        audio_duration=job.audio_duration,
+        transcription_device=transcriber.device,
+        diarization_device=diarizer.device
     )
+
+
+@app.post("/cancel/{job_id}")
+async def cancel_job(job_id: str):
+    """Cancel a running transcription job."""
+    job = await job_manager.get_job(job_id)
+    
+    if not job:
+        raise HTTPException(404, f"Job {job_id} not found")
+    
+    if job.status in (JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED):
+        return {"job_id": job_id, "status": job.status.value, "message": "Job already finished"}
+    
+    # Set the cancelled flag — process_transcription checks this between stages
+    job.cancelled = True
+    
+    # Cancel the asyncio task if still active
+    task = _active_tasks.get(job_id)
+    if task and not task.done():
+        task.cancel()
+    
+    logger.info(f"Job {job_id} cancellation requested")
+    return {"job_id": job_id, "status": "cancelled", "message": "Cancellation requested"}
 
 
 @app.get("/status/{job_id}", response_model=JobStatusResponse)

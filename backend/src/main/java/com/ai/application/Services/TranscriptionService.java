@@ -258,15 +258,14 @@ public class TranscriptionService {
 
     /**
      * Submit an audio file for async transcription.
-     * Returns the job ID immediately - the Python service processes in the
-     * background.
+     * Returns job info including device/duration for time estimation.
      *
      * @param audioFile The audio file to transcribe
-     * @return The job ID for progress tracking
+     * @return Map with jobId, audioDuration, transcriptionDevice, diarizationDevice
      * @throws IOException            If file processing fails
      * @throws TranscriptionException If submission fails
      */
-    public String transcribeAsync(MultipartFile audioFile) throws IOException, TranscriptionException {
+    public Map<String, Object> transcribeAsync(MultipartFile audioFile) throws IOException, TranscriptionException {
         String correlationId = MDC.get("correlationId");
         if (correlationId == null) {
             correlationId = UUID.randomUUID().toString();
@@ -318,8 +317,20 @@ public class TranscriptionService {
                 throw new TranscriptionException("No job ID returned from transcription service");
             }
 
+            Map<String, Object> result = new HashMap<>();
+            result.put("jobId", jobId);
+            if (root.has("audio_duration") && !root.get("audio_duration").isNull()) {
+                result.put("audioDuration", root.get("audio_duration").asDouble());
+            }
+            if (root.has("transcription_device") && !root.get("transcription_device").isNull()) {
+                result.put("transcriptionDevice", root.get("transcription_device").asText());
+            }
+            if (root.has("diarization_device") && !root.get("diarization_device").isNull()) {
+                result.put("diarizationDevice", root.get("diarization_device").asText());
+            }
+
             logger.info("Async transcription submitted, job ID: {}", jobId);
-            return jobId;
+            return result;
 
         } catch (RestClientException e) {
             logger.error("Failed to connect to transcription service: {}", e.getMessage());
@@ -353,6 +364,15 @@ public class TranscriptionService {
             progress.put("status", root.has("status") ? root.get("status").asText() : "unknown");
             progress.put("progress", root.has("progress") ? root.get("progress").asInt() : 0);
             progress.put("stage", root.has("stage") ? root.get("stage").asText() : "unknown");
+            if (root.has("audio_duration") && !root.get("audio_duration").isNull()) {
+                progress.put("audioDuration", root.get("audio_duration").asDouble());
+            }
+            if (root.has("transcription_device") && !root.get("transcription_device").isNull()) {
+                progress.put("transcriptionDevice", root.get("transcription_device").asText());
+            }
+            if (root.has("diarization_device") && !root.get("diarization_device").isNull()) {
+                progress.put("diarizationDevice", root.get("diarization_device").asText());
+            }
 
             return progress;
 
@@ -360,6 +380,22 @@ public class TranscriptionService {
             throw new TranscriptionException("Failed to get job progress: " + e.getMessage());
         } catch (Exception e) {
             throw new TranscriptionException("Failed to parse progress response: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Cancel a running transcription job.
+     */
+    public void cancelJob(String jobId) throws TranscriptionException {
+        try {
+            restTemplate.postForEntity(
+                    transcriptionServiceUrl + "/cancel/" + jobId,
+                    null,
+                    String.class);
+            logger.info("Cancelled job {}", jobId);
+        } catch (RestClientException e) {
+            logger.warn("Failed to cancel job {}: {}", jobId, e.getMessage());
+            // Don't throw - cancellation is best-effort
         }
     }
 

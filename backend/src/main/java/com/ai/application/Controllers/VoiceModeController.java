@@ -103,11 +103,22 @@ public class VoiceModeController {
         }
 
         try {
-            String jobId = transcriptionService.transcribeAsync(file);
+            Map<String, Object> jobInfo = transcriptionService.transcribeAsync(file);
 
-            return ResponseEntity.ok(Map.of(
-                    "status", "processing",
-                    "jobId", jobId));
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("status", "processing");
+            response.put("jobId", jobInfo.get("jobId"));
+            if (jobInfo.containsKey("audioDuration")) {
+                response.put("audioDuration", jobInfo.get("audioDuration"));
+            }
+            if (jobInfo.containsKey("transcriptionDevice")) {
+                response.put("transcriptionDevice", jobInfo.get("transcriptionDevice"));
+            }
+            if (jobInfo.containsKey("diarizationDevice")) {
+                response.put("diarizationDevice", jobInfo.get("diarizationDevice"));
+            }
+
+            return ResponseEntity.ok(response);
 
         } catch (TranscriptionException e) {
             logger.error("Transcription submission failed: {}", e.getMessage());
@@ -137,6 +148,21 @@ public class VoiceModeController {
             return ResponseEntity.ok(progress);
         } catch (TranscriptionException e) {
             return ResponseEntity.status(404).body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /**
+     * Cancel a transcription job.
+     */
+    @PostMapping("/cancel/{jobId}")
+    public ResponseEntity<?> cancelJob(@PathVariable String jobId) {
+        try {
+            transcriptionService.cancelJob(jobId);
+            return ResponseEntity.ok(Map.of("status", "cancelled"));
+        } catch (TranscriptionException e) {
+            return ResponseEntity.status(500).body(Map.of(
                     "status", "error",
                     "message", e.getMessage()));
         }

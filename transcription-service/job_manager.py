@@ -22,6 +22,7 @@ class JobStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     TIMEOUT = "timeout"
+    CANCELLED = "cancelled"
 
 
 @dataclass
@@ -34,11 +35,13 @@ class TranscriptionJob:
     status: JobStatus = JobStatus.QUEUED
     progress: int = 0
     stage: str = "queued"
+    audio_duration: Optional[float] = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     result: Optional[dict] = None
     error: Optional[str] = None
+    cancelled: bool = False
     
     def to_dict(self) -> dict:
         """Convert job to dictionary for API response."""

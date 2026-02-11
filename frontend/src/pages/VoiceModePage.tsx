@@ -48,7 +48,14 @@ async function checkVoiceServiceStatus(): Promise<{ available: boolean }> {
     return response.json()
 }
 
-async function uploadForTranscription(file: File): Promise<{ status: string; jobId?: string; message?: string }> {
+async function uploadForTranscription(file: File): Promise<{
+    status: string;
+    jobId?: string;
+    audioDuration?: number;
+    transcriptionDevice?: string;
+    diarizationDevice?: string;
+    message?: string;
+}> {
     const formData = new FormData()
     formData.append('file', file)
 
@@ -59,7 +66,10 @@ async function uploadForTranscription(file: File): Promise<{ status: string; job
     return response.json()
 }
 
-async function pollProgress(jobId: string): Promise<{ jobId: string; status: string; progress: number; stage: string }> {
+async function pollProgress(jobId: string): Promise<{
+    jobId: string; status: string; progress: number; stage: string;
+    audioDuration?: number; transcriptionDevice?: string; diarizationDevice?: string;
+}> {
     const response = await fetch(`${API_BASE}/minutes/voice/progress/${jobId}`)
     return response.json()
 }
@@ -76,6 +86,16 @@ async function generateFromTranscript(request: GenerateRequest): Promise<{ statu
         body: JSON.stringify(request),
     })
     return response.json()
+}
+
+async function cancelTranscription(jobId: string): Promise<void> {
+    try {
+        await fetch(`${API_BASE}/minutes/voice/cancel/${jobId}`, {
+            method: 'POST',
+        })
+    } catch (e) {
+        console.warn('Failed to cancel transcription:', e)
+    }
 }
 
 // Helper functions
@@ -125,6 +145,9 @@ export default function VoiceModePage() {
     const [transcriptionProgress, setTranscriptionProgress] = useState(0)
     const [transcriptionStage, setTranscriptionStage] = useState('')
     const [jobId, setJobId] = useState<string | null>(null)
+    const [estimatedTotalTime, setEstimatedTotalTime] = useState(0)
+    const startTimeRef = useRef<number>(0)
+    const animFrameRef = useRef<number>(0)
 
     // PDF Preview state
     const [showPdfPreview, setShowPdfPreview] = useState(false)
@@ -182,8 +205,21 @@ export default function VoiceModePage() {
 
             if (result.status === 'processing' && result.jobId) {
                 setJobId(result.jobId)
-                setTranscriptionProgress(5)
                 setTranscriptionStage('transcribing')
+
+                // Calculate estimated processing time
+                const duration = result.audioDuration || 60 // fallback 60s
+                const transDevice = result.transcriptionDevice || 'cpu'
+                const diarDevice = result.diarizationDevice || 'cpu'
+
+                // Estimation multipliers (processing_time = audio_duration * multiplier)
+                const transMultiplier = transDevice === 'cuda' ? 0.5 : 8.0
+                const convertMultiplier = 0.1
+                const diarMultiplier = diarDevice === 'cuda' ? 0.5 : 3.0
+
+                const estTime = duration * (transMultiplier + convertMultiplier + diarMultiplier)
+                setEstimatedTotalTime(estTime)
+                startTimeRef.current = Date.now()
             } else if (result.status === 'error') {
                 setError(result.message || 'Transcription failed')
                 setIsRetryable(true)
@@ -196,7 +232,22 @@ export default function VoiceModePage() {
         }
     }, [file])
 
-    // Poll for transcription progress
+    // Smooth timer-based progress animation
+    useEffect(() => {
+        if (!jobId || step !== 'processing' || estimatedTotalTime <= 0) return
+
+        const tick = () => {
+            const elapsed = (Date.now() - startTimeRef.current) / 1000
+            const rawProgress = Math.min((elapsed / estimatedTotalTime) * 100, 99)
+            setTranscriptionProgress(Math.round(rawProgress))
+            animFrameRef.current = requestAnimationFrame(tick)
+        }
+        animFrameRef.current = requestAnimationFrame(tick)
+
+        return () => cancelAnimationFrame(animFrameRef.current)
+    }, [jobId, step, estimatedTotalTime])
+
+    // Poll for stage changes and completion
     useEffect(() => {
         if (!jobId || step !== 'processing') return
 
@@ -204,11 +255,13 @@ export default function VoiceModePage() {
             try {
                 const progress = await pollProgress(jobId)
 
-                setTranscriptionProgress(progress.progress)
+                // Update stage from server (actual stage is authoritative)
                 setTranscriptionStage(progress.stage)
 
                 if (progress.status === 'completed') {
                     clearInterval(intervalId)
+                    cancelAnimationFrame(animFrameRef.current)
+                    setTranscriptionProgress(100)
                     // Fetch the full result
                     try {
                         const result = await fetchTranscriptionResult(jobId)
@@ -219,7 +272,8 @@ export default function VoiceModePage() {
                                 mapping[speaker] = `Speaker ${idx + 1}`
                             })
                             setSpeakerMapping(mapping)
-                            setStep('review')
+                            // Brief delay to show 100% before transitioning
+                            setTimeout(() => setStep('review'), 600)
                         } else {
                             setError(result.message || 'Failed to retrieve transcription result')
                             setIsRetryable(true)
@@ -233,17 +287,50 @@ export default function VoiceModePage() {
                     setJobId(null)
                 } else if (progress.status === 'failed') {
                     clearInterval(intervalId)
+                    cancelAnimationFrame(animFrameRef.current)
                     setError('Transcription failed. Please try again.')
                     setIsRetryable(true)
                     setStep('upload')
                     setJobId(null)
+                } else if (progress.status === 'cancelled') {
+                    clearInterval(intervalId)
+                    cancelAnimationFrame(animFrameRef.current)
+                    setJobId(null)
+                    setStep('upload')
                 }
             } catch {
                 // Silently retry — network blip
             }
-        }, 1500)
+        }, 2000)
 
-        return () => clearInterval(intervalId)
+        // Cleanup function to cancel job if unmounting while processing
+        return () => {
+            clearInterval(intervalId)
+            // Only cancel if we're still processing and unmounting (jobId check inside interval handles completion)
+            // We use a ref to track if component is unmounting vs just effect cleanup
+        }
+    }, [jobId, step])
+
+    // Handle page unload / navigation
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (jobId && step === 'processing') {
+                // Trigger cancellation beacon
+                navigator.sendBeacon(`${API_BASE}/minutes/voice/cancel/${jobId}`)
+                e.preventDefault()
+                e.returnValue = ''
+            }
+        }
+
+        window.addEventListener('beforeunload', handleBeforeUnload)
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload)
+            // If unmounting while processing (navigation within app), cancel the job
+            if (jobId && step === 'processing') {
+                cancelTranscription(jobId)
+            }
+        }
     }, [jobId, step])
 
     // Update speaker name
@@ -551,9 +638,8 @@ export default function VoiceModePage() {
                             {transcriptionStage === 'transcribing' && '🎧'}
                             {transcriptionStage === 'converting' && '🔄'}
                             {transcriptionStage === 'diarizing' && '🗣️'}
-                            {transcriptionStage === 'merging' && '✨'}
                             {transcriptionStage === 'completed' && '✅'}
-                            {!['uploading', 'transcribing', 'converting', 'diarizing', 'merging', 'completed'].includes(transcriptionStage) && '🎙️'}
+                            {!['uploading', 'transcribing', 'converting', 'diarizing', 'completed'].includes(transcriptionStage) && '🎙️'}
                         </div>
 
                         <h2 className="text-xl font-bold text-white">Transcribing Your Recording</h2>
@@ -566,10 +652,9 @@ export default function VoiceModePage() {
                                     {transcriptionStage === 'transcribing' && 'Transcribing audio with AI...'}
                                     {transcriptionStage === 'converting' && 'Converting audio format...'}
                                     {transcriptionStage === 'diarizing' && 'Detecting speakers...'}
-                                    {transcriptionStage === 'merging' && 'Finalizing transcript...'}
                                     {transcriptionStage === 'completed' && 'Complete!'}
                                     {transcriptionStage === 'queued' && 'Waiting in queue...'}
-                                    {!['uploading', 'transcribing', 'converting', 'diarizing', 'merging', 'completed', 'queued'].includes(transcriptionStage) && 'Processing...'}
+                                    {!['uploading', 'transcribing', 'converting', 'diarizing', 'completed', 'queued'].includes(transcriptionStage) && 'Processing...'}
                                 </span>
                                 <span className="text-sm font-bold text-purple-400">
                                     {transcriptionProgress}%
@@ -585,32 +670,47 @@ export default function VoiceModePage() {
                                     }}
                                     initial={{ width: '0%' }}
                                     animate={{ width: `${transcriptionProgress}%` }}
-                                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                                    transition={{ duration: 0.5, ease: 'linear' }}
                                 />
                             </div>
 
                             {/* Stage steps */}
                             <div className="mt-6 space-y-2 text-sm">
                                 {[
-                                    { key: 'transcribing', icon: '🎧', label: 'Transcribing audio', threshold: 10 },
-                                    { key: 'converting', icon: '🔄', label: 'Converting format', threshold: 42 },
-                                    { key: 'diarizing', icon: '🗣️', label: 'Detecting speakers', threshold: 55 },
-                                    { key: 'merging', icon: '✨', label: 'Finalizing', threshold: 92 },
-                                ].map((s) => (
-                                    <div
-                                        key={s.key}
-                                        className={`flex items-center gap-2 transition-all duration-300 ${transcriptionProgress >= s.threshold
-                                                ? transcriptionStage === s.key
-                                                    ? 'text-purple-300'
-                                                    : 'text-green-400'
-                                                : 'text-slate-600'
-                                            }`}
-                                    >
-                                        <span>{transcriptionProgress > s.threshold && transcriptionStage !== s.key ? '✓' : s.icon}</span>
-                                        <span>{s.label}</span>
-                                    </div>
-                                ))}
+                                    { key: 'transcribing', icon: '🎧', label: 'Transcribing audio', order: 0 },
+                                    { key: 'converting', icon: '🔄', label: 'Converting format', order: 1 },
+                                    { key: 'diarizing', icon: '🗣️', label: 'Detecting speakers', order: 2 },
+                                ].map((s) => {
+                                    const stageOrder: Record<string, number> = { transcribing: 0, converting: 1, diarizing: 2, completed: 3 }
+                                    const currentOrder = stageOrder[transcriptionStage] ?? -1
+                                    const isDone = currentOrder > s.order
+                                    const isActive = currentOrder === s.order
+                                    return (
+                                        <div
+                                            key={s.key}
+                                            className={`flex items-center gap-2 transition-all duration-300 ${isDone ? 'text-green-400' : isActive ? 'text-purple-300' : 'text-slate-600'
+                                                }`}
+                                        >
+                                            <span>{isDone ? '✓' : s.icon}</span>
+                                            <span>{s.label}</span>
+                                        </div>
+                                    )
+                                })}
                             </div>
+
+                            {/* Estimated time remaining */}
+                            {estimatedTotalTime > 0 && transcriptionProgress < 100 && (
+                                <p className="text-slate-500 mt-4 text-xs">
+                                    {(() => {
+                                        const elapsed = (Date.now() - startTimeRef.current) / 1000
+                                        const remaining = Math.max(0, estimatedTotalTime - elapsed)
+                                        if (remaining > 60) {
+                                            return `~${Math.ceil(remaining / 60)} min remaining`
+                                        }
+                                        return remaining > 5 ? `~${Math.ceil(remaining)}s remaining` : 'Almost done...'
+                                    })()}
+                                </p>
+                            )}
                         </div>
 
                         <p className="text-slate-500 mt-6 text-sm">
