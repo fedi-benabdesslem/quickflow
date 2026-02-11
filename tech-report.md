@@ -136,7 +136,6 @@ A comprehensive reference of all available backend endpoints.
 | `GET` | `/sync/status` | Get sync status and last sync timestamp. | - |
 | `POST` | `/{id}/usage` | Increment usage counter for contact (used for sorting). | - |
 | `PUT` | `/{id}/favorite` | Toggle favorite status for a contact. | - |
-| `PUT` | `/{id}/favorite` | Toggle favorite status for a contact. | - |
 
 #### Bookmarks (`/api/bookmarks`)
 | Method | Endpoint | Description | Request Body |
