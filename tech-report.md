@@ -185,7 +185,7 @@ A comprehensive reference of all available backend endpoints.
 A dedicated microservice optimized for GPU-accelerated audio processing.
 
 #### Core Components
--   **`main.py`**: FastAPI application entry point defining endpoints (`/transcribe`, `/diarize`, `/health`, `/status/{job_id}`, `/cancel/{job_id}`, `/result/{job_id}`, `/metrics`).
+-   **`main.py`**: FastAPI application entry point defining endpoints (`/transcribe`, `/diarize`, `/health`, `/status/{job_id}`, `/progress/{job_id}`, `/cancel/{job_id}`, `/result/{job_id}`, `/metrics`).
 -   **`transcription.py`**: Wraps `openai-whisper` for speech-to-text conversion. Handles model loading and VRAM management.
 -   **`diarization.py`**: Wraps `pyannote.audio` for speaker identification. Segments audio by speaker turns.
 -   **`job_manager.py`**: A robust async job queue using `asyncio.Semaphore` to limit concurrent GPU operations. Manages job lifecycle (Queued -> Processing -> Completed/Failed).
