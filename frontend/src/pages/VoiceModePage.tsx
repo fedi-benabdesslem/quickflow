@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { marked } from 'marked'
@@ -48,7 +48,7 @@ async function checkVoiceServiceStatus(): Promise<{ available: boolean }> {
     return response.json()
 }
 
-async function uploadForTranscription(file: File): Promise<{ status: string; data?: TranscriptResult; message?: string }> {
+async function uploadForTranscription(file: File): Promise<{ status: string; jobId?: string; message?: string }> {
     const formData = new FormData()
     formData.append('file', file)
 
@@ -56,6 +56,16 @@ async function uploadForTranscription(file: File): Promise<{ status: string; dat
         method: 'POST',
         body: formData,
     })
+    return response.json()
+}
+
+async function pollProgress(jobId: string): Promise<{ jobId: string; status: string; progress: number; stage: string }> {
+    const response = await fetch(`${API_BASE}/minutes/voice/progress/${jobId}`)
+    return response.json()
+}
+
+async function fetchTranscriptionResult(jobId: string): Promise<{ status: string; data?: TranscriptResult; message?: string }> {
+    const response = await fetch(`${API_BASE}/minutes/voice/job/${jobId}`)
     return response.json()
 }
 
@@ -111,6 +121,11 @@ export default function VoiceModePage() {
     const [isRetryable, setIsRetryable] = useState(false)
     const [serviceAvailable, setServiceAvailable] = useState<boolean | null>(null)
 
+    // Progress tracking state
+    const [transcriptionProgress, setTranscriptionProgress] = useState(0)
+    const [transcriptionStage, setTranscriptionStage] = useState('')
+    const [jobId, setJobId] = useState<string | null>(null)
+
     // PDF Preview state
     const [showPdfPreview, setShowPdfPreview] = useState(false)
     const [pdfFileId, setPdfFileId] = useState<string | null>(null)
@@ -153,26 +168,23 @@ export default function VoiceModePage() {
         if (droppedFile) handleFileSelect(droppedFile)
     }, [handleFileSelect])
 
-    // Upload and transcribe
+    // Upload and start async transcription
     const handleUpload = useCallback(async () => {
         if (!file) return
 
         setStep('processing')
         setError('')
+        setTranscriptionProgress(0)
+        setTranscriptionStage('uploading')
 
         try {
             const result = await uploadForTranscription(file)
 
-            if (result.status === 'success' && result.data) {
-                setTranscript(result.data)
-                // Initialize speaker mapping
-                const mapping: Record<string, string> = {}
-                result.data.speakers?.forEach((speaker, idx) => {
-                    mapping[speaker] = `Speaker ${idx + 1}`
-                })
-                setSpeakerMapping(mapping)
-                setStep('review')
-            } else {
+            if (result.status === 'processing' && result.jobId) {
+                setJobId(result.jobId)
+                setTranscriptionProgress(5)
+                setTranscriptionStage('transcribing')
+            } else if (result.status === 'error') {
                 setError(result.message || 'Transcription failed')
                 setIsRetryable(true)
                 setStep('upload')
@@ -183,6 +195,56 @@ export default function VoiceModePage() {
             setStep('upload')
         }
     }, [file])
+
+    // Poll for transcription progress
+    useEffect(() => {
+        if (!jobId || step !== 'processing') return
+
+        const intervalId = setInterval(async () => {
+            try {
+                const progress = await pollProgress(jobId)
+
+                setTranscriptionProgress(progress.progress)
+                setTranscriptionStage(progress.stage)
+
+                if (progress.status === 'completed') {
+                    clearInterval(intervalId)
+                    // Fetch the full result
+                    try {
+                        const result = await fetchTranscriptionResult(jobId)
+                        if (result.status === 'success' && result.data) {
+                            setTranscript(result.data)
+                            const mapping: Record<string, string> = {}
+                            result.data.speakers?.forEach((speaker: string, idx: number) => {
+                                mapping[speaker] = `Speaker ${idx + 1}`
+                            })
+                            setSpeakerMapping(mapping)
+                            setStep('review')
+                        } else {
+                            setError(result.message || 'Failed to retrieve transcription result')
+                            setIsRetryable(true)
+                            setStep('upload')
+                        }
+                    } catch {
+                        setError('Failed to retrieve transcription result')
+                        setIsRetryable(true)
+                        setStep('upload')
+                    }
+                    setJobId(null)
+                } else if (progress.status === 'failed') {
+                    clearInterval(intervalId)
+                    setError('Transcription failed. Please try again.')
+                    setIsRetryable(true)
+                    setStep('upload')
+                    setJobId(null)
+                }
+            } catch {
+                // Silently retry — network blip
+            }
+        }, 1500)
+
+        return () => clearInterval(intervalId)
+    }, [jobId, step])
 
     // Update speaker name
     const updateSpeakerName = useCallback((speakerId: string, name: string) => {
@@ -483,20 +545,77 @@ export default function VoiceModePage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="glass-card p-12 text-center"
                     >
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                            className="mx-auto w-16 h-16 rounded-full border-4 border-purple-500/30 border-t-purple-500"
-                        />
-                        <h2 className="text-xl font-bold text-white mt-6">Transcribing Your Recording</h2>
-                        <p className="text-slate-400 mt-2">
+                        {/* Stage icon */}
+                        <div className="text-5xl mb-6">
+                            {transcriptionStage === 'uploading' && '📤'}
+                            {transcriptionStage === 'transcribing' && '🎧'}
+                            {transcriptionStage === 'converting' && '🔄'}
+                            {transcriptionStage === 'diarizing' && '🗣️'}
+                            {transcriptionStage === 'merging' && '✨'}
+                            {transcriptionStage === 'completed' && '✅'}
+                            {!['uploading', 'transcribing', 'converting', 'diarizing', 'merging', 'completed'].includes(transcriptionStage) && '🎙️'}
+                        </div>
+
+                        <h2 className="text-xl font-bold text-white">Transcribing Your Recording</h2>
+
+                        {/* Progress bar */}
+                        <div className="mt-6 max-w-md mx-auto">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-sm text-slate-400">
+                                    {transcriptionStage === 'uploading' && 'Uploading file...'}
+                                    {transcriptionStage === 'transcribing' && 'Transcribing audio with AI...'}
+                                    {transcriptionStage === 'converting' && 'Converting audio format...'}
+                                    {transcriptionStage === 'diarizing' && 'Detecting speakers...'}
+                                    {transcriptionStage === 'merging' && 'Finalizing transcript...'}
+                                    {transcriptionStage === 'completed' && 'Complete!'}
+                                    {transcriptionStage === 'queued' && 'Waiting in queue...'}
+                                    {!['uploading', 'transcribing', 'converting', 'diarizing', 'merging', 'completed', 'queued'].includes(transcriptionStage) && 'Processing...'}
+                                </span>
+                                <span className="text-sm font-bold text-purple-400">
+                                    {transcriptionProgress}%
+                                </span>
+                            </div>
+
+                            {/* Bar background */}
+                            <div className="w-full h-3 bg-slate-700/50 rounded-full overflow-hidden">
+                                <motion.div
+                                    className="h-full rounded-full"
+                                    style={{
+                                        background: 'linear-gradient(90deg, #a855f7, #ec4899)',
+                                    }}
+                                    initial={{ width: '0%' }}
+                                    animate={{ width: `${transcriptionProgress}%` }}
+                                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                                />
+                            </div>
+
+                            {/* Stage steps */}
+                            <div className="mt-6 space-y-2 text-sm">
+                                {[
+                                    { key: 'transcribing', icon: '🎧', label: 'Transcribing audio', threshold: 10 },
+                                    { key: 'converting', icon: '🔄', label: 'Converting format', threshold: 42 },
+                                    { key: 'diarizing', icon: '🗣️', label: 'Detecting speakers', threshold: 55 },
+                                    { key: 'merging', icon: '✨', label: 'Finalizing', threshold: 92 },
+                                ].map((s) => (
+                                    <div
+                                        key={s.key}
+                                        className={`flex items-center gap-2 transition-all duration-300 ${transcriptionProgress >= s.threshold
+                                                ? transcriptionStage === s.key
+                                                    ? 'text-purple-300'
+                                                    : 'text-green-400'
+                                                : 'text-slate-600'
+                                            }`}
+                                    >
+                                        <span>{transcriptionProgress > s.threshold && transcriptionStage !== s.key ? '✓' : s.icon}</span>
+                                        <span>{s.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <p className="text-slate-500 mt-6 text-sm">
                             This may take a few minutes depending on the recording length...
                         </p>
-                        <div className="mt-6 space-y-2 text-sm text-slate-500">
-                            <p>🎧 Analyzing audio...</p>
-                            <p>🗣️ Detecting speakers...</p>
-                            <p>✍️ Generating transcript...</p>
-                        </div>
                     </motion.div>
                 )}
 

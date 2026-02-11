@@ -103,14 +103,14 @@ public class VoiceModeController {
         }
 
         try {
-            TranscriptResult result = transcriptionService.transcribe(file);
+            String jobId = transcriptionService.transcribeAsync(file);
 
             return ResponseEntity.ok(Map.of(
-                    "status", "success",
-                    "data", result));
+                    "status", "processing",
+                    "jobId", jobId));
 
         } catch (TranscriptionException e) {
-            logger.error("Transcription failed: {}", e.getMessage());
+            logger.error("Transcription submission failed: {}", e.getMessage());
             return ResponseEntity.status(503).body(Map.of(
                     "status", "error",
                     "message", e.getMessage(),
@@ -123,6 +123,22 @@ public class VoiceModeController {
                     "message", "Failed to process uploaded file"));
         } finally {
             MDC.remove("correlationId");
+        }
+    }
+
+    /**
+     * Get the progress of a transcription job.
+     * GET /api/minutes/voice/progress/{jobId}
+     */
+    @GetMapping("/progress/{jobId}")
+    public ResponseEntity<?> getJobProgress(@PathVariable String jobId) {
+        try {
+            Map<String, Object> progress = transcriptionService.getJobProgress(jobId);
+            return ResponseEntity.ok(progress);
+        } catch (TranscriptionException e) {
+            return ResponseEntity.status(404).body(Map.of(
+                    "status", "error",
+                    "message", e.getMessage()));
         }
     }
 
@@ -177,10 +193,23 @@ public class VoiceModeController {
     @GetMapping("/job/{jobId}")
     public ResponseEntity<?> getJobStatus(@PathVariable String jobId) {
         try {
-            TranscriptResult result = transcriptionService.getJobStatus(jobId);
-            return ResponseEntity.ok(Map.of(
-                    "status", "success",
-                    "data", result));
+            // First check progress
+            Map<String, Object> progress = transcriptionService.getJobProgress(jobId);
+            String status = (String) progress.get("status");
+
+            if ("completed".equals(status)) {
+                // Fetch the full result
+                TranscriptResult result = transcriptionService.getJobStatus(jobId);
+                return ResponseEntity.ok(Map.of(
+                        "status", "success",
+                        "data", result));
+            } else if ("failed".equals(status)) {
+                return ResponseEntity.ok(Map.of(
+                        "status", "error",
+                        "message", "Transcription failed"));
+            } else {
+                return ResponseEntity.ok(progress);
+            }
         } catch (TranscriptionException e) {
             return ResponseEntity.status(404).body(Map.of(
                     "status", "error",
