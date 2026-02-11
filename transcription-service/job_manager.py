@@ -22,6 +22,7 @@ class JobStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     TIMEOUT = "timeout"
+    CANCELLED = "cancelled"
 
 
 @dataclass
@@ -32,11 +33,15 @@ class TranscriptionJob:
     filename: str
     file_size: int
     status: JobStatus = JobStatus.QUEUED
+    progress: int = 0
+    stage: str = "queued"
+    audio_duration: Optional[float] = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     result: Optional[dict] = None
     error: Optional[str] = None
+    cancelled: bool = False
     
     def to_dict(self) -> dict:
         """Convert job to dictionary for API response."""
@@ -46,6 +51,8 @@ class TranscriptionJob:
             "filename": self.filename,
             "file_size": self.file_size,
             "status": self.status.value,
+            "progress": self.progress,
+            "stage": self.stage,
             "created_at": self.created_at.isoformat(),
             "started_at": self.started_at.isoformat() if self.started_at else None,
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
@@ -121,6 +128,23 @@ class JobManager:
                 job.error = error
                 
         logger.info(f"Job {job_id} status updated to {status.value}")
+    
+    async def update_progress(
+        self,
+        job_id: str,
+        progress: int,
+        stage: str
+    ) -> None:
+        """Update job progress and stage."""
+        job = self.jobs.get(job_id)
+        if not job:
+            return
+            
+        async with self._lock:
+            job.progress = min(max(progress, 0), 100)
+            job.stage = stage
+                
+        logger.debug(f"Job {job_id} progress: {progress}% ({stage})")
     
     async def acquire_slot(self) -> bool:
         """Acquire a processing slot (blocks until available)."""

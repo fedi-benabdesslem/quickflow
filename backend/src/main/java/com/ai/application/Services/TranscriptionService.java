@@ -21,7 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -246,11 +248,154 @@ public class TranscriptionService {
     public TranscriptResult getJobStatus(String jobId) throws TranscriptionException {
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(
-                    transcriptionServiceUrl + "/status/" + jobId,
+                    transcriptionServiceUrl + "/result/" + jobId,
                     String.class);
             return parseResponse(response.getBody());
         } catch (RestClientException e) {
             throw new TranscriptionException("Failed to get job status: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Submit an audio file for async transcription.
+     * Returns job info including device/duration for time estimation.
+     *
+     * @param audioFile The audio file to transcribe
+     * @return Map with jobId, audioDuration, transcriptionDevice, diarizationDevice
+     * @throws IOException            If file processing fails
+     * @throws TranscriptionException If submission fails
+     */
+    public Map<String, Object> transcribeAsync(MultipartFile audioFile) throws IOException, TranscriptionException {
+        String correlationId = MDC.get("correlationId");
+        if (correlationId == null) {
+            correlationId = UUID.randomUUID().toString();
+            MDC.put("correlationId", correlationId);
+        }
+
+        logger.info("Starting async transcription for file: {} (size: {} bytes)",
+                audioFile.getOriginalFilename(), audioFile.getSize());
+
+        // Check service health first
+        if (!serviceHealthy.get()) {
+            checkHealth();
+            if (!serviceHealthy.get()) {
+                throw new TranscriptionException("Transcription service is not available");
+            }
+        }
+
+        // Prepare multipart request
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.set("X-Correlation-ID", correlationId);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new ByteArrayResource(audioFile.getBytes()) {
+            @Override
+            public String getFilename() {
+                return audioFile.getOriginalFilename();
+            }
+        });
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    transcriptionServiceUrl + "/transcribe",
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class);
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new TranscriptionException("Transcription service returned: " + response.getStatusCode());
+            }
+
+            // Parse the job_id from response
+            JsonNode root = objectMapper.readTree(response.getBody());
+            String jobId = root.has("job_id") ? root.get("job_id").asText() : null;
+
+            if (jobId == null || jobId.isEmpty()) {
+                throw new TranscriptionException("No job ID returned from transcription service");
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("jobId", jobId);
+            if (root.has("audio_duration") && !root.get("audio_duration").isNull()) {
+                result.put("audioDuration", root.get("audio_duration").asDouble());
+            }
+            if (root.has("transcription_device") && !root.get("transcription_device").isNull()) {
+                result.put("transcriptionDevice", root.get("transcription_device").asText());
+            }
+            if (root.has("diarization_device") && !root.get("diarization_device").isNull()) {
+                result.put("diarizationDevice", root.get("diarization_device").asText());
+            }
+
+            logger.info("Async transcription submitted, job ID: {}", jobId);
+            return result;
+
+        } catch (RestClientException e) {
+            logger.error("Failed to connect to transcription service: {}", e.getMessage());
+            serviceHealthy.set(false);
+            throw new TranscriptionException("Transcription service unavailable: " + e.getMessage());
+        } catch (Exception e) {
+            if (e instanceof TranscriptionException)
+                throw (TranscriptionException) e;
+            logger.error("Failed to parse transcription response: {}", e.getMessage());
+            throw new TranscriptionException("Failed to process transcription response: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get progress of a transcription job from the Python service.
+     *
+     * @param jobId The job ID to check
+     * @return Map with job_id, status, progress (0-100), and stage
+     * @throws TranscriptionException If the request fails
+     */
+    public Map<String, Object> getJobProgress(String jobId) throws TranscriptionException {
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(
+                    transcriptionServiceUrl + "/progress/" + jobId,
+                    String.class);
+
+            JsonNode root = objectMapper.readTree(response.getBody());
+
+            Map<String, Object> progress = new HashMap<>();
+            progress.put("jobId", root.has("job_id") ? root.get("job_id").asText() : jobId);
+            progress.put("status", root.has("status") ? root.get("status").asText() : "unknown");
+            progress.put("progress", root.has("progress") ? root.get("progress").asInt() : 0);
+            progress.put("stage", root.has("stage") ? root.get("stage").asText() : "unknown");
+            if (root.has("audio_duration") && !root.get("audio_duration").isNull()) {
+                progress.put("audioDuration", root.get("audio_duration").asDouble());
+            }
+            if (root.has("transcription_device") && !root.get("transcription_device").isNull()) {
+                progress.put("transcriptionDevice", root.get("transcription_device").asText());
+            }
+            if (root.has("diarization_device") && !root.get("diarization_device").isNull()) {
+                progress.put("diarizationDevice", root.get("diarization_device").asText());
+            }
+
+            return progress;
+
+        } catch (RestClientException e) {
+            throw new TranscriptionException("Failed to get job progress: " + e.getMessage());
+        } catch (Exception e) {
+            throw new TranscriptionException("Failed to parse progress response: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Cancel a running transcription job.
+     */
+    public void cancelJob(String jobId) throws TranscriptionException {
+        try {
+            restTemplate.postForEntity(
+                    transcriptionServiceUrl + "/cancel/" + jobId,
+                    null,
+                    String.class);
+            logger.info("Cancelled job {}", jobId);
+        } catch (RestClientException e) {
+            logger.warn("Failed to cancel job {}: {}", jobId, e.getMessage());
+            // Don't throw - cancellation is best-effort
         }
     }
 

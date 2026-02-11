@@ -24,8 +24,10 @@ The backend is structured as a layered Spring Boot application.
 ### 2.2 Controllers (API Layer)
 REST endpoints that handle HTTP requests and responses.
 -   **`AuthController`**: Manages user authentication flows.
+-   **`BookmarkController`**: Manages user bookmarks for quick access to items.
 -   **`ContactsController`**: Manages contact CRUD operations, sync with Google/Microsoft, and search/autocomplete.
 -   **`EmailController`**: Handles general email sending operations via Gmail/Outlook.
+-   **`GroupController`**: Manages user groups for organizing contacts and sharing.
 -   **`HealthController`**: Provides a simple liveness probe endpoint (`/health`).
 -   **`MeetingController`**: Core logic for meeting management (CRUD).
 -   **`MeetingTemplateController`**: Manages the CRUD operations for user defined Meeting Templates.
@@ -114,6 +116,7 @@ A comprehensive reference of all available backend endpoints.
 | `POST` | `/quick/generate` | Quick Mode: Generates final minutes from extracted data. | `{ data: ExtractedData }` |
 | `POST` | `/structured/generate` | Structured Mode: Generates minutes from detailed form. | `StructuredModeRequest` |
 | `POST` | `/send` | Sends generated minutes email with PDF attachment. | `MinutesEmailRequest` |
+| `POST` | `/voice/cancel/{jobId}` | Cancels a running voice transcription job. | - |
 | `POST` | `/draft/quick` | (Legacy) Save Quick Mode draft. | `Map` |
 | `POST` | `/draft/structured`| (Legacy) Save Structured Mode draft. | `Map` |
 
@@ -134,6 +137,25 @@ A comprehensive reference of all available backend endpoints.
 | `POST` | `/{id}/usage` | Increment usage counter for contact (used for sorting). | - |
 | `PUT` | `/{id}/favorite` | Toggle favorite status for a contact. | - |
 
+#### Bookmarks (`/api/bookmarks`)
+| Method | Endpoint | Description | Request Body |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Get all bookmarks for the user. | - |
+| `POST` | `/` | Add a new bookmark. | `{ itemId, type }` |
+| `DELETE` | `/{itemId}` | Remove a bookmark. | - |
+
+#### Groups (`/api/groups`)
+| Method | Endpoint | Description | Request Body |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Get all groups for the user. | - |
+| `POST` | `/` | Create a new group. | `{ name, description, memberIds }` |
+| `GET` | `/{id}` | Get a specific group details. | - |
+| `PUT` | `/{id}` | Update a group. | `{ name, description, memberIds }` |
+| `DELETE` | `/{id}` | Delete a group. | - |
+| `POST` | `/{id}/members` | Add members to a group. | `{ memberIds }` |
+| `DELETE` | `/{id}/members/{memberId}` | Remove a member from a group. | - |
+| `GET` | `/search` | Search groups by name. | `?q=&limit=` |
+| `GET` | `/count` | Get total group count (for badges). | - |
 #### PDF (`/api/pdf`)
 | Method | Endpoint | Description | Request Body |
 | :--- | :--- | :--- | :--- |
@@ -163,7 +185,7 @@ A comprehensive reference of all available backend endpoints.
 A dedicated microservice optimized for GPU-accelerated audio processing.
 
 #### Core Components
--   **`main.py`**: FastAPI application entry point defining endpoints (`/transcribe`, `/diarize`, `/health`, `/status/{job_id}`).
+-   **`main.py`**: FastAPI application entry point defining endpoints (`/transcribe`, `/diarize`, `/health`, `/status/{job_id}`, `/progress/{job_id}`, `/cancel/{job_id}`, `/result/{job_id}`, `/metrics`).
 -   **`transcription.py`**: Wraps `openai-whisper` for speech-to-text conversion. Handles model loading and VRAM management.
 -   **`diarization.py`**: Wraps `pyannote.audio` for speaker identification. Segments audio by speaker turns.
 -   **`job_manager.py`**: A robust async job queue using `asyncio.Semaphore` to limit concurrent GPU operations. Manages job lifecycle (Queued -> Processing -> Completed/Failed).
