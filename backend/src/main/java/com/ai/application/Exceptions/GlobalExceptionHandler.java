@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleGlobalException(Exception ex, WebRequest request) {
         Map<String, String> body = Map.of(
                 "status", "error",
-                "message", "An unexpected error occurred: " + ex.getMessage()
+                "message", "An unexpected error occurred. Please try again later."
         );
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }

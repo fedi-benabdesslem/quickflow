@@ -53,9 +53,8 @@ public class PdfController {
                     "message", "PDF generated successfully"));
 
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "PDF generation failed: " + e.getMessage()));
+                    .body(Map.of("error", "PDF generation failed"));
         }
     }
 
