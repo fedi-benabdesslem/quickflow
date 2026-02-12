@@ -224,8 +224,8 @@ public class ContactController {
         try {
             String userId = authentication.getName();
             // Verify contact belongs to user
-            var existing = contactService.getContactById(id);
-            if (existing == null || !userId.equals(existing.getUserId())) {
+            var existingContact = contactService.getContactById(id);
+            if (existingContact.isEmpty() || !userId.equals(existingContact.get().getUserId())) {
                 return ResponseEntity.status(403)
                         .body(Map.of("error", "Access denied"));
             }
@@ -258,8 +258,8 @@ public class ContactController {
     public ResponseEntity<?> deleteContact(Authentication authentication, @PathVariable String id) {
         try {
             String userId = authentication.getName();
-            var existing = contactService.getContactById(id);
-            if (existing == null || !userId.equals(existing.getUserId())) {
+            var existingContact = contactService.getContactById(id);
+            if (existingContact.isEmpty() || !userId.equals(existingContact.get().getUserId())) {
                 return ResponseEntity.status(403)
                         .body(Map.of("error", "Access denied"));
             }
@@ -279,8 +279,8 @@ public class ContactController {
     public ResponseEntity<?> toggleFavorite(Authentication authentication, @PathVariable String id) {
         try {
             String userId = authentication.getName();
-            var existing = contactService.getContactById(id);
-            if (existing == null || !userId.equals(existing.getUserId())) {
+            var existingContact = contactService.getContactById(id);
+            if (existingContact.isEmpty() || !userId.equals(existingContact.get().getUserId())) {
                 return ResponseEntity.status(403)
                         .body(Map.of("error", "Access denied"));
             }

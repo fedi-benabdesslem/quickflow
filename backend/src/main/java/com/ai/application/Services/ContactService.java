@@ -247,8 +247,8 @@ public class ContactService {
     /**
      * Get a single contact by ID.
      */
-    public Contact getContactById(String id) {
-        return contactRepository.findById(id).orElse(null);
+    public Optional<Contact> getContactById(String id) {
+        return contactRepository.findById(id);
     }
 
     /**
