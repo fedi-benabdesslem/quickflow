@@ -78,7 +78,7 @@ public class GmailService {
             System.err.println("[GmailService] ERROR: No valid access token - refresh failed or no token exists");
             throw new Exception("No valid access token available. Please sign in again.");
         }
-        System.out.println("[GmailService] Got access token (length: " + accessToken.length() + ")");
+        System.out.println("[GmailService] Got valid access token");
 
         // Get user's email address
         TokenStorageService.DecryptedTokens tokens = tokenStorageService.getDecryptedTokens(supabaseId);
@@ -87,7 +87,7 @@ public class GmailService {
             throw new Exception("No stored tokens found for user.");
         }
         String fromEmail = tokens.getEmail();
-        System.out.println("[GmailService] Sending from email: " + fromEmail + " to: " + to);
+        System.out.println("[GmailService] Sending email to: " + to);
 
         // Create Gmail service
         Gmail gmail = createGmailService(accessToken);

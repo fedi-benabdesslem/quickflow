@@ -241,8 +241,9 @@ public class HistoryController {
         return emailRepository.findById(id)
                 .map(email -> {
                     // Security check: ensure email belongs to user
-                    // Note: Email entity has userId field but existing findById doesn't check it
-                    // Ideally we should check if email.getUserId().equals(userId)
+                    if (!userId.equals(email.getUserId())) {
+                        return ResponseEntity.status(403).build();
+                    }
 
                     boolean bookmarked = bookmarkRepository.findByUserIdAndItemId(userId, id).isPresent();
                     // Map to response object fitting frontend interface
@@ -269,6 +270,10 @@ public class HistoryController {
 
         return meetingRepository.findById(id)
                 .map(meeting -> {
+                    // Security check: ensure meeting belongs to user
+                    if (!userId.equals(meeting.getUserId())) {
+                        return ResponseEntity.status(403).build();
+                    }
                     boolean bookmarked = bookmarkRepository.findByUserIdAndItemId(userId, id).isPresent();
                     return ResponseEntity.ok(new Object() {
                         public String id = meeting.getId();
@@ -288,9 +293,18 @@ public class HistoryController {
     }
 
     @DeleteMapping("/{type}/{id}")
-    public ResponseEntity<?> deleteItem(@PathVariable String type, @PathVariable String id) {
+    public ResponseEntity<?> deleteItem(@PathVariable String type, @PathVariable String id,
+            java.security.Principal principal) {
+        String userId = getCurrentUserId(principal);
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
         if ("email".equalsIgnoreCase(type)) {
             return emailRepository.findById(id).map(email -> {
+                if (!userId.equals(email.getUserId())) {
+                    return ResponseEntity.status(403).build();
+                }
                 email.setDeleted(true);
                 email.setDeletedAt(LocalDateTime.now());
                 emailRepository.save(email);
@@ -298,6 +312,9 @@ public class HistoryController {
             }).orElse(ResponseEntity.notFound().build());
         } else if ("minute".equalsIgnoreCase(type)) {
             return meetingRepository.findById(id).map(meeting -> {
+                if (!userId.equals(meeting.getUserId())) {
+                    return ResponseEntity.status(403).build();
+                }
                 meeting.setDeleted(true);
                 meeting.setDeletedAt(LocalDateTime.now());
                 meetingRepository.save(meeting);

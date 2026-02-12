@@ -57,10 +57,7 @@ public class AuthController {
         String email = (String) body.get("email");
 
         System.out.println("[AuthController] Storing tokens for user: " + supabaseId);
-        System.out.println("[AuthController] Provider: " + provider + ", Email: " + email);
-        System.out.println("[AuthController] Access token present: " + (accessToken != null && !accessToken.isEmpty()));
-        System.out.println(
-                "[AuthController] Refresh token present: " + (refreshToken != null && !refreshToken.isEmpty()));
+        System.out.println("[AuthController] Provider: " + provider);
 
         // Handle expiresIn - can be integer or long
         long expiresIn = 3600; // default 1 hour
@@ -106,7 +103,7 @@ public class AuthController {
             e.printStackTrace();
             return ResponseEntity.status(500).body(Map.of(
                     "status", "error",
-                    "message", "Failed to store tokens: " + e.getMessage()));
+                    "message", "Failed to store tokens"));
         }
     }
 

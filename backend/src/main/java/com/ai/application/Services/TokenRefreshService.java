@@ -61,8 +61,6 @@ public class TokenRefreshService {
         }
 
         System.out.println("[TokenRefreshService] Found tokens - provider: " + tokens.getProvider());
-        System.out.println("[TokenRefreshService] Token expires at: " + tokens.getExpiresAt());
-        System.out.println("[TokenRefreshService] Is expired or expiring soon: " + tokens.isExpiredOrExpiringSoon());
 
         // If token is not expired, return existing
         if (!tokens.isExpiredOrExpiringSoon()) {
