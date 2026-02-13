@@ -6,7 +6,7 @@ import TechSupportButton from '../components/TechSupportButton'
 import PdfPreviewModal from '../components/PdfPreviewModal'
 import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
 import RichTextEditor from '../components/RichTextEditor'
-import { generatePdf, type Contact } from '../lib/api'
+import api, { generatePdf, type Contact } from '../lib/api'
 
 // Types
 interface TranscriptSegment {
@@ -40,10 +40,11 @@ interface GenerateRequest {
     meetingLocation: string
 }
 
-// API calls
+// API calls - status check is public, all others use authenticated api instance
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 async function checkVoiceServiceStatus(): Promise<{ available: boolean }> {
+    // Status endpoint is public (no auth required)
     const response = await fetch(`${API_BASE}/minutes/voice/status`)
     return response.json()
 }
@@ -59,40 +60,33 @@ async function uploadForTranscription(file: File): Promise<{
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(`${API_BASE}/minutes/voice/transcribe`, {
-        method: 'POST',
-        body: formData,
+    const response = await api.post('/minutes/voice/transcribe', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
     })
-    return response.json()
+    return response.data
 }
 
 async function pollProgress(jobId: string): Promise<{
     jobId: string; status: string; progress: number; stage: string;
     audioDuration?: number; transcriptionDevice?: string; diarizationDevice?: string;
 }> {
-    const response = await fetch(`${API_BASE}/minutes/voice/progress/${jobId}`)
-    return response.json()
+    const response = await api.get(`/minutes/voice/progress/${jobId}`)
+    return response.data
 }
 
 async function fetchTranscriptionResult(jobId: string): Promise<{ status: string; data?: TranscriptResult; message?: string }> {
-    const response = await fetch(`${API_BASE}/minutes/voice/job/${jobId}`)
-    return response.json()
+    const response = await api.get(`/minutes/voice/job/${jobId}`)
+    return response.data
 }
 
 async function generateFromTranscript(request: GenerateRequest): Promise<{ status: string; content?: string; message?: string }> {
-    const response = await fetch(`${API_BASE}/minutes/voice/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-    })
-    return response.json()
+    const response = await api.post('/minutes/voice/generate', request)
+    return response.data
 }
 
 async function cancelTranscription(jobId: string): Promise<void> {
     try {
-        await fetch(`${API_BASE}/minutes/voice/cancel/${jobId}`, {
-            method: 'POST',
-        })
+        await api.post(`/minutes/voice/cancel/${jobId}`)
     } catch (e) {
         console.warn('Failed to cancel transcription:', e)
     }
