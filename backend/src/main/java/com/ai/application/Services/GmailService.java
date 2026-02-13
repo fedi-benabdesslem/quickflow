@@ -91,11 +91,7 @@ public class GmailService {
             throw new Exception("No stored tokens found for user.");
         }
         String fromEmail = tokens.getEmail();
-        // Mask recipient email to protect PII in logs
-        String maskedRecipient = to != null && to.contains("@") 
-            ? to.substring(0, Math.min(3, to.indexOf("@"))) + "***@" + to.substring(to.indexOf("@") + 1)
-            : "***";
-        logger.info("Sending email to: {}", maskedRecipient);
+        logger.info("Sending email from: {} to: {}", maskEmail(fromEmail), maskEmail(to));
 
         // Create Gmail service
         Gmail gmail = createGmailService(accessToken);
@@ -112,6 +108,23 @@ public class GmailService {
         logger.info("Email sent successfully via Gmail API");
 
         return true;
+    }
+
+    /**
+     * Masks an email address to protect PII in logs.
+     * Shows only the domain and masks the local part.
+     * Example: "user@example.com" -> "***@example.com"
+     */
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "***";
+        }
+        int atIndex = email.indexOf("@");
+        if (atIndex <= 0) {
+            return "***";
+        }
+        // Only show domain to protect PII
+        return "***@" + email.substring(atIndex + 1);
     }
 
     /**
