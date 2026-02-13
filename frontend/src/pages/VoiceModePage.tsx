@@ -309,8 +309,18 @@ export default function VoiceModePage() {
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (jobId && step === 'processing') {
-                // Trigger cancellation beacon
-                navigator.sendBeacon(`${API_BASE}/minutes/voice/cancel/${jobId}`)
+                // Use fetch with keepalive to include auth header (sendBeacon cannot attach Authorization)
+                const authHeader = api.defaults.headers.common['Authorization']
+                if (authHeader) {
+                    fetch(`${API_BASE}/minutes/voice/cancel/${jobId}`, {
+                        method: 'POST',
+                        keepalive: true,
+                        headers: {
+                            'Authorization': authHeader as string,
+                            'Content-Type': 'application/json'
+                        }
+                    }).catch(err => console.warn('Failed to cancel on unload:', err))
+                }
                 e.preventDefault()
                 e.returnValue = ''
             }
