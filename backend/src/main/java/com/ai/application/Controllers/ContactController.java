@@ -223,9 +223,13 @@ public class ContactController {
             @RequestBody UpdateContactRequest request) {
         try {
             String userId = authentication.getName();
-            // Verify contact belongs to user
+            // Verify contact exists and belongs to user
             var existingContact = contactService.getContactById(id);
-            if (existingContact.isEmpty() || !userId.equals(existingContact.get().getUserId())) {
+            if (existingContact.isEmpty()) {
+                return ResponseEntity.status(404)
+                        .body(Map.of("error", "Contact not found"));
+            }
+            if (!userId.equals(existingContact.get().getUserId())) {
                 return ResponseEntity.status(403)
                         .body(Map.of("error", "Access denied"));
             }
