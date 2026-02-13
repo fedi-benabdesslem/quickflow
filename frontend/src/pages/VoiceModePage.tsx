@@ -320,6 +320,8 @@ export default function VoiceModePage() {
                             'Content-Type': 'application/json'
                         }
                     }).catch(err => console.warn(`Failed to cancel job ${jobId} on unload:`, err))
+                } else {
+                    console.warn(`Cannot cancel job ${jobId} on unload: auth token not available`)
                 }
                 e.preventDefault()
                 e.returnValue = ''
