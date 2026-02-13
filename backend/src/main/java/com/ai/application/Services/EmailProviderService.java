@@ -58,9 +58,6 @@ public class EmailProviderService {
         UserToken userToken = userTokenOpt.get();
         String provider = userToken.getProvider();
         System.out.println("[EmailProviderService] Found token for user, provider: " + provider);
-        System.out.println("[EmailProviderService] Token expires at: " + userToken.getExpiresAt());
-        System.out.println(
-                "[EmailProviderService] Token expired or expiring soon: " + userToken.isTokenExpiredOrExpiringSoon());
 
         // Check if user can send emails
         if (!userToken.canSendEmail()) {

@@ -48,8 +48,14 @@ public class SupportController {
         String supportRecipients = "fadib.abdesslem2004@gmail.com, oussemabenameur9@gmail.com";
         String subject = "user report on quickflow";
 
-        // Convert message to HTML format
-        String htmlContent = "<p>" + message.replace("\n", "</p><p>") + "</p>";
+        // Convert message to HTML format (sanitize to prevent HTML injection)
+        String sanitized = message
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#x27;");
+        String htmlContent = "<p>" + sanitized.replace("\n", "</p><p>") + "</p>";
 
         EmailProviderService.SendResult result = emailProviderService.sendEmail(
                 supabaseId, supportRecipients, subject, htmlContent);

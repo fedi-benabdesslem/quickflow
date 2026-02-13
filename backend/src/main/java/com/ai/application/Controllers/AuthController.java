@@ -1,6 +1,8 @@
 package com.ai.application.Controllers;
 
 import com.ai.application.Services.TokenStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final TokenStorageService tokenStorageService;
 
@@ -57,10 +61,7 @@ public class AuthController {
         String email = (String) body.get("email");
 
         System.out.println("[AuthController] Storing tokens for user: " + supabaseId);
-        System.out.println("[AuthController] Provider: " + provider + ", Email: " + email);
-        System.out.println("[AuthController] Access token present: " + (accessToken != null && !accessToken.isEmpty()));
-        System.out.println(
-                "[AuthController] Refresh token present: " + (refreshToken != null && !refreshToken.isEmpty()));
+        System.out.println("[AuthController] Provider: " + provider);
 
         // Handle expiresIn - can be integer or long
         long expiresIn = 3600; // default 1 hour
@@ -97,16 +98,15 @@ public class AuthController {
                     refreshToken,
                     expiresIn);
 
-            System.out.println("[AuthController] SUCCESS: Tokens stored successfully for user: " + supabaseId);
+            logger.info("Tokens stored successfully for user");
             return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", "Tokens stored successfully"));
         } catch (Exception e) {
-            System.err.println("[AuthController] ERROR: Failed to store tokens: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Failed to store tokens", e);
             return ResponseEntity.status(500).body(Map.of(
                     "status", "error",
-                    "message", "Failed to store tokens: " + e.getMessage()));
+                    "message", "Failed to store tokens"));
         }
     }
 
