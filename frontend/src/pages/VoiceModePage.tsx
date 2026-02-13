@@ -310,13 +310,13 @@ export default function VoiceModePage() {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (jobId && step === 'processing') {
                 // Use fetch with keepalive to include auth header (sendBeacon cannot attach Authorization)
-                const authToken = api.defaults.headers.common['Authorization']
-                if (authToken) {
+                const authHeaderValue = api.defaults.headers.common['Authorization']
+                if (authHeaderValue) {
                     fetch(`${API_BASE}/minutes/voice/cancel/${jobId}`, {
                         method: 'POST',
                         keepalive: true,
                         headers: {
-                            'Authorization': authToken as string,
+                            'Authorization': authHeaderValue as string,
                             'Content-Type': 'application/json'
                         }
                     }).catch(err => console.warn(`Failed to cancel job ${jobId} on unload:`, err))
