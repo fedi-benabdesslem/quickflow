@@ -8,6 +8,8 @@ import com.google.api.services.gmail.model.Message;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import jakarta.activation.DataHandler;
@@ -30,6 +32,8 @@ import java.util.Properties;
  */
 @Service
 public class GmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GmailService.class);
 
     private static final String APPLICATION_NAME = "QuickFlow";
     private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
@@ -70,38 +74,42 @@ public class GmailService {
      */
     public boolean sendEmailWithAttachment(String supabaseId, String to, String subject,
             String htmlBody, byte[] pdfBytes, String pdfFilename) throws Exception {
-        System.out.println("[GmailService] sendEmailWithAttachment called for user: " + supabaseId);
+        logger.debug("sendEmailWithAttachment called");
 
         // Get or refresh access token
         String accessToken = tokenRefreshService.refreshTokenIfNeeded(supabaseId);
         if (accessToken == null) {
-            System.err.println("[GmailService] ERROR: No valid access token - refresh failed or no token exists");
+            logger.error("No valid access token - refresh failed or no token exists");
             throw new Exception("No valid access token available. Please sign in again.");
         }
-        System.out.println("[GmailService] Got valid access token");
+        logger.debug("Got valid access token");
 
         // Get user's email address
         TokenStorageService.DecryptedTokens tokens = tokenStorageService.getDecryptedTokens(supabaseId);
         if (tokens == null) {
-            System.err.println("[GmailService] ERROR: No stored tokens found for user");
+            logger.error("No stored tokens found for user");
             throw new Exception("No stored tokens found for user.");
         }
         String fromEmail = tokens.getEmail();
-        System.out.println("[GmailService] Sending email to: " + to);
+        // Mask recipient email to protect PII in logs
+        String maskedRecipient = to != null && to.contains("@") 
+            ? to.substring(0, Math.min(3, to.indexOf("@"))) + "***@" + to.substring(to.indexOf("@") + 1)
+            : "***";
+        logger.info("Sending email to: {}", maskedRecipient);
 
         // Create Gmail service
         Gmail gmail = createGmailService(accessToken);
-        System.out.println("[GmailService] Gmail service created successfully");
+        logger.debug("Gmail service created successfully");
 
         // Create MIME message
         MimeMessage mimeMessage = createMimeMessage(fromEmail, to, subject, htmlBody, pdfBytes, pdfFilename);
-        System.out.println("[GmailService] MIME message created, subject: " + subject);
+        logger.debug("MIME message created, subject: {}", subject);
 
         // Encode and send
         Message message = createMessageFromMimeMessage(mimeMessage);
-        System.out.println("[GmailService] Sending message via Gmail API...");
+        logger.debug("Sending message via Gmail API...");
         gmail.users().messages().send("me", message).execute();
-        System.out.println("[GmailService] SUCCESS: Email sent via Gmail API!");
+        logger.info("Email sent successfully via Gmail API");
 
         return true;
     }
