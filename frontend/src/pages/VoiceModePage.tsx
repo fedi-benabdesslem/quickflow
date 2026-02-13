@@ -41,12 +41,11 @@ interface GenerateRequest {
 }
 
 // API calls - status check is public, all others use authenticated api instance
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 async function checkVoiceServiceStatus(): Promise<{ available: boolean }> {
-    // Status endpoint is public (no auth required)
-    const response = await fetch(`${API_BASE}/minutes/voice/status`)
-    return response.json()
+    // Status endpoint is public (no auth required) but uses the shared api instance
+    const response = await api.get('/minutes/voice/status')
+    return response.data
 }
 
 async function uploadForTranscription(file: File): Promise<{
