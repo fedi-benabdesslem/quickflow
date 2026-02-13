@@ -120,7 +120,8 @@ public class GmailService {
             return "***";
         }
         int atIndex = email.indexOf("@");
-        if (atIndex <= 0) {
+        if (atIndex == 0) {
+            // Email starts with '@', mask everything
             return "***";
         }
         // Only show domain to protect PII
