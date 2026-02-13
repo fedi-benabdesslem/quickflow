@@ -3,6 +3,8 @@ package com.ai.application.Controllers;
 import com.ai.application.Services.GridFsService;
 import com.ai.application.Services.PdfGenerationService;
 import com.ai.application.model.PdfGenerationRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,6 +16,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/pdf")
 public class PdfController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PdfController.class);
 
     private final PdfGenerationService pdfGenerationService;
     private final GridFsService gridFsService;
@@ -53,6 +57,7 @@ public class PdfController {
                     "message", "PDF generated successfully"));
 
         } catch (Exception e) {
+            logger.error("Error generating PDF", e);
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "PDF generation failed"));
         }
