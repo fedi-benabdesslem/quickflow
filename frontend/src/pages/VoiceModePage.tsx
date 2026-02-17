@@ -311,7 +311,7 @@ export default function VoiceModePage() {
                 // Use fetch with keepalive to include auth header (sendBeacon cannot attach Authorization)
                 const authHeaderValue = api.defaults.headers.common['Authorization']
                 if (authHeaderValue) {
-                    fetch(`${API_BASE}/minutes/voice/cancel/${jobId}`, {
+                    fetch(`${api.defaults.baseURL}/minutes/voice/cancel/${jobId}`, {
                         method: 'POST',
                         keepalive: true,
                         headers: {
