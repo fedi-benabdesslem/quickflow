@@ -1,9 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import UserAvatar from '../components/UserAvatar'
 import TechSupportButton from '../components/TechSupportButton'
+import SmtpSetupModal from '../components/SmtpSetupModal'
+import { getSmtpStatus, testSmtp, removeSmtp, type SmtpStatusResponse } from '../lib/api'
 
 export default function ProfilePage() {
     const navigate = useNavigate()
@@ -16,6 +18,22 @@ export default function ProfilePage() {
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
     const [hasChanges, setHasChanges] = useState(false)
 
+    // SMTP state
+    const [smtpStatus, setSmtpStatus] = useState<SmtpStatusResponse | null>(null)
+    const [showSmtpModal, setShowSmtpModal] = useState(false)
+    const [smtpModalMode, setSmtpModalMode] = useState<'setup' | 'update'>('setup')
+    const [smtpLoading, setSmtpLoading] = useState(false)
+    const [smtpFeedback, setSmtpFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+    useEffect(() => {
+        loadSmtpStatus()
+    }, [])
+
+    const loadSmtpStatus = async () => {
+        const status = await getSmtpStatus()
+        setSmtpStatus(status)
+    }
+
     const handleNameChange = (value: string) => {
         setDisplayName(value)
         setHasChanges(true)
@@ -26,13 +44,11 @@ export default function ProfilePage() {
         const file = e.target.files?.[0]
         if (!file) return
 
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             setFeedback({ type: 'error', message: 'Please select an image file.' })
             return
         }
 
-        // Validate file size (max 500KB for base64 storage in metadata)
         if (file.size > 500 * 1024) {
             setFeedback({ type: 'error', message: 'Image must be under 500KB. Please use a smaller image.' })
             return
@@ -92,6 +108,37 @@ export default function ProfilePage() {
         }
 
         setSaving(false)
+    }
+
+    const handleTestSmtp = async () => {
+        setSmtpLoading(true)
+        setSmtpFeedback(null)
+        const result = await testSmtp()
+        if ((result as any).success) {
+            setSmtpFeedback({ type: 'success', message: 'Test email sent! Check your inbox.' })
+        } else {
+            setSmtpFeedback({ type: 'error', message: (result as any).message || 'Failed to send test email.' })
+        }
+        setSmtpLoading(false)
+    }
+
+    const handleDisconnectSmtp = async () => {
+        if (!confirm('Are you sure you want to disconnect email sending? You can set it up again later.')) return
+        setSmtpLoading(true)
+        setSmtpFeedback(null)
+        const result = await removeSmtp()
+        if ((result as any).success) {
+            setSmtpFeedback({ type: 'success', message: 'Email configuration removed.' })
+            await loadSmtpStatus()
+        } else {
+            setSmtpFeedback({ type: 'error', message: (result as any).message || 'Failed to remove configuration.' })
+        }
+        setSmtpLoading(false)
+    }
+
+    const handleSmtpConfigured = () => {
+        loadSmtpStatus()
+        setSmtpFeedback({ type: 'success', message: 'Email sending configured successfully!' })
     }
 
     return (
@@ -210,8 +257,8 @@ export default function ProfilePage() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             className={`mt-6 p-3 rounded-lg text-sm ${feedback.type === 'success'
-                                    ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
-                                    : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                                ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                                : 'bg-red-500/10 border border-red-500/20 text-red-400'
                                 }`}
                         >
                             {feedback.message}
@@ -236,7 +283,101 @@ export default function ProfilePage() {
                         )}
                     </motion.button>
                 </div>
+
+                {/* SMTP Email Configuration Section */}
+                {smtpStatus && !smtpStatus.isOAuth && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="glass-card p-8 mt-6"
+                    >
+                        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            ✉️ Email Sending Configuration
+                        </h2>
+
+                        <div className="space-y-3">
+                            {/* Provider Info */}
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-slate-400">Provider</span>
+                                <span className="text-sm text-white font-medium">{smtpStatus.providerName}</span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-slate-400">Status</span>
+                                <span className={`text-sm font-medium ${smtpStatus.smtpConfigured ? 'text-emerald-400' : 'text-slate-500'}`}>
+                                    {smtpStatus.smtpConfigured ? '✅ Connected' : '❌ Not configured'}
+                                </span>
+                            </div>
+
+                            {/* SMTP Feedback */}
+                            {smtpFeedback && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className={`p-3 rounded-lg text-sm ${smtpFeedback.type === 'success'
+                                        ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                                        : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                                        }`}
+                                >
+                                    {smtpFeedback.message}
+                                </motion.div>
+                            )}
+
+                            {/* Actions */}
+                            {smtpStatus.smtpConfigured ? (
+                                <div className="flex flex-wrap gap-2 pt-2">
+                                    <button
+                                        onClick={handleTestSmtp}
+                                        disabled={smtpLoading}
+                                        className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors disabled:opacity-50"
+                                    >
+                                        {smtpLoading ? 'Sending...' : 'Send Test Email'}
+                                    </button>
+                                    <button
+                                        onClick={() => { setSmtpModalMode('update'); setShowSmtpModal(true) }}
+                                        className="px-4 py-2 text-sm bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg border border-white/10 transition-colors"
+                                    >
+                                        Update Password
+                                    </button>
+                                    <button
+                                        onClick={handleDisconnectSmtp}
+                                        disabled={smtpLoading}
+                                        className="px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                                    >
+                                        Disconnect
+                                    </button>
+                                </div>
+                            ) : smtpStatus.providerSupported && !smtpStatus.providerBlocked ? (
+                                <button
+                                    onClick={() => { setSmtpModalMode('setup'); setShowSmtpModal(true) }}
+                                    className="mt-2 w-full px-4 py-3 text-sm bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors font-medium"
+                                >
+                                    Set Up Email Sending
+                                </button>
+                            ) : smtpStatus.providerBlocked ? (
+                                <p className="text-sm text-yellow-500/80 pt-1">
+                                    ⚠️ Your email provider does not support third-party email sending.
+                                </p>
+                            ) : (
+                                <p className="text-sm text-slate-500 pt-1">
+                                    Email sending is not available for your provider.
+                                </p>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
             </motion.div>
+
+            {/* SMTP Setup Modal */}
+            <SmtpSetupModal
+                email={user?.email || ''}
+                isOpen={showSmtpModal}
+                onClose={() => setShowSmtpModal(false)}
+                onConfigured={handleSmtpConfigured}
+                mode={smtpModalMode}
+            />
         </div>
     )
 }
+

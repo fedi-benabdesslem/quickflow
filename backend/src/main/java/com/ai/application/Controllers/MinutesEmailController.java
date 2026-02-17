@@ -136,6 +136,10 @@ public class MinutesEmailController {
                     "status", "success",
                     "message", "Meeting minutes sent successfully",
                     "recipientCount", request.getRecipients().size()));
+        } else if (result.isSmtpNotConfigured()) {
+            return ResponseEntity.ok(Map.of(
+                    "status", "smtp_not_configured",
+                    "message", result.getMessage()));
         } else if (result.isUnsupportedProvider()) {
             return ResponseEntity.ok(Map.of(
                     "status", "unsupported",

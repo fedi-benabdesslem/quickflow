@@ -35,6 +35,15 @@ public class UserToken {
     /** When the access token expires */
     private LocalDateTime expiresAt;
 
+    /** Encrypted SMTP app-specific password */
+    private String smtpPasswordEncrypted;
+
+    /** Whether SMTP has been configured with an app password */
+    private boolean smtpConfigured;
+
+    /** Whether the user skipped SMTP setup */
+    private boolean smtpSetupSkipped;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -142,6 +151,35 @@ public class UserToken {
      * email/password).
      */
     public boolean canSendEmail() {
-        return "google".equalsIgnoreCase(provider) || "azure".equalsIgnoreCase(provider);
+        return "google".equalsIgnoreCase(provider) || "azure".equalsIgnoreCase(provider) || smtpConfigured;
+    }
+
+    // SMTP Getters and Setters
+
+    public String getSmtpPasswordEncrypted() {
+        return smtpPasswordEncrypted;
+    }
+
+    public void setSmtpPasswordEncrypted(String smtpPasswordEncrypted) {
+        this.smtpPasswordEncrypted = smtpPasswordEncrypted;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isSmtpConfigured() {
+        return smtpConfigured;
+    }
+
+    public void setSmtpConfigured(boolean smtpConfigured) {
+        this.smtpConfigured = smtpConfigured;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isSmtpSetupSkipped() {
+        return smtpSetupSkipped;
+    }
+
+    public void setSmtpSetupSkipped(boolean smtpSetupSkipped) {
+        this.smtpSetupSkipped = smtpSetupSkipped;
+        this.updatedAt = LocalDateTime.now();
     }
 }

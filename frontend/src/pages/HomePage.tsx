@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
@@ -5,11 +6,29 @@ import { useSidebar } from '../contexts/SidebarContext'
 import UserAvatar from '../components/UserAvatar'
 import UserProfileSidebar from '../components/UserProfileSidebar'
 import TechSupportButton from '../components/TechSupportButton'
+import SmtpSetupModal from '../components/SmtpSetupModal'
+import { getSmtpStatus } from '../lib/api'
 
 export default function HomePage() {
     const { user } = useAuth()
     const { openSidebar } = useSidebar()
     const navigate = useNavigate()
+    const [showSmtpSetup, setShowSmtpSetup] = useState(false)
+
+    // Check if user needs SMTP setup (post-signup)
+    useEffect(() => {
+        const checkSmtpSetup = async () => {
+            try {
+                const status = await getSmtpStatus()
+                if (status.needsSetup) {
+                    setShowSmtpSetup(true)
+                }
+            } catch {
+                // silently ignore
+            }
+        }
+        checkSmtpSetup()
+    }, [])
 
     // Extract first name for greeting
     const firstName = user?.username?.split(' ')[0] || user?.username || 'there'
@@ -180,6 +199,15 @@ export default function HomePage() {
                     <div className="mt-4 h-1 w-0 group-hover:w-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-300" />
                 </motion.div>
             </div>
+
+            {/* SMTP Setup Modal (post-signup prompt) */}
+            <SmtpSetupModal
+                email={user?.email || ''}
+                isOpen={showSmtpSetup}
+                onClose={() => setShowSmtpSetup(false)}
+                onConfigured={() => setShowSmtpSetup(false)}
+                mode="setup"
+            />
         </div>
     )
 }
