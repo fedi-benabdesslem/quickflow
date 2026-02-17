@@ -245,6 +245,13 @@ public class ContactService {
     }
 
     /**
+     * Get a single contact by ID.
+     */
+    public Optional<Contact> getContactById(String id) {
+        return contactRepository.findById(id);
+    }
+
+    /**
      * Delete a contact (soft delete).
      */
     public void deleteContact(String id) {

@@ -67,7 +67,7 @@ public class ContactController {
         } catch (Exception e) {
             logger.error("Error getting contacts", e);
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Failed to get contacts: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to get contacts"));
         }
     }
 
@@ -171,7 +171,7 @@ public class ContactController {
         } catch (Exception e) {
             logger.error("Error importing contacts", e);
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Failed to import contacts: " + e.getMessage()));
+                    .body(Map.of("error", "Failed to import contacts"));
         }
     }
 
@@ -218,9 +218,22 @@ public class ContactController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateContact(
+            Authentication authentication,
             @PathVariable String id,
             @RequestBody UpdateContactRequest request) {
         try {
+            String userId = authentication.getName();
+            // Verify contact exists and belongs to user
+            var existingContact = contactService.getContactById(id);
+            if (existingContact.isEmpty()) {
+                return ResponseEntity.status(404)
+                        .body(Map.of("error", "Contact not found"));
+            }
+            if (!userId.equals(existingContact.get().getUserId())) {
+                return ResponseEntity.status(403)
+                        .body(Map.of("error", "Access denied"));
+            }
+
             Contact contact = contactService.updateContact(
                     id,
                     request.getName(),
@@ -246,8 +259,18 @@ public class ContactController {
      * Delete a contact.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContact(@PathVariable String id) {
+    public ResponseEntity<?> deleteContact(Authentication authentication, @PathVariable String id) {
         try {
+            String userId = authentication.getName();
+            var existingContact = contactService.getContactById(id);
+            if (existingContact.isEmpty()) {
+                return ResponseEntity.status(404)
+                        .body(Map.of("error", "Contact not found"));
+            }
+            if (!userId.equals(existingContact.get().getUserId())) {
+                return ResponseEntity.status(403)
+                        .body(Map.of("error", "Access denied"));
+            }
             contactService.deleteContact(id);
             return ResponseEntity.ok(Map.of("success", true, "message", "Contact deleted"));
         } catch (Exception e) {
@@ -261,8 +284,18 @@ public class ContactController {
      * Toggle favorite status.
      */
     @PostMapping("/{id}/favorite")
-    public ResponseEntity<?> toggleFavorite(@PathVariable String id) {
+    public ResponseEntity<?> toggleFavorite(Authentication authentication, @PathVariable String id) {
         try {
+            String userId = authentication.getName();
+            var existingContact = contactService.getContactById(id);
+            if (existingContact.isEmpty()) {
+                return ResponseEntity.status(404)
+                        .body(Map.of("error", "Contact not found"));
+            }
+            if (!userId.equals(existingContact.get().getUserId())) {
+                return ResponseEntity.status(403)
+                        .body(Map.of("error", "Access denied"));
+            }
             Contact contact = contactService.toggleFavorite(id);
             return ResponseEntity.ok(contact);
         } catch (Exception e) {

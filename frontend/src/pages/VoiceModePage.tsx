@@ -6,7 +6,7 @@ import TechSupportButton from '../components/TechSupportButton'
 import PdfPreviewModal from '../components/PdfPreviewModal'
 import ContactAutocomplete from '../components/contacts/ContactAutocomplete'
 import RichTextEditor from '../components/RichTextEditor'
-import { generatePdf, type Contact } from '../lib/api'
+import api, { generatePdf, type Contact } from '../lib/api'
 
 // Types
 interface TranscriptSegment {
@@ -40,12 +40,12 @@ interface GenerateRequest {
     meetingLocation: string
 }
 
-// API calls
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+// API calls - status check is public, all others use authenticated api instance
 
 async function checkVoiceServiceStatus(): Promise<{ available: boolean }> {
-    const response = await fetch(`${API_BASE}/minutes/voice/status`)
-    return response.json()
+    // Status endpoint is public (no auth required) but uses the shared api instance
+    const response = await api.get('/minutes/voice/status')
+    return response.data
 }
 
 async function uploadForTranscription(file: File): Promise<{
@@ -59,40 +59,33 @@ async function uploadForTranscription(file: File): Promise<{
     const formData = new FormData()
     formData.append('file', file)
 
-    const response = await fetch(`${API_BASE}/minutes/voice/transcribe`, {
-        method: 'POST',
-        body: formData,
+    const response = await api.post('/minutes/voice/transcribe', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
     })
-    return response.json()
+    return response.data
 }
 
 async function pollProgress(jobId: string): Promise<{
     jobId: string; status: string; progress: number; stage: string;
     audioDuration?: number; transcriptionDevice?: string; diarizationDevice?: string;
 }> {
-    const response = await fetch(`${API_BASE}/minutes/voice/progress/${jobId}`)
-    return response.json()
+    const response = await api.get(`/minutes/voice/progress/${jobId}`)
+    return response.data
 }
 
 async function fetchTranscriptionResult(jobId: string): Promise<{ status: string; data?: TranscriptResult; message?: string }> {
-    const response = await fetch(`${API_BASE}/minutes/voice/job/${jobId}`)
-    return response.json()
+    const response = await api.get(`/minutes/voice/job/${jobId}`)
+    return response.data
 }
 
 async function generateFromTranscript(request: GenerateRequest): Promise<{ status: string; content?: string; message?: string }> {
-    const response = await fetch(`${API_BASE}/minutes/voice/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-    })
-    return response.json()
+    const response = await api.post('/minutes/voice/generate', request)
+    return response.data
 }
 
 async function cancelTranscription(jobId: string): Promise<void> {
     try {
-        await fetch(`${API_BASE}/minutes/voice/cancel/${jobId}`, {
-            method: 'POST',
-        })
+        await api.post(`/minutes/voice/cancel/${jobId}`)
     } catch (e) {
         console.warn('Failed to cancel transcription:', e)
     }
@@ -315,8 +308,20 @@ export default function VoiceModePage() {
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (jobId && step === 'processing') {
-                // Trigger cancellation beacon
-                navigator.sendBeacon(`${API_BASE}/minutes/voice/cancel/${jobId}`)
+                // Use fetch with keepalive to include auth header (sendBeacon cannot attach Authorization)
+                const authHeaderValue = api.defaults.headers.common['Authorization']
+                if (authHeaderValue) {
+                    fetch(`${api.defaults.baseURL}/minutes/voice/cancel/${jobId}`, {
+                        method: 'POST',
+                        keepalive: true,
+                        headers: {
+                            'Authorization': authHeaderValue as string,
+                            'Content-Type': 'application/json'
+                        }
+                    }).catch(err => console.warn(`Failed to cancel job ${jobId} on unload:`, err))
+                } else {
+                    console.warn(`Cannot cancel job ${jobId} on unload: auth token not available`)
+                }
                 e.preventDefault()
                 e.returnValue = ''
             }
