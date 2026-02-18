@@ -60,6 +60,39 @@ public class MicrosoftGraphService {
     }
 
     /**
+     * Sends an email using a provided access token directly (for linked OAuth
+     * accounts).
+     */
+    public boolean sendEmailWithAccessToken(String accessToken,
+            String to, String subject, String htmlBody) throws Exception {
+        return sendEmailWithAccessToken(accessToken, to, subject, htmlBody, null, null);
+    }
+
+    /**
+     * Sends an email with optional attachment using a provided access token (for
+     * linked OAuth accounts).
+     */
+    public boolean sendEmailWithAccessToken(String accessToken,
+            String to, String subject, String htmlBody,
+            byte[] pdfBytes, String pdfFilename) throws Exception {
+        JsonObject emailPayload = buildEmailPayload(to, subject, htmlBody, pdfBytes, pdfFilename);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(accessToken);
+
+        HttpEntity<String> request = new HttpEntity<>(gson.toJson(emailPayload), headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    GRAPH_SEND_MAIL_URL, request, String.class);
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (Exception e) {
+            throw new Exception("Failed to send email via linked Microsoft Graph: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Sends an email with a PDF attachment via Microsoft Graph API.
      * 
      * @param supabaseId  User's Supabase ID

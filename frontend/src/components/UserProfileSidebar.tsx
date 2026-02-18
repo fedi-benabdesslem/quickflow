@@ -39,7 +39,7 @@ export default function UserProfileSidebar() {
     }
 
     // Get user photo from Supabase session metadata
-    const photoUrl = null // Will be populated from session.user.user_metadata.avatar_url
+    const photoUrl = user?.avatarUrl || null
     const fullName = user?.username || user?.email?.split('@')[0] || 'User'
 
     // Close sidebar on ESC key
@@ -187,7 +187,7 @@ export default function UserProfileSidebar() {
                                 </div>
 
                                 <button
-                                    onClick={() => {/* TODO: Open edit profile modal */ }}
+                                    onClick={() => handleNavigation('/profile')}
                                     className="mt-4 px-4 py-2 text-sm text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg transition-colors"
                                 >
                                     Edit Profile

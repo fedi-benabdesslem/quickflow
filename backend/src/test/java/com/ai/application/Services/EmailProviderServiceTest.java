@@ -1,5 +1,6 @@
 package com.ai.application.Services;
 
+import com.ai.application.Config.SmtpProviderConfig;
 import com.ai.application.model.Entity.UserToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,13 +38,23 @@ class EmailProviderServiceTest {
     private MicrosoftGraphService microsoftGraphService;
 
     @Mock
+    private SmtpEmailService smtpEmailService;
+
+    @Mock
     private TokenStorageService tokenStorageService;
+
+    @Mock
+    private EncryptionService encryptionService;
+
+    @Mock
+    private SmtpProviderConfig smtpProviderConfig;
 
     private EmailProviderService emailProviderService;
 
     @BeforeEach
     void setUp() {
-        emailProviderService = new EmailProviderService(gmailService, microsoftGraphService, tokenStorageService);
+        emailProviderService = new EmailProviderService(gmailService, microsoftGraphService,
+                smtpEmailService, tokenStorageService, encryptionService, smtpProviderConfig);
     }
 
     @Nested
@@ -57,11 +68,11 @@ class EmailProviderServiceTest {
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.empty());
 
             EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, "to@example.com", "Subject", "Body");
+                    supabaseId, "to@example.com", "Subject", "Body");
 
             assertFalse(result.isSuccess());
             assertEquals("no_tokens", result.getCode());
-            assertTrue(result.getMessage().contains("No OAuth tokens"));
+            assertTrue(result.getMessage().contains("No account found"));
         }
 
         @Test
@@ -70,11 +81,11 @@ class EmailProviderServiceTest {
             String supabaseId = "user-123";
             UserToken token = new UserToken(supabaseId, "user@example.com", "email");
             token.setAccessToken("token");
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
 
             EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, "to@example.com", "Subject", "Body");
+                    supabaseId, "to@example.com", "Subject", "Body");
 
             assertFalse(result.isSuccess());
             assertEquals("unsupported_provider", result.getCode());
@@ -88,12 +99,12 @@ class EmailProviderServiceTest {
             UserToken token = new UserToken(supabaseId, "user@gmail.com", "google");
             token.setAccessToken("token");
             token.setExpiresAt(LocalDateTime.now().plusHours(1));
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
             when(gmailService.sendEmail(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
 
             EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, "to@example.com", "Subject", "<p>Body</p>");
+                    supabaseId, "to@example.com", "Subject", "<p>Body</p>");
 
             assertTrue(result.isSuccess());
             verify(gmailService).sendEmail(supabaseId, "to@example.com", "Subject", "<p>Body</p>");
@@ -107,12 +118,12 @@ class EmailProviderServiceTest {
             UserToken token = new UserToken(supabaseId, "user@outlook.com", "azure");
             token.setAccessToken("token");
             token.setExpiresAt(LocalDateTime.now().plusHours(1));
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
             when(microsoftGraphService.sendEmail(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
 
             EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, "to@example.com", "Subject", "<p>Body</p>");
+                    supabaseId, "to@example.com", "Subject", "<p>Body</p>");
 
             assertTrue(result.isSuccess());
             verify(microsoftGraphService).sendEmail(supabaseId, "to@example.com", "Subject", "<p>Body</p>");
@@ -126,12 +137,12 @@ class EmailProviderServiceTest {
             UserToken token = new UserToken(supabaseId, "user@gmail.com", "google");
             token.setAccessToken("token");
             token.setExpiresAt(LocalDateTime.now().plusHours(1));
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
             when(gmailService.sendEmail(anyString(), anyString(), anyString(), anyString())).thenReturn(false);
 
             EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, "to@example.com", "Subject", "Body");
+                    supabaseId, "to@example.com", "Subject", "Body");
 
             assertFalse(result.isSuccess());
             assertEquals("send_failed", result.getCode());
@@ -144,13 +155,13 @@ class EmailProviderServiceTest {
             UserToken token = new UserToken(supabaseId, "user@gmail.com", "google");
             token.setAccessToken("token");
             token.setExpiresAt(LocalDateTime.now().plusHours(1));
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
             when(gmailService.sendEmail(anyString(), anyString(), anyString(), anyString()))
-                .thenThrow(new RuntimeException("Please sign in again to send emails"));
+                    .thenThrow(new RuntimeException("Please sign in again to send emails"));
 
             EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, "to@example.com", "Subject", "Body");
+                    supabaseId, "to@example.com", "Subject", "Body");
 
             assertFalse(result.isSuccess());
             assertEquals("reauth_required", result.getCode());
@@ -164,13 +175,13 @@ class EmailProviderServiceTest {
             UserToken token = new UserToken(supabaseId, "user@gmail.com", "google");
             token.setAccessToken("token");
             token.setExpiresAt(LocalDateTime.now().plusHours(1));
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
             when(gmailService.sendEmail(anyString(), anyString(), anyString(), anyString()))
-                .thenThrow(new RuntimeException("Network error"));
+                    .thenThrow(new RuntimeException("Network error"));
 
             EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, "to@example.com", "Subject", "Body");
+                    supabaseId, "to@example.com", "Subject", "Body");
 
             assertFalse(result.isSuccess());
             assertEquals("service_error", result.getCode());
@@ -188,18 +199,18 @@ class EmailProviderServiceTest {
             UserToken token = new UserToken(supabaseId, "user@gmail.com", "google");
             token.setAccessToken("token");
             token.setExpiresAt(LocalDateTime.now().plusHours(1));
-            byte[] pdfBytes = new byte[]{1, 2, 3};
-            
+            byte[] pdfBytes = new byte[] { 1, 2, 3 };
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
-            when(gmailService.sendEmailWithAttachment(anyString(), anyString(), anyString(), anyString(), 
-                any(byte[].class), anyString())).thenReturn(true);
+            when(gmailService.sendEmailWithAttachment(anyString(), anyString(), anyString(), anyString(),
+                    any(byte[].class), anyString())).thenReturn(true);
 
             EmailProviderService.SendResult result = emailProviderService.sendEmailWithAttachment(
-                supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
+                    supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
 
             assertTrue(result.isSuccess());
             verify(gmailService).sendEmailWithAttachment(
-                supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
+                    supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
         }
 
         @Test
@@ -209,18 +220,18 @@ class EmailProviderServiceTest {
             UserToken token = new UserToken(supabaseId, "user@outlook.com", "azure");
             token.setAccessToken("token");
             token.setExpiresAt(LocalDateTime.now().plusHours(1));
-            byte[] pdfBytes = new byte[]{1, 2, 3};
-            
+            byte[] pdfBytes = new byte[] { 1, 2, 3 };
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
-            when(microsoftGraphService.sendEmailWithAttachment(anyString(), anyString(), anyString(), anyString(), 
-                any(byte[].class), anyString())).thenReturn(true);
+            when(microsoftGraphService.sendEmailWithAttachment(anyString(), anyString(), anyString(), anyString(),
+                    any(byte[].class), anyString())).thenReturn(true);
 
             EmailProviderService.SendResult result = emailProviderService.sendEmailWithAttachment(
-                supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
+                    supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
 
             assertTrue(result.isSuccess());
             verify(microsoftGraphService).sendEmailWithAttachment(
-                supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
+                    supabaseId, "to@example.com", "Subject", "Body", pdfBytes, "report.pdf");
         }
     }
 
@@ -233,7 +244,7 @@ class EmailProviderServiceTest {
         void returnTrueForGoogleProvider() {
             String supabaseId = "user-123";
             UserToken token = new UserToken(supabaseId, "user@gmail.com", "google");
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
 
             assertTrue(emailProviderService.canUserSendEmail(supabaseId));
@@ -244,7 +255,7 @@ class EmailProviderServiceTest {
         void returnTrueForAzureProvider() {
             String supabaseId = "user-123";
             UserToken token = new UserToken(supabaseId, "user@outlook.com", "azure");
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
 
             assertTrue(emailProviderService.canUserSendEmail(supabaseId));
@@ -255,7 +266,7 @@ class EmailProviderServiceTest {
         void returnFalseForEmailProvider() {
             String supabaseId = "user-123";
             UserToken token = new UserToken(supabaseId, "user@example.com", "email");
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
 
             assertFalse(emailProviderService.canUserSendEmail(supabaseId));
@@ -279,7 +290,7 @@ class EmailProviderServiceTest {
         void returnProviderType() {
             String supabaseId = "user-123";
             UserToken token = new UserToken(supabaseId, "user@gmail.com", "google");
-            
+
             when(tokenStorageService.getUserToken(supabaseId)).thenReturn(Optional.of(token));
 
             assertEquals("google", emailProviderService.getUserProvider(supabaseId));
@@ -301,8 +312,8 @@ class EmailProviderServiceTest {
         @Test
         @DisplayName("Should create success result")
         void createSuccessResult() {
-            EmailProviderService.SendResult result = 
-                new EmailProviderService.SendResult(true, "Email sent!", "success");
+            EmailProviderService.SendResult result = new EmailProviderService.SendResult(true, "Email sent!",
+                    "success");
 
             assertTrue(result.isSuccess());
             assertEquals("Email sent!", result.getMessage());
@@ -312,8 +323,8 @@ class EmailProviderServiceTest {
         @Test
         @DisplayName("Should detect unsupported provider")
         void detectUnsupportedProvider() {
-            EmailProviderService.SendResult result = 
-                new EmailProviderService.SendResult(false, "Not supported", "unsupported_provider");
+            EmailProviderService.SendResult result = new EmailProviderService.SendResult(false, "Not supported",
+                    "unsupported_provider");
 
             assertTrue(result.isUnsupportedProvider());
             assertFalse(result.requiresReauth());
@@ -322,8 +333,8 @@ class EmailProviderServiceTest {
         @Test
         @DisplayName("Should detect reauth required")
         void detectReauthRequired() {
-            EmailProviderService.SendResult result = 
-                new EmailProviderService.SendResult(false, "Please sign in", "reauth_required");
+            EmailProviderService.SendResult result = new EmailProviderService.SendResult(false, "Please sign in",
+                    "reauth_required");
 
             assertTrue(result.requiresReauth());
             assertFalse(result.isUnsupportedProvider());

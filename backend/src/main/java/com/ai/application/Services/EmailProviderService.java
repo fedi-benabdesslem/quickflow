@@ -1,5 +1,6 @@
 package com.ai.application.Services;
 
+import com.ai.application.Config.SmtpProviderConfig;
 import com.ai.application.model.Entity.UserToken;
 import org.springframework.stereotype.Service;
 
@@ -16,24 +17,27 @@ public class EmailProviderService {
 
     private final GmailService gmailService;
     private final MicrosoftGraphService microsoftGraphService;
+    private final SmtpEmailService smtpEmailService;
     private final TokenStorageService tokenStorageService;
+    private final EncryptionService encryptionService;
+    private final SmtpProviderConfig smtpProviderConfig;
 
     public EmailProviderService(GmailService gmailService,
             MicrosoftGraphService microsoftGraphService,
-            TokenStorageService tokenStorageService) {
+            SmtpEmailService smtpEmailService,
+            TokenStorageService tokenStorageService,
+            EncryptionService encryptionService,
+            SmtpProviderConfig smtpProviderConfig) {
         this.gmailService = gmailService;
         this.microsoftGraphService = microsoftGraphService;
+        this.smtpEmailService = smtpEmailService;
         this.tokenStorageService = tokenStorageService;
+        this.encryptionService = encryptionService;
+        this.smtpProviderConfig = smtpProviderConfig;
     }
 
     /**
      * Sends an email using the appropriate provider for the user.
-     * 
-     * @param supabaseId User's Supabase ID
-     * @param to         Recipient email addresses (comma-separated)
-     * @param subject    Email subject
-     * @param htmlBody   Email body in HTML format
-     * @return SendResult with status and message
      */
     public SendResult sendEmail(String supabaseId, String to, String subject, String htmlBody) {
         return sendEmailWithAttachment(supabaseId, to, subject, htmlBody, null, null);
@@ -45,65 +49,108 @@ public class EmailProviderService {
     public SendResult sendEmailWithAttachment(String supabaseId, String to, String subject,
             String htmlBody, byte[] pdfBytes, String pdfFilename) {
         System.out.println("[EmailProviderService] sendEmail called for user: " + supabaseId);
-        System.out.println("[EmailProviderService] Recipients: " + to + ", Subject: " + subject);
 
-        // Get user's provider
+        // Get user's token record
         Optional<UserToken> userTokenOpt = tokenStorageService.getUserToken(supabaseId);
 
         if (userTokenOpt.isEmpty()) {
-            System.err.println("[EmailProviderService] ERROR: No OAuth tokens found for user: " + supabaseId);
-            return new SendResult(false, "No OAuth tokens found. Please sign in again.", "no_tokens");
+            System.err.println("[EmailProviderService] ERROR: No tokens found for user: " + supabaseId);
+            return new SendResult(false, "No account found. Please sign in again.", "no_tokens");
         }
 
         UserToken userToken = userTokenOpt.get();
         String provider = userToken.getProvider();
-        System.out.println("[EmailProviderService] Found token for user, provider: " + provider);
-
-        // Check if user can send emails
-        if (!userToken.canSendEmail()) {
-            System.out.println("[EmailProviderService] User cannot send email - unsupported provider: " + provider);
-            return new SendResult(false,
-                    "Email sending not supported for your domain yet. Coming soon!",
-                    "unsupported_provider");
-        }
+        System.out.println(
+                "[EmailProviderService] Provider: " + provider + ", smtpConfigured: " + userToken.isSmtpConfigured());
 
         try {
-            System.out.println("[EmailProviderService] Attempting to send via provider: " + provider);
-            boolean success = switch (provider.toLowerCase()) {
-                case "google" -> {
-                    System.out.println("[EmailProviderService] Using Gmail service...");
-                    if (pdfBytes != null) {
-                        yield gmailService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes,
-                                pdfFilename);
-                    } else {
-                        yield gmailService.sendEmail(supabaseId, to, subject, htmlBody);
-                    }
-                }
-                case "azure" -> {
-                    System.out.println("[EmailProviderService] Using Microsoft Graph service...");
-                    if (pdfBytes != null) {
-                        yield microsoftGraphService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes,
-                                pdfFilename);
-                    } else {
-                        yield microsoftGraphService.sendEmail(supabaseId, to, subject, htmlBody);
-                    }
-                }
-                default -> throw new Exception("Unsupported provider: " + provider);
-            };
-
-            if (success) {
-                System.out.println("[EmailProviderService] SUCCESS: Email sent successfully!");
-                return new SendResult(true, "Email sent successfully!", "success");
-            } else {
-                System.err.println("[EmailProviderService] FAILED: Email sending returned false");
-                return new SendResult(false, "Failed to send email.", "send_failed");
+            // Priority 1: Google OAuth (direct sign-in)
+            if ("google".equalsIgnoreCase(provider)) {
+                System.out.println("[EmailProviderService] Using Gmail service...");
+                boolean success = pdfBytes != null
+                        ? gmailService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes, pdfFilename)
+                        : gmailService.sendEmail(supabaseId, to, subject, htmlBody);
+                return success ? new SendResult(true, "Email sent successfully!", "success")
+                        : new SendResult(false, "Failed to send email.", "send_failed");
             }
+
+            // Priority 2: Microsoft OAuth (direct sign-in)
+            if ("azure".equalsIgnoreCase(provider)) {
+                System.out.println("[EmailProviderService] Using Microsoft Graph service...");
+                boolean success = pdfBytes != null
+                        ? microsoftGraphService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes,
+                                pdfFilename)
+                        : microsoftGraphService.sendEmail(supabaseId, to, subject, htmlBody);
+                return success ? new SendResult(true, "Email sent successfully!", "success")
+                        : new SendResult(false, "Failed to send email.", "send_failed");
+            }
+
+            // Priority 3: Linked OAuth provider (email/password user who linked
+            // Google/Microsoft)
+            if (userToken.hasLinkedProvider()) {
+                String linkedProvider = userToken.getLinkedProvider();
+                System.out.println("[EmailProviderService] Using linked " + linkedProvider + " provider...");
+
+                // Decrypt the linked provider's access token
+                String linkedAccessToken = encryptionService.decrypt(userToken.getLinkedProviderTokenEncrypted());
+
+                if ("google".equals(linkedProvider)) {
+                    // Store the linked token temporarily for GmailService to use
+                    boolean success = pdfBytes != null
+                            ? gmailService.sendEmailWithAccessToken(linkedAccessToken,
+                                    userToken.getLinkedProviderEmail(),
+                                    to, subject, htmlBody, pdfBytes, pdfFilename)
+                            : gmailService.sendEmailWithAccessToken(linkedAccessToken,
+                                    userToken.getLinkedProviderEmail(),
+                                    to, subject, htmlBody);
+                    return success ? new SendResult(true, "Email sent successfully!", "success")
+                            : new SendResult(false, "Failed to send email.", "send_failed");
+                } else if ("microsoft".equals(linkedProvider)) {
+                    boolean success = pdfBytes != null
+                            ? microsoftGraphService.sendEmailWithAccessToken(linkedAccessToken,
+                                    to, subject, htmlBody, pdfBytes, pdfFilename)
+                            : microsoftGraphService.sendEmailWithAccessToken(linkedAccessToken,
+                                    to, subject, htmlBody);
+                    return success ? new SendResult(true, "Email sent successfully!", "success")
+                            : new SendResult(false, "Failed to send email.", "send_failed");
+                }
+            }
+
+            // Priority 4: SMTP (configured with app password)
+            if (userToken.isSmtpConfigured()) {
+                System.out.println("[EmailProviderService] Using SMTP service...");
+                String email = userToken.getEmail();
+                String password = encryptionService.decrypt(userToken.getSmtpPasswordEncrypted());
+
+                boolean success = pdfBytes != null
+                        ? smtpEmailService.sendEmailWithAttachment(email, password, to, subject, htmlBody, pdfBytes,
+                                pdfFilename)
+                        : smtpEmailService.sendEmail(email, password, to, subject, htmlBody);
+                return success ? new SendResult(true, "Email sent successfully!", "success")
+                        : new SendResult(false, "Failed to send email.", "send_failed");
+            }
+
+            // Priority 5: SMTP domain supported but not configured
+            String domain = SmtpProviderConfig.extractDomain(userToken.getEmail());
+            if (smtpProviderConfig.isSupported(domain)) {
+                String providerName = smtpProviderConfig.getProviderName(domain);
+                return new SendResult(false,
+                        "Set up email sending for " + providerName + " to send this email.",
+                        "smtp_not_configured");
+            }
+
+            // Priority 6: Unsupported provider
+            return new SendResult(false,
+                    "Email sending is not available for your provider. You can download the PDF and send it manually.",
+                    "unsupported_provider");
+
+        } catch (SmtpEmailService.SmtpSendException e) {
+            System.err.println("[EmailProviderService] SMTP error: " + e.getMessage());
+            return new SendResult(false, e.getMessage(), e.getCode());
         } catch (Exception e) {
             String message = e.getMessage();
             System.err.println("[EmailProviderService] EXCEPTION: " + message);
-            e.printStackTrace();
 
-            // Handle specific error cases
             if (message != null && message.contains("sign in again")) {
                 return new SendResult(false, "Please sign in again to send emails.", "reauth_required");
             }
@@ -162,6 +209,10 @@ public class EmailProviderService {
 
         public boolean requiresReauth() {
             return "reauth_required".equals(code);
+        }
+
+        public boolean isSmtpNotConfigured() {
+            return "smtp_not_configured".equals(code);
         }
     }
 }

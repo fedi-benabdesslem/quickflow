@@ -2,6 +2,7 @@ export interface User {
     id: string;
     username: string;
     email?: string;
+    avatarUrl?: string;
 }
 
 export interface AuthContextType {
@@ -14,6 +15,7 @@ export interface AuthContextType {
     signInWithMicrosoft: () => Promise<AuthResult>;
     signOut: () => Promise<void>;
     resetPassword: (email: string) => Promise<AuthResult>;
+    updateProfile: (updates: { username?: string; avatarUrl?: string }) => Promise<AuthResult>;
 }
 
 export interface Session {

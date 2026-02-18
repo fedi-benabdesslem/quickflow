@@ -61,6 +61,33 @@ public class GmailService {
     }
 
     /**
+     * Sends an email using a provided access token directly (for linked OAuth
+     * accounts).
+     */
+    public boolean sendEmailWithAccessToken(String accessToken, String fromEmail,
+            String to, String subject, String htmlBody) throws Exception {
+        return sendEmailWithAccessToken(accessToken, fromEmail, to, subject, htmlBody, null, null);
+    }
+
+    /**
+     * Sends an email with optional attachment using a provided access token (for
+     * linked OAuth accounts).
+     */
+    public boolean sendEmailWithAccessToken(String accessToken, String fromEmail,
+            String to, String subject, String htmlBody,
+            byte[] pdfBytes, String pdfFilename) throws Exception {
+        logger.info("Sending email via linked Gmail - from: {} to: {}", maskEmail(fromEmail), maskEmail(to));
+
+        Gmail gmail = createGmailService(accessToken);
+        MimeMessage mimeMessage = createMimeMessage(fromEmail, to, subject, htmlBody, pdfBytes, pdfFilename);
+        Message message = createMessageFromMimeMessage(mimeMessage);
+
+        gmail.users().messages().send("me", message).execute();
+        logger.info("Email sent successfully via linked Gmail");
+        return true;
+    }
+
+    /**
      * Sends an email with a PDF attachment via Gmail API.
      * 
      * @param supabaseId  User's Supabase ID

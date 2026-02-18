@@ -791,5 +791,141 @@ export const sendSupportEmail = async (message: string): Promise<ApiResponse> =>
     }
 }
 
+// ============ SMTP Configuration APIs ============
+
+export interface SmtpStatusResponse {
+    smtpConfigured: boolean
+    smtpSetupSkipped: boolean
+    providerSupported: boolean
+    providerBlocked: boolean
+    providerName: string
+    needsSetup: boolean
+    isOAuth: boolean
+    // New fields for hosting detection & OAuth linking
+    hostingProvider: string
+    hostingProviderName: string
+    linkedProvider: string
+    linkedProviderName: string
+    linkedProviderEmail: string
+    action: 'ready' | 'link_oauth' | 'setup_smtp' | 'unsupported' | ''
+}
+
+/**
+ * Configure SMTP by validating and storing an app-specific password.
+ */
+export const configureSmtp = async (appPassword: string): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/user/smtp/configure', { appPassword })
+        return response.data
+    } catch (error) {
+        console.error('SMTP configure error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as ApiResponse
+        }
+        return { status: 'error', message: 'Failed to configure email sending' }
+    }
+}
+
+/**
+ * Send a test email to the user's own address.
+ */
+export const testSmtp = async (): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/user/smtp/test')
+        return response.data
+    } catch (error) {
+        console.error('SMTP test error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as ApiResponse
+        }
+        return { status: 'error', message: 'Failed to send test email' }
+    }
+}
+
+/**
+ * Remove SMTP configuration.
+ */
+export const removeSmtp = async (): Promise<ApiResponse> => {
+    try {
+        const response = await api.delete<ApiResponse>('/user/smtp/configure')
+        return response.data
+    } catch (error) {
+        console.error('SMTP remove error:', error)
+        if (axios.isAxiosError(error) && error.response) {
+            return error.response.data as ApiResponse
+        }
+        return { status: 'error', message: 'Failed to remove email configuration' }
+    }
+}
+
+/**
+ * Get SMTP configuration status.
+ */
+export const getSmtpStatus = async (): Promise<SmtpStatusResponse> => {
+    try {
+        const response = await api.get<SmtpStatusResponse>('/user/smtp/status')
+        return response.data
+    } catch (error) {
+        console.error('SMTP status error:', error)
+        return {
+            smtpConfigured: false,
+            smtpSetupSkipped: false,
+            providerSupported: false,
+            providerBlocked: false,
+            providerName: 'Unknown',
+            needsSetup: false,
+            isOAuth: false,
+            hostingProvider: '',
+            hostingProviderName: '',
+            linkedProvider: '',
+            linkedProviderName: '',
+            linkedProviderEmail: '',
+            action: '',
+        }
+    }
+}
+
+/**
+ * Skip SMTP setup.
+ */
+export const skipSmtpSetup = async (): Promise<ApiResponse> => {
+    try {
+        const response = await api.post<ApiResponse>('/user/smtp/skip-setup')
+        return response.data
+    } catch (error) {
+        console.error('SMTP skip error:', error)
+        return { status: 'error', message: 'Failed to skip SMTP setup' }
+    }
+}
+
+// ============ OAuth Linking APIs ============
+
+/**
+ * Initiate OAuth linking for a provider (google or microsoft).
+ * Returns an authorization URL to redirect the user to.
+ */
+export const linkOAuthProvider = async (provider: 'google' | 'microsoft'): Promise<{ status: string; authorizationUrl?: string; message?: string }> => {
+    try {
+        const response = await api.get(`/auth/link/${provider}`)
+        return response.data
+    } catch (error) {
+        console.error('OAuth linking error:', error)
+        return { status: 'error', message: 'Failed to initiate account linking' }
+    }
+}
+
+/**
+ * Unlink an OAuth provider from the user's account.
+ */
+export const unlinkOAuthProvider = async (): Promise<ApiResponse> => {
+    try {
+        const response = await api.delete<ApiResponse>('/auth/link')
+        return response.data
+    } catch (error) {
+        console.error('OAuth unlink error:', error)
+        return { status: 'error', message: 'Failed to unlink provider' }
+    }
+}
+
 export default api
 

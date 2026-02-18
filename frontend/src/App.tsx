@@ -20,6 +20,7 @@ import GroupsPage from './pages/GroupsPage'
 import TechSupportPage from './pages/TechSupportPage'
 import HistoryPage from './pages/HistoryPage'
 import VoiceModePage from './pages/VoiceModePage'
+import ProfilePage from './pages/ProfilePage'
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -211,6 +212,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <TechSupportPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <ProfilePage />
                         </ProtectedRoute>
                     }
                 />

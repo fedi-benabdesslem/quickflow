@@ -33,8 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     });
                     setUser({
                         id: currentSession.user.id,
-                        username: currentSession.user.user_metadata?.username || currentSession.user.email?.split('@')[0] || 'User',
+                        username: currentSession.user.user_metadata?.full_name || currentSession.user.user_metadata?.username || currentSession.user.email?.split('@')[0] || 'User',
                         email: currentSession.user.email,
+                        avatarUrl: currentSession.user.user_metadata?.avatar_url || currentSession.user.user_metadata?.picture || undefined,
                     });
                     // Set auth token synchronously for API calls
                     setAuthToken(currentSession.access_token);
@@ -70,8 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 });
                 setUser({
                     id: currentSession.user.id,
-                    username: currentSession.user.user_metadata?.username || currentSession.user.email?.split('@')[0] || 'User',
+                    username: currentSession.user.user_metadata?.full_name || currentSession.user.user_metadata?.username || currentSession.user.email?.split('@')[0] || 'User',
                     email: currentSession.user.email,
+                    avatarUrl: currentSession.user.user_metadata?.avatar_url || currentSession.user.user_metadata?.picture || undefined,
                 });
                 // Set auth token synchronously
                 setAuthToken(currentSession.access_token);
@@ -193,6 +195,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }
 
+    const updateProfile = async (updates: { username?: string; avatarUrl?: string }): Promise<AuthResult> => {
+        try {
+            const data: Record<string, string> = {}
+            if (updates.username !== undefined) {
+                data.full_name = updates.username
+                data.username = updates.username
+            }
+            if (updates.avatarUrl !== undefined) {
+                data.avatar_url = updates.avatarUrl
+            }
+
+            const { error } = await supabase.auth.updateUser({ data })
+            if (error) {
+                return { success: false, error: error.message }
+            }
+
+            // Update local state immediately
+            setUser(prev => prev ? {
+                ...prev,
+                username: updates.username ?? prev.username,
+                avatarUrl: updates.avatarUrl ?? prev.avatarUrl,
+            } : null)
+
+            return { success: true }
+        } catch (err) {
+            return { success: false, error: 'An unexpected error occurred' }
+        }
+    }
+
     const signOut = async (): Promise<void> => {
         await supabase.auth.signOut()
         setUser(null)
@@ -216,7 +247,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signInWithGoogle, signInWithMicrosoft, signOut, resetPassword }}>
+        <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signInWithGoogle, signInWithMicrosoft, signOut, resetPassword, updateProfile }}>
             {children}
         </AuthContext.Provider>
     )

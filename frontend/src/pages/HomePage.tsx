@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
@@ -5,11 +6,35 @@ import { useSidebar } from '../contexts/SidebarContext'
 import UserAvatar from '../components/UserAvatar'
 import UserProfileSidebar from '../components/UserProfileSidebar'
 import TechSupportButton from '../components/TechSupportButton'
+import SmtpSetupModal from '../components/SmtpSetupModal'
+import { getSmtpStatus } from '../lib/api'
 
 export default function HomePage() {
     const { user } = useAuth()
     const { openSidebar } = useSidebar()
     const navigate = useNavigate()
+    const [showSmtpSetup, setShowSmtpSetup] = useState(false)
+
+    // Check if user needs email setup (post-signup)
+    useEffect(() => {
+        const checkEmailSetup = async () => {
+            try {
+                const status = await getSmtpStatus()
+                if (status.action === 'link_oauth') {
+                    // Redirect to profile page for OAuth linking
+                    navigate('/profile', { replace: true })
+                } else if (status.needsSetup) {
+                    setShowSmtpSetup(true)
+                }
+            } catch {
+                // silently ignore
+            }
+        }
+        checkEmailSetup()
+    }, [navigate])
+
+    // Extract first name for greeting
+    const firstName = user?.username?.split(' ')[0] || user?.username || 'there'
 
     return (
         <div className="min-h-screen p-4 sm:p-6 relative z-10">
@@ -24,6 +49,7 @@ export default function HomePage() {
             >
                 <div className="flex items-center gap-3">
                     <UserAvatar
+                        photoUrl={user?.avatarUrl}
                         fullName={user?.username || user?.email}
                         size="md"
                         showOnlineIndicator
@@ -56,7 +82,7 @@ export default function HomePage() {
                 <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
                     Welcome back,{' '}
                     <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                        {user?.username}
+                        {firstName}
                     </span>
                     !
                 </h1>
@@ -176,6 +202,15 @@ export default function HomePage() {
                     <div className="mt-4 h-1 w-0 group-hover:w-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-300" />
                 </motion.div>
             </div>
+
+            {/* SMTP Setup Modal (post-signup prompt) */}
+            <SmtpSetupModal
+                email={user?.email || ''}
+                isOpen={showSmtpSetup}
+                onClose={() => setShowSmtpSetup(false)}
+                onConfigured={() => setShowSmtpSetup(false)}
+                mode="setup"
+            />
         </div>
     )
 }

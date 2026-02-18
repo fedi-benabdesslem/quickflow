@@ -126,6 +126,12 @@ public class EmailController {
             return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", "Email sent successfully"));
+        } else if (result.isSmtpNotConfigured()) {
+            email.setStatus("draft");
+            emailRepository.save(email);
+            return ResponseEntity.ok(Map.of(
+                    "status", "smtp_not_configured",
+                    "message", result.getMessage()));
         } else if (result.isUnsupportedProvider()) {
             // Email/password user - show toast message
             email.setStatus("draft");
