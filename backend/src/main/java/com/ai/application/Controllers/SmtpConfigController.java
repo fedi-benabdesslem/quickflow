@@ -1,6 +1,7 @@
 package com.ai.application.Controllers;
 
 import com.ai.application.Config.SmtpProviderConfig;
+import com.ai.application.Services.DomainDetectionService;
 import com.ai.application.Services.EncryptionService;
 import com.ai.application.Services.SmtpEmailService;
 import com.ai.application.Services.SmtpEmailService.SmtpSendException;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,15 +30,18 @@ public class SmtpConfigController {
     private final EncryptionService encryptionService;
     private final SmtpEmailService smtpEmailService;
     private final SmtpProviderConfig smtpProviderConfig;
+    private final DomainDetectionService domainDetectionService;
 
     public SmtpConfigController(UserTokenRepository userTokenRepository,
             EncryptionService encryptionService,
             SmtpEmailService smtpEmailService,
-            SmtpProviderConfig smtpProviderConfig) {
+            SmtpProviderConfig smtpProviderConfig,
+            DomainDetectionService domainDetectionService) {
         this.userTokenRepository = userTokenRepository;
         this.encryptionService = encryptionService;
         this.smtpEmailService = smtpEmailService;
         this.smtpProviderConfig = smtpProviderConfig;
+        this.domainDetectionService = domainDetectionService;
     }
 
     /**
@@ -164,6 +169,8 @@ public class SmtpConfigController {
 
     /**
      * Get SMTP configuration status.
+     * Enhanced with MX-based hosting provider detection, linked provider info,
+     * and a computed 'action' field for frontend guidance.
      */
     @GetMapping("/status")
     public ResponseEntity<?> getStatus(Principal principal) {
@@ -190,14 +197,78 @@ public class SmtpConfigController {
         boolean isOAuth = "google".equalsIgnoreCase(userToken.getProvider())
                 || "azure".equalsIgnoreCase(userToken.getProvider());
 
-        return ResponseEntity.ok(Map.of(
-                "smtpConfigured", userToken.isSmtpConfigured(),
-                "smtpSetupSkipped", userToken.isSmtpSetupSkipped(),
-                "providerSupported", supported,
-                "providerBlocked", blocked,
-                "providerName", providerName != null ? providerName : "Unknown",
-                "needsSetup", supported && !userToken.isSmtpConfigured() && !userToken.isSmtpSetupSkipped() && !isOAuth,
-                "isOAuth", isOAuth));
+        // Detect hosting provider via MX records (cached)
+        String hostingProvider = domainDetectionService.detectProvider(email);
+        String hostingProviderName = domainDetectionService.getProviderName(hostingProvider);
+
+        // Cache the detection result
+        if (userToken.getDetectedHostingProvider() == null
+                || !userToken.getDetectedHostingProvider().equals(hostingProvider)) {
+            userToken.setDetectedHostingProvider(hostingProvider);
+            userTokenRepository.save(userToken);
+        }
+
+        // Compute the recommended action for the frontend
+        String action = computeAction(isOAuth, userToken, hostingProvider, supported);
+
+        // Build response with all fields
+        Map<String, Object> response = new HashMap<>();
+        response.put("smtpConfigured", userToken.isSmtpConfigured());
+        response.put("smtpSetupSkipped", userToken.isSmtpSetupSkipped());
+        response.put("providerSupported", supported);
+        response.put("providerBlocked", blocked);
+        response.put("providerName", providerName != null ? providerName : "Unknown");
+        response.put("needsSetup", supported && !userToken.isSmtpConfigured()
+                && !userToken.isSmtpSetupSkipped() && !isOAuth && !userToken.hasLinkedProvider());
+        response.put("isOAuth", isOAuth);
+
+        // New fields for hosting detection & linked provider
+        response.put("hostingProvider", hostingProvider);
+        response.put("hostingProviderName", hostingProviderName != null ? hostingProviderName : "");
+        response.put("linkedProvider", userToken.getLinkedProvider() != null ? userToken.getLinkedProvider() : "");
+        response.put("linkedProviderName",
+                userToken.getLinkedProvider() != null
+                        ? domainDetectionService.getProviderName(userToken.getLinkedProvider())
+                        : "");
+        response.put("linkedProviderEmail",
+                userToken.getLinkedProviderEmail() != null ? userToken.getLinkedProviderEmail() : "");
+        response.put("action", action);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Computes the recommended action for the frontend based on user state.
+     */
+    private String computeAction(boolean isOAuth, UserToken userToken,
+            String hostingProvider, boolean smtpSupported) {
+        // Already using OAuth directly — fully ready
+        if (isOAuth) {
+            return "ready";
+        }
+
+        // Has a linked OAuth provider — ready via linked account
+        if (userToken.hasLinkedProvider()) {
+            return "ready";
+        }
+
+        // Has SMTP configured — ready via SMTP
+        if (userToken.isSmtpConfigured()) {
+            return "ready";
+        }
+
+        // MX detection found Google or Microsoft hosting — suggest OAuth linking
+        if ("google".equals(hostingProvider) || "microsoft".equals(hostingProvider)) {
+            return "link_oauth";
+        }
+
+        // SMTP provider supported — suggest SMTP setup
+        if (smtpSupported) {
+            return "setup_smtp";
+        }
+
+        // Nothing available
+        return "unsupported";
     }
 
     /**

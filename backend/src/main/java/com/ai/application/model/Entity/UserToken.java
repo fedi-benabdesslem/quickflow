@@ -44,6 +44,26 @@ public class UserToken {
     /** Whether the user skipped SMTP setup */
     private boolean smtpSetupSkipped;
 
+    // ===== Linked OAuth Provider Fields =====
+
+    /**
+     * Linked provider type: "google" or "microsoft" (for email/password users who
+     * link OAuth)
+     */
+    private String linkedProvider;
+
+    /** Encrypted access token for the linked provider */
+    private String linkedProviderTokenEncrypted;
+
+    /** Encrypted refresh token for the linked provider */
+    private String linkedProviderRefreshToken;
+
+    /** Email from the linked OAuth account */
+    private String linkedProviderEmail;
+
+    /** Cached MX detection result: "google", "microsoft", or "unknown" */
+    private String detectedHostingProvider;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
@@ -151,7 +171,15 @@ public class UserToken {
      * email/password).
      */
     public boolean canSendEmail() {
-        return "google".equalsIgnoreCase(provider) || "azure".equalsIgnoreCase(provider) || smtpConfigured;
+        return "google".equalsIgnoreCase(provider) || "azure".equalsIgnoreCase(provider)
+                || linkedProvider != null || smtpConfigured;
+    }
+
+    /**
+     * Checks if this user has a linked OAuth provider.
+     */
+    public boolean hasLinkedProvider() {
+        return linkedProvider != null && linkedProviderTokenEncrypted != null;
     }
 
     // SMTP Getters and Setters
@@ -180,6 +208,63 @@ public class UserToken {
 
     public void setSmtpSetupSkipped(boolean smtpSetupSkipped) {
         this.smtpSetupSkipped = smtpSetupSkipped;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // ===== Linked Provider Getters and Setters =====
+
+    public String getLinkedProvider() {
+        return linkedProvider;
+    }
+
+    public void setLinkedProvider(String linkedProvider) {
+        this.linkedProvider = linkedProvider;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public String getLinkedProviderTokenEncrypted() {
+        return linkedProviderTokenEncrypted;
+    }
+
+    public void setLinkedProviderTokenEncrypted(String linkedProviderTokenEncrypted) {
+        this.linkedProviderTokenEncrypted = linkedProviderTokenEncrypted;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public String getLinkedProviderRefreshToken() {
+        return linkedProviderRefreshToken;
+    }
+
+    public void setLinkedProviderRefreshToken(String linkedProviderRefreshToken) {
+        this.linkedProviderRefreshToken = linkedProviderRefreshToken;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public String getLinkedProviderEmail() {
+        return linkedProviderEmail;
+    }
+
+    public void setLinkedProviderEmail(String linkedProviderEmail) {
+        this.linkedProviderEmail = linkedProviderEmail;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public String getDetectedHostingProvider() {
+        return detectedHostingProvider;
+    }
+
+    public void setDetectedHostingProvider(String detectedHostingProvider) {
+        this.detectedHostingProvider = detectedHostingProvider;
+    }
+
+    /**
+     * Clears all linked provider data.
+     */
+    public void clearLinkedProvider() {
+        this.linkedProvider = null;
+        this.linkedProviderTokenEncrypted = null;
+        this.linkedProviderRefreshToken = null;
+        this.linkedProviderEmail = null;
         this.updatedAt = LocalDateTime.now();
     }
 }

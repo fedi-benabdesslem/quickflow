@@ -15,20 +15,23 @@ export default function HomePage() {
     const navigate = useNavigate()
     const [showSmtpSetup, setShowSmtpSetup] = useState(false)
 
-    // Check if user needs SMTP setup (post-signup)
+    // Check if user needs email setup (post-signup)
     useEffect(() => {
-        const checkSmtpSetup = async () => {
+        const checkEmailSetup = async () => {
             try {
                 const status = await getSmtpStatus()
-                if (status.needsSetup) {
+                if (status.action === 'link_oauth') {
+                    // Redirect to profile page for OAuth linking
+                    navigate('/profile', { replace: true })
+                } else if (status.needsSetup) {
                     setShowSmtpSetup(true)
                 }
             } catch {
                 // silently ignore
             }
         }
-        checkSmtpSetup()
-    }, [])
+        checkEmailSetup()
+    }, [navigate])
 
     // Extract first name for greeting
     const firstName = user?.username?.split(' ')[0] || user?.username || 'there'

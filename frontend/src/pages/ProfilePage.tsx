@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import UserAvatar from '../components/UserAvatar'
 import TechSupportButton from '../components/TechSupportButton'
 import SmtpSetupModal from '../components/SmtpSetupModal'
-import { getSmtpStatus, testSmtp, removeSmtp, type SmtpStatusResponse } from '../lib/api'
+import { getSmtpStatus, testSmtp, removeSmtp, linkOAuthProvider, unlinkOAuthProvider, type SmtpStatusResponse } from '../lib/api'
 
 export default function ProfilePage() {
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
     const { user, updateProfile } = useAuth()
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -25,9 +26,29 @@ export default function ProfilePage() {
     const [smtpLoading, setSmtpLoading] = useState(false)
     const [smtpFeedback, setSmtpFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
+    // OAuth linking state
+    const [linkingLoading, setLinkingLoading] = useState(false)
+
     useEffect(() => {
         loadSmtpStatus()
     }, [])
+
+    // Handle OAuth linking redirect
+    useEffect(() => {
+        const linked = searchParams.get('linked')
+        if (linked === 'success') {
+            setSmtpFeedback({ type: 'success', message: 'Account linked successfully! You can now send emails.' })
+            loadSmtpStatus()
+            searchParams.delete('linked')
+            setSearchParams(searchParams, { replace: true })
+        } else if (linked === 'error') {
+            const errorMsg = searchParams.get('error') || 'Failed to link account.'
+            setSmtpFeedback({ type: 'error', message: errorMsg })
+            searchParams.delete('linked')
+            searchParams.delete('error')
+            setSearchParams(searchParams, { replace: true })
+        }
+    }, [searchParams, setSearchParams])
 
     const loadSmtpStatus = async () => {
         const status = await getSmtpStatus()
@@ -139,6 +160,37 @@ export default function ProfilePage() {
     const handleSmtpConfigured = () => {
         loadSmtpStatus()
         setSmtpFeedback({ type: 'success', message: 'Email sending configured successfully!' })
+    }
+
+    const handleLinkOAuth = async (provider: 'google' | 'microsoft') => {
+        setLinkingLoading(true)
+        setSmtpFeedback(null)
+        try {
+            const result = await linkOAuthProvider(provider)
+            if (result.authorizationUrl) {
+                window.location.href = result.authorizationUrl
+            } else {
+                setSmtpFeedback({ type: 'error', message: result.message || 'Failed to start linking.' })
+                setLinkingLoading(false)
+            }
+        } catch {
+            setSmtpFeedback({ type: 'error', message: 'Failed to initiate account linking.' })
+            setLinkingLoading(false)
+        }
+    }
+
+    const handleUnlinkOAuth = async () => {
+        if (!confirm('Are you sure you want to unlink your account? You will no longer be able to send emails through this provider.')) return
+        setLinkingLoading(true)
+        setSmtpFeedback(null)
+        const result = await unlinkOAuthProvider()
+        if ((result as any).status === 'success') {
+            setSmtpFeedback({ type: 'success', message: 'Account unlinked.' })
+            await loadSmtpStatus()
+        } else {
+            setSmtpFeedback({ type: 'error', message: (result as any).message || 'Failed to unlink.' })
+        }
+        setLinkingLoading(false)
     }
 
     return (
@@ -284,8 +336,77 @@ export default function ProfilePage() {
                     </motion.button>
                 </div>
 
+                {/* OAuth Linking Section (for email/password users with Google/Microsoft hosted domains) */}
+                {smtpStatus && !smtpStatus.isOAuth && (smtpStatus.action === 'link_oauth' || smtpStatus.linkedProvider) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="glass-card p-8 mt-6"
+                    >
+                        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                            🔗 Account Linking
+                        </h2>
+
+                        {smtpStatus.linkedProvider ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-slate-400">Linked Account</span>
+                                    <span className="text-sm text-emerald-400 font-medium">
+                                        ✅ {smtpStatus.linkedProviderName || smtpStatus.linkedProvider}
+                                    </span>
+                                </div>
+                                {smtpStatus.linkedProviderEmail && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-slate-400">Email</span>
+                                        <span className="text-sm text-white">{smtpStatus.linkedProviderEmail}</span>
+                                    </div>
+                                )}
+                                <div className="pt-2">
+                                    <button
+                                        onClick={handleUnlinkOAuth}
+                                        disabled={linkingLoading}
+                                        className="px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
+                                    >
+                                        {linkingLoading ? 'Unlinking...' : 'Unlink Account'}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <p className="text-sm text-slate-400">
+                                    Your email is hosted by <strong className="text-white">{smtpStatus.hostingProviderName}</strong>.
+                                    Link your account to send emails directly.
+                                </p>
+                                <div className="flex flex-wrap gap-2 pt-2">
+                                    {smtpStatus.hostingProvider === 'google' && (
+                                        <button
+                                            onClick={() => handleLinkOAuth('google')}
+                                            disabled={linkingLoading}
+                                            className="px-4 py-3 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-lg transition-colors font-medium flex items-center gap-2 disabled:opacity-50"
+                                        >
+                                            <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" /></svg>
+                                            {linkingLoading ? 'Connecting...' : 'Link Google Account'}
+                                        </button>
+                                    )}
+                                    {smtpStatus.hostingProvider === 'microsoft' && (
+                                        <button
+                                            onClick={() => handleLinkOAuth('microsoft')}
+                                            disabled={linkingLoading}
+                                            className="px-4 py-3 text-sm bg-[#2F2F2F] hover:bg-[#3F3F3F] text-white rounded-lg transition-colors font-medium flex items-center gap-2 disabled:opacity-50"
+                                        >
+                                            <svg className="w-4 h-4" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#F25022" /><rect x="11" y="1" width="9" height="9" fill="#7FBA00" /><rect x="1" y="11" width="9" height="9" fill="#00A4EF" /><rect x="11" y="11" width="9" height="9" fill="#FFB900" /></svg>
+                                            {linkingLoading ? 'Connecting...' : 'Link Microsoft Account'}
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+
                 {/* SMTP Email Configuration Section */}
-                {smtpStatus && !smtpStatus.isOAuth && (
+                {smtpStatus && !smtpStatus.isOAuth && !smtpStatus.linkedProvider && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -365,6 +486,20 @@ export default function ProfilePage() {
                                 </p>
                             )}
                         </div>
+                    </motion.div>
+                )}
+
+                {/* Linking feedback (shown above SMTP section when applicable) */}
+                {smtpStatus && !smtpStatus.isOAuth && smtpStatus.linkedProvider && smtpFeedback && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`mt-4 p-3 rounded-lg text-sm ${smtpFeedback.type === 'success'
+                            ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                            : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                            }`}
+                    >
+                        {smtpFeedback.message}
                     </motion.div>
                 )}
             </motion.div>

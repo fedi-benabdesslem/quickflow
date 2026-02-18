@@ -64,7 +64,7 @@ public class EmailProviderService {
                 "[EmailProviderService] Provider: " + provider + ", smtpConfigured: " + userToken.isSmtpConfigured());
 
         try {
-            // Priority 1: Google OAuth
+            // Priority 1: Google OAuth (direct sign-in)
             if ("google".equalsIgnoreCase(provider)) {
                 System.out.println("[EmailProviderService] Using Gmail service...");
                 boolean success = pdfBytes != null
@@ -74,7 +74,7 @@ public class EmailProviderService {
                         : new SendResult(false, "Failed to send email.", "send_failed");
             }
 
-            // Priority 2: Microsoft OAuth
+            // Priority 2: Microsoft OAuth (direct sign-in)
             if ("azure".equalsIgnoreCase(provider)) {
                 System.out.println("[EmailProviderService] Using Microsoft Graph service...");
                 boolean success = pdfBytes != null
@@ -85,7 +85,38 @@ public class EmailProviderService {
                         : new SendResult(false, "Failed to send email.", "send_failed");
             }
 
-            // Priority 3: SMTP (configured with app password)
+            // Priority 3: Linked OAuth provider (email/password user who linked
+            // Google/Microsoft)
+            if (userToken.hasLinkedProvider()) {
+                String linkedProvider = userToken.getLinkedProvider();
+                System.out.println("[EmailProviderService] Using linked " + linkedProvider + " provider...");
+
+                // Decrypt the linked provider's access token
+                String linkedAccessToken = encryptionService.decrypt(userToken.getLinkedProviderTokenEncrypted());
+
+                if ("google".equals(linkedProvider)) {
+                    // Store the linked token temporarily for GmailService to use
+                    boolean success = pdfBytes != null
+                            ? gmailService.sendEmailWithAccessToken(linkedAccessToken,
+                                    userToken.getLinkedProviderEmail(),
+                                    to, subject, htmlBody, pdfBytes, pdfFilename)
+                            : gmailService.sendEmailWithAccessToken(linkedAccessToken,
+                                    userToken.getLinkedProviderEmail(),
+                                    to, subject, htmlBody);
+                    return success ? new SendResult(true, "Email sent successfully!", "success")
+                            : new SendResult(false, "Failed to send email.", "send_failed");
+                } else if ("microsoft".equals(linkedProvider)) {
+                    boolean success = pdfBytes != null
+                            ? microsoftGraphService.sendEmailWithAccessToken(linkedAccessToken,
+                                    to, subject, htmlBody, pdfBytes, pdfFilename)
+                            : microsoftGraphService.sendEmailWithAccessToken(linkedAccessToken,
+                                    to, subject, htmlBody);
+                    return success ? new SendResult(true, "Email sent successfully!", "success")
+                            : new SendResult(false, "Failed to send email.", "send_failed");
+                }
+            }
+
+            // Priority 4: SMTP (configured with app password)
             if (userToken.isSmtpConfigured()) {
                 System.out.println("[EmailProviderService] Using SMTP service...");
                 String email = userToken.getEmail();
@@ -99,7 +130,7 @@ public class EmailProviderService {
                         : new SendResult(false, "Failed to send email.", "send_failed");
             }
 
-            // Priority 4: SMTP domain supported but not configured
+            // Priority 5: SMTP domain supported but not configured
             String domain = SmtpProviderConfig.extractDomain(userToken.getEmail());
             if (smtpProviderConfig.isSupported(domain)) {
                 String providerName = smtpProviderConfig.getProviderName(domain);
@@ -108,7 +139,7 @@ public class EmailProviderService {
                         "smtp_not_configured");
             }
 
-            // Priority 5: Unsupported provider
+            // Priority 6: Unsupported provider
             return new SendResult(false,
                     "Email sending is not available for your provider. You can download the PDF and send it manually.",
                     "unsupported_provider");

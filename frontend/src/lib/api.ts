@@ -801,6 +801,13 @@ export interface SmtpStatusResponse {
     providerName: string
     needsSetup: boolean
     isOAuth: boolean
+    // New fields for hosting detection & OAuth linking
+    hostingProvider: string
+    hostingProviderName: string
+    linkedProvider: string
+    linkedProviderName: string
+    linkedProviderEmail: string
+    action: 'ready' | 'link_oauth' | 'setup_smtp' | 'unsupported' | ''
 }
 
 /**
@@ -868,6 +875,12 @@ export const getSmtpStatus = async (): Promise<SmtpStatusResponse> => {
             providerName: 'Unknown',
             needsSetup: false,
             isOAuth: false,
+            hostingProvider: '',
+            hostingProviderName: '',
+            linkedProvider: '',
+            linkedProviderName: '',
+            linkedProviderEmail: '',
+            action: '',
         }
     }
 }
@@ -882,6 +895,35 @@ export const skipSmtpSetup = async (): Promise<ApiResponse> => {
     } catch (error) {
         console.error('SMTP skip error:', error)
         return { status: 'error', message: 'Failed to skip SMTP setup' }
+    }
+}
+
+// ============ OAuth Linking APIs ============
+
+/**
+ * Initiate OAuth linking for a provider (google or microsoft).
+ * Returns an authorization URL to redirect the user to.
+ */
+export const linkOAuthProvider = async (provider: 'google' | 'microsoft'): Promise<{ status: string; authorizationUrl?: string; message?: string }> => {
+    try {
+        const response = await api.get(`/auth/link/${provider}`)
+        return response.data
+    } catch (error) {
+        console.error('OAuth linking error:', error)
+        return { status: 'error', message: 'Failed to initiate account linking' }
+    }
+}
+
+/**
+ * Unlink an OAuth provider from the user's account.
+ */
+export const unlinkOAuthProvider = async (): Promise<ApiResponse> => {
+    try {
+        const response = await api.delete<ApiResponse>('/auth/link')
+        return response.data
+    } catch (error) {
+        console.error('OAuth unlink error:', error)
+        return { status: 'error', message: 'Failed to unlink provider' }
     }
 }
 
