@@ -80,9 +80,11 @@ function RootRedirect() {
 function App() {
     const { session } = useAuth()
 
-    // Set auth token whenever session changes
+    // Set auth token whenever session changes (but don't clear on initial null)
     useEffect(() => {
-        setAuthToken(session?.accessToken || null)
+        if (session?.accessToken) {
+            setAuthToken(session.accessToken)
+        }
     }, [session])
 
     return (
