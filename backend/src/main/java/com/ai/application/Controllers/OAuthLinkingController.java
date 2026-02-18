@@ -1,7 +1,10 @@
 package com.ai.application.Controllers;
 
+import com.ai.application.Repositories.UserRepository;
 import com.ai.application.Repositories.UserTokenRepository;
 import com.ai.application.Services.EncryptionService;
+import com.ai.application.model.Entity.AuthConnection;
+import com.ai.application.model.Entity.User;
 import com.ai.application.model.Entity.UserToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -20,12 +23,16 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Controller for OAuth account linking.
- * 
+ *
  * Allows email/password users to link their Google or Microsoft account
  * for email sending capabilities without changing their auth method.
+ *
+ * Uses the new User model with AuthConnection, with a legacy UserToken
+ * fallback.
  */
 @RestController
 @RequestMapping("/api/auth/link")
@@ -47,31 +54,34 @@ public class OAuthLinkingController {
     @Value("${google.oauth.client-secret:}")
     private String googleClientSecret;
 
-    @Value("${microsoft.oauth.client-id:}")
+    @Value("${spring.security.oauth2.client.registration.microsoft.client-id:}")
     private String microsoftClientId;
 
-    @Value("${microsoft.oauth.client-secret:}")
+    @Value("${spring.security.oauth2.client.registration.microsoft.client-secret:}")
     private String microsoftClientSecret;
 
-    @Value("${microsoft.oauth.tenant-id:common}")
+    @Value("${spring.security.oauth2.client.provider.microsoft.tenant-id:common}")
     private String microsoftTenantId;
 
-    @Value("${supabase.jwt.secret:}")
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${oauth.linking.frontend-url:http://localhost:5173}")
+    @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
-    @Value("${oauth.linking.backend-url:http://localhost:8080}")
+    @Value("${app.backend.url:http://localhost:8080}")
     private String backendUrl;
 
+    private final UserRepository userRepository;
     private final UserTokenRepository userTokenRepository;
     private final EncryptionService encryptionService;
     private final RestTemplate restTemplate;
     private final Gson gson;
 
-    public OAuthLinkingController(UserTokenRepository userTokenRepository,
+    public OAuthLinkingController(UserRepository userRepository,
+            UserTokenRepository userTokenRepository,
             EncryptionService encryptionService) {
+        this.userRepository = userRepository;
         this.userTokenRepository = userTokenRepository;
         this.encryptionService = encryptionService;
         this.restTemplate = new RestTemplate();
@@ -80,22 +90,19 @@ public class OAuthLinkingController {
 
     /**
      * Generates an OAuth authorization URL for linking a provider.
-     * Returns the URL that the frontend should redirect to.
      */
     @GetMapping("/{provider}")
     public ResponseEntity<?> getLinkingUrl(@PathVariable String provider, Principal principal) {
-        String supabaseId = principal.getName();
-        System.out.println("[OAuthLinking] Link request for provider: " + provider + ", user: " + supabaseId);
+        String userId = principal.getName();
+        System.out.println("[OAuthLinking] Link request for provider: " + provider + ", user: " + userId);
 
-        // Validate provider
         if (!"google".equalsIgnoreCase(provider) && !"microsoft".equalsIgnoreCase(provider)) {
             return ResponseEntity.badRequest().body(Map.of(
                     "status", "error",
                     "message", "Unsupported provider. Use 'google' or 'microsoft'."));
         }
 
-        // Generate a short-lived linking token (HMAC-signed)
-        String linkingToken = generateLinkingToken(supabaseId, provider.toLowerCase());
+        String linkingToken = generateLinkingToken(userId, provider.toLowerCase());
         String callbackUrl = backendUrl + "/api/auth/link/callback";
 
         String authorizationUrl;
@@ -111,10 +118,8 @@ public class OAuthLinkingController {
     }
 
     /**
-     * OAuth callback endpoint — handles the redirect from Google/Microsoft.
-     * This is a PUBLIC endpoint (no JWT required) because it's called by the
-     * OAuth provider redirect, not by the authenticated frontend.
-     * Authentication is via the signed linking token in the state parameter.
+     * OAuth callback — handles redirect from Google/Microsoft.
+     * PUBLIC endpoint — auth is via the signed linking token in state parameter.
      */
     @GetMapping("/callback")
     public ResponseEntity<?> handleCallback(
@@ -125,7 +130,6 @@ public class OAuthLinkingController {
         System.out.println("[OAuthLinking] Callback received - code present: " + (code != null)
                 + ", state present: " + (state != null) + ", error: " + error);
 
-        // Handle OAuth errors
         if (error != null) {
             System.err.println("[OAuthLinking] OAuth error: " + error);
             return redirectToFrontend("error", "OAuth authorization was denied or failed.");
@@ -135,7 +139,6 @@ public class OAuthLinkingController {
             return redirectToFrontend("error", "Missing authorization code or state.");
         }
 
-        // Validate the linking token
         LinkingTokenClaims claims;
         try {
             claims = validateLinkingToken(state);
@@ -144,14 +147,13 @@ public class OAuthLinkingController {
             return redirectToFrontend("error", "Link session expired. Please try again.");
         }
 
-        String supabaseId = claims.supabaseId;
+        String userId = claims.userId;
         String provider = claims.provider;
         String callbackUrl = backendUrl + "/api/auth/link/callback";
 
-        System.out.println("[OAuthLinking] Valid linking token - user: " + supabaseId + ", provider: " + provider);
+        System.out.println("[OAuthLinking] Valid linking token - user: " + userId + ", provider: " + provider);
 
         try {
-            // Exchange authorization code for tokens
             TokenResponse tokens;
             String linkedEmail;
 
@@ -167,25 +169,58 @@ public class OAuthLinkingController {
                 return redirectToFrontend("error", "Failed to obtain tokens from provider.");
             }
 
-            // Store linked provider tokens
-            UserToken userToken = userTokenRepository.findBySupabaseId(supabaseId)
-                    .orElse(null);
+            // Try new User model first
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
 
-            if (userToken == null) {
-                return redirectToFrontend("error", "User account not found.");
+                // Create or update AuthConnection for linked provider
+                AuthConnection conn = user.findConnection(provider);
+                if (conn == null) {
+                    conn = new AuthConnection();
+                    conn.setProvider(provider);
+                    conn.setConnectionType("linked");
+                    if (user.getAuthConnections() == null) {
+                        user.setAuthConnections(new java.util.ArrayList<>());
+                    }
+                    user.getAuthConnections().add(conn);
+                }
+
+                conn.setAccessTokenEncrypted(encryptionService.encrypt(tokens.accessToken));
+                if (tokens.refreshToken != null) {
+                    conn.setRefreshTokenEncrypted(encryptionService.encrypt(tokens.refreshToken));
+                }
+                conn.setProviderEmail(linkedEmail);
+                conn.setConnectedAt(LocalDateTime.now());
+                conn.setTokenExpiresAt(LocalDateTime.now().plusHours(1));
+
+                user.setUpdatedAt(LocalDateTime.now());
+                userRepository.save(user);
+
+                System.out.println("[OAuthLinking] Successfully linked " + provider
+                        + " via User model for user: " + userId);
+                return redirectToFrontend("success", null);
             }
 
-            userToken.setLinkedProvider(provider);
-            userToken.setLinkedProviderTokenEncrypted(encryptionService.encrypt(tokens.accessToken));
-            if (tokens.refreshToken != null) {
-                userToken.setLinkedProviderRefreshToken(encryptionService.encrypt(tokens.refreshToken));
-            }
-            userToken.setLinkedProviderEmail(linkedEmail);
-            userToken.setUpdatedAt(LocalDateTime.now());
-            userTokenRepository.save(userToken);
+            // Fallback to legacy UserToken model
+            Optional<UserToken> tokenOpt = userTokenRepository.findByEmail(userId);
+            if (tokenOpt.isPresent()) {
+                UserToken userToken = tokenOpt.get();
+                userToken.setLinkedProvider(provider);
+                userToken.setLinkedProviderTokenEncrypted(encryptionService.encrypt(tokens.accessToken));
+                if (tokens.refreshToken != null) {
+                    userToken.setLinkedProviderRefreshToken(encryptionService.encrypt(tokens.refreshToken));
+                }
+                userToken.setLinkedProviderEmail(linkedEmail);
+                userToken.setUpdatedAt(LocalDateTime.now());
+                userTokenRepository.save(userToken);
 
-            System.out.println("[OAuthLinking] Successfully linked " + provider + " for user: " + supabaseId);
-            return redirectToFrontend("success", null);
+                System.out.println("[OAuthLinking] Successfully linked " + provider
+                        + " via legacy UserToken for user: " + userId);
+                return redirectToFrontend("success", null);
+            }
+
+            return redirectToFrontend("error", "User account not found.");
 
         } catch (Exception e) {
             System.err.println("[OAuthLinking] Token exchange failed: " + e.getMessage());
@@ -199,15 +234,31 @@ public class OAuthLinkingController {
      */
     @DeleteMapping
     public ResponseEntity<?> unlinkProvider(Principal principal) {
-        String supabaseId = principal.getName();
-        System.out.println("[OAuthLinking] Unlink request for user: " + supabaseId);
+        String userId = principal.getName();
+        System.out.println("[OAuthLinking] Unlink request for user: " + userId);
 
-        return userTokenRepository.findBySupabaseId(supabaseId)
+        // Try new User model first
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            // Remove all linked (non-primary) AuthConnections
+            if (user.getAuthConnections() != null) {
+                user.getAuthConnections().removeIf(c -> "linked".equals(c.getConnectionType()));
+                user.setUpdatedAt(LocalDateTime.now());
+                userRepository.save(user);
+            }
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Provider unlinked successfully."));
+        }
+
+        // Fallback to legacy model
+        return userTokenRepository.findByEmail(userId)
                 .map(userToken -> {
                     String previousProvider = userToken.getLinkedProvider();
                     userToken.clearLinkedProvider();
                     userTokenRepository.save(userToken);
-                    System.out.println("[OAuthLinking] Unlinked " + previousProvider + " for user: " + supabaseId);
+                    System.out.println("[OAuthLinking] Unlinked " + previousProvider + " for user: " + userId);
                     return ResponseEntity.ok(Map.of(
                             "status", "success",
                             "message", "Provider unlinked successfully."));
@@ -219,23 +270,15 @@ public class OAuthLinkingController {
 
     // ===== Linking Token (HMAC-signed) =====
 
-    /**
-     * Generates a simple HMAC-signed linking token:
-     * payload = supabaseId|provider|expiryTimestamp
-     * token = base64(payload) + "." + base64(hmac-sha256(payload))
-     */
-    private String generateLinkingToken(String supabaseId, String provider) {
+    private String generateLinkingToken(String userId, String provider) {
         long expiry = System.currentTimeMillis() + LINKING_TOKEN_EXPIRY_MS;
-        String payload = supabaseId + "|" + provider + "|" + expiry;
+        String payload = userId + "|" + provider + "|" + expiry;
         String payloadB64 = Base64.getUrlEncoder().withoutPadding()
                 .encodeToString(payload.getBytes(StandardCharsets.UTF_8));
         String signature = hmacSign(payload);
         return payloadB64 + "." + signature;
     }
 
-    /**
-     * Validates a linking token and returns the claims if valid.
-     */
     private LinkingTokenClaims validateLinkingToken(String token) {
         String[] parts = token.split("\\.");
         if (parts.length != 2) {
@@ -412,7 +455,7 @@ public class OAuthLinkingController {
 
     // ===== Inner Classes =====
 
-    private record LinkingTokenClaims(String supabaseId, String provider) {
+    private record LinkingTokenClaims(String userId, String provider) {
     }
 
     private record TokenResponse(String accessToken, String refreshToken) {

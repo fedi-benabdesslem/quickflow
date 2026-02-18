@@ -38,7 +38,7 @@ export default function UserProfileSidebar() {
         return 'email'
     }
 
-    // Get user photo from Supabase session metadata
+    // Get user photo from authentication context
     const photoUrl = user?.avatarUrl || null
     const fullName = user?.username || user?.email?.split('@')[0] || 'User'
 

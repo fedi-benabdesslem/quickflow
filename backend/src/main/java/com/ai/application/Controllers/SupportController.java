@@ -42,7 +42,7 @@ public class SupportController {
                     "message", "Message cannot be empty"));
         }
 
-        String supabaseId = principal.getName();
+        String userId = principal.getName();
 
         // Fixed support email addresses
         String supportRecipients = "fadib.abdesslem2004@gmail.com, oussemabenameur9@gmail.com";
@@ -58,7 +58,7 @@ public class SupportController {
         String htmlContent = "<p>" + sanitized.replace("\n", "</p><p>") + "</p>";
 
         EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, supportRecipients, subject, htmlContent);
+                userId, supportRecipients, subject, htmlContent);
 
         if (result.isSuccess()) {
             return ResponseEntity.ok(Map.of(

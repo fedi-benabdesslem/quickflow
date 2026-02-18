@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@playwright/test": "^1.58.2",
     "@react-pdf/renderer": "^3.4.4",
     "@supabase/supabase-js": "^2.91.0",
     "@types/marked": "^5.0.2",

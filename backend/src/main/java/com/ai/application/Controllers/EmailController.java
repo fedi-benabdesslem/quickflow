@@ -107,7 +107,7 @@ public class EmailController {
         email.setGeneratedContent(finalContent);
 
         // Try sending via OAuth provider first
-        String supabaseId = principal.getName();
+        String userId = principal.getName();
         String recipients = String.join(", ", email.getRecipients());
 
         // Convert plain text to HTML if it's not already
@@ -117,7 +117,7 @@ public class EmailController {
         }
 
         EmailProviderService.SendResult result = emailProviderService.sendEmail(
-                supabaseId, recipients, email.getSubject(), htmlContent);
+                userId, recipients, email.getSubject(), htmlContent);
 
         if (result.isSuccess()) {
             email.setStatus("sent");

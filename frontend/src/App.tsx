@@ -5,6 +5,10 @@ import { useEffect } from 'react'
 import NebulaBackground from './components/NebulaBackground'
 import { ToastProvider } from './components/Toast'
 import AuthPage from './pages/AuthPage'
+import AuthCallbackPage from './pages/AuthCallbackPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import HomePage from './pages/HomePage'
 import MeetingPage from './pages/MeetingPage'
 import EmailPage from './pages/EmailPage'
@@ -78,7 +82,7 @@ function App() {
 
     // Set auth token whenever session changes
     useEffect(() => {
-        setAuthToken(session?.access_token || null)
+        setAuthToken(session?.accessToken || null)
     }, [session])
 
     return (
@@ -95,6 +99,10 @@ function App() {
                         </PublicRoute>
                     }
                 />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route
                     path="/home"
                     element={

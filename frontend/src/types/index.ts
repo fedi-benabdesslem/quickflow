@@ -3,6 +3,7 @@ export interface User {
     username: string;
     email?: string;
     avatarUrl?: string;
+    role?: string;
 }
 
 export interface AuthContextType {
@@ -19,9 +20,7 @@ export interface AuthContextType {
 }
 
 export interface Session {
-    access_token: string;
-    refresh_token: string;
-    expires_at?: number;
+    accessToken: string;
 }
 
 export interface AuthResult {

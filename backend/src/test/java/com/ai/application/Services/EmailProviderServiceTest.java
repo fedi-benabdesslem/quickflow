@@ -1,6 +1,7 @@
 package com.ai.application.Services;
 
 import com.ai.application.Config.SmtpProviderConfig;
+import com.ai.application.Repositories.UserRepository;
 import com.ai.application.model.Entity.UserToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,12 +50,15 @@ class EmailProviderServiceTest {
     @Mock
     private SmtpProviderConfig smtpProviderConfig;
 
+    @Mock
+    private UserRepository userRepository;
+
     private EmailProviderService emailProviderService;
 
     @BeforeEach
     void setUp() {
         emailProviderService = new EmailProviderService(gmailService, microsoftGraphService,
-                smtpEmailService, tokenStorageService, encryptionService, smtpProviderConfig);
+                smtpEmailService, tokenStorageService, userRepository, encryptionService, smtpProviderConfig);
     }
 
     @Nested
