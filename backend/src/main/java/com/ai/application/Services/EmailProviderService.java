@@ -21,7 +21,6 @@ public class EmailProviderService {
     private final GmailService gmailService;
     private final MicrosoftGraphService microsoftGraphService;
     private final SmtpEmailService smtpEmailService;
-    private final TokenStorageService tokenStorageService;
     private final UserRepository userRepository;
     private final EncryptionService encryptionService;
     private final SmtpProviderConfig smtpProviderConfig;
@@ -29,14 +28,12 @@ public class EmailProviderService {
     public EmailProviderService(GmailService gmailService,
             MicrosoftGraphService microsoftGraphService,
             SmtpEmailService smtpEmailService,
-            TokenStorageService tokenStorageService,
             UserRepository userRepository,
             EncryptionService encryptionService,
             SmtpProviderConfig smtpProviderConfig) {
         this.gmailService = gmailService;
         this.microsoftGraphService = microsoftGraphService;
         this.smtpEmailService = smtpEmailService;
-        this.tokenStorageService = tokenStorageService;
         this.userRepository = userRepository;
         this.encryptionService = encryptionService;
         this.smtpProviderConfig = smtpProviderConfig;
@@ -57,15 +54,18 @@ public class EmailProviderService {
             String htmlBody, byte[] pdfBytes, String pdfFilename) {
         System.out.println("[EmailProviderService] sendEmail called for user: " + userId);
 
-        // Try new User model first
+        // Try finding user by ID first, then by email
         Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(userId);
+        }
 
         if (userOpt.isPresent()) {
             return sendUsingUserModel(userOpt.get(), to, subject, htmlBody, pdfBytes, pdfFilename);
         }
 
-        // Fallback to legacy UserToken model (for migration period)
-        return sendUsingLegacyModel(userId, to, subject, htmlBody, pdfBytes, pdfFilename);
+        System.err.println("[EmailProviderService] ERROR: No user found for: " + userId);
+        return new SendResult(false, "No account found. Please sign in again.", "no_tokens");
     }
 
     /**
@@ -151,69 +151,14 @@ public class EmailProviderService {
     }
 
     /**
-     * Fallback: Send email using legacy UserToken model.
-     * Kept for backward compatibility during migration.
-     */
-    private SendResult sendUsingLegacyModel(String userId, String to, String subject,
-            String htmlBody, byte[] pdfBytes, String pdfFilename) {
-        // Delegate to old TokenStorageService-based flow
-        var userTokenOpt = tokenStorageService.getUserToken(userId);
-        if (userTokenOpt.isEmpty()) {
-            System.err.println("[EmailProviderService] ERROR: No tokens found for user: " + userId);
-            return new SendResult(false, "No account found. Please sign in again.", "no_tokens");
-        }
-
-        var userToken = userTokenOpt.get();
-        String provider = userToken.getProvider();
-
-        try {
-            if ("google".equalsIgnoreCase(provider)) {
-                boolean success = pdfBytes != null
-                        ? gmailService.sendEmailWithAttachment(userId, to, subject, htmlBody, pdfBytes, pdfFilename)
-                        : gmailService.sendEmail(userId, to, subject, htmlBody);
-                return success ? new SendResult(true, "Email sent successfully!", "success")
-                        : new SendResult(false, "Failed to send email.", "send_failed");
-            }
-
-            if ("azure".equalsIgnoreCase(provider)) {
-                boolean success = pdfBytes != null
-                        ? microsoftGraphService.sendEmailWithAttachment(userId, to, subject, htmlBody, pdfBytes,
-                                pdfFilename)
-                        : microsoftGraphService.sendEmail(userId, to, subject, htmlBody);
-                return success ? new SendResult(true, "Email sent successfully!", "success")
-                        : new SendResult(false, "Failed to send email.", "send_failed");
-            }
-
-            if (userToken.isSmtpConfigured()) {
-                String email = userToken.getEmail();
-                String password = encryptionService.decrypt(userToken.getSmtpPasswordEncrypted());
-                boolean success = pdfBytes != null
-                        ? smtpEmailService.sendEmailWithAttachment(email, password, to, subject, htmlBody, pdfBytes,
-                                pdfFilename)
-                        : smtpEmailService.sendEmail(email, password, to, subject, htmlBody);
-                return success ? new SendResult(true, "Email sent successfully!", "success")
-                        : new SendResult(false, "Failed to send email.", "send_failed");
-            }
-
-            return new SendResult(false, "Email sending is not available.", "unsupported_provider");
-        } catch (Exception e) {
-            return new SendResult(false, "Service not available, try later.", "service_error");
-        }
-    }
-
-    /**
      * Checks if a user can send emails.
      */
     public boolean canUserSendEmail(String userId) {
-        // Check new model first
         Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            return userOpt.get().canSendEmail();
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(userId);
         }
-        // Legacy fallback
-        return tokenStorageService.getUserToken(userId)
-                .map(ut -> ut.canSendEmail())
-                .orElse(false);
+        return userOpt.map(User::canSendEmail).orElse(false);
     }
 
     /**
@@ -221,6 +166,9 @@ public class EmailProviderService {
      */
     public String getUserProvider(String userId) {
         Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(userId);
+        }
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (user.hasProvider("google"))
@@ -231,9 +179,7 @@ public class EmailProviderService {
                 return "smtp";
             return "email";
         }
-        return tokenStorageService.getUserToken(userId)
-                .map(ut -> ut.getProvider())
-                .orElse("none");
+        return "none";
     }
 
     /**

@@ -6,10 +6,8 @@ import com.ai.application.Services.DomainDetectionService;
 import com.ai.application.Services.EncryptionService;
 import com.ai.application.Services.SmtpEmailService;
 import com.ai.application.Services.SmtpEmailService.SmtpSendException;
-import com.ai.application.Repositories.UserTokenRepository;
 import com.ai.application.model.Entity.AuthConnection;
 import com.ai.application.model.Entity.User;
-import com.ai.application.model.Entity.UserToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +20,7 @@ import java.util.Optional;
 
 /**
  * Controller for SMTP email configuration endpoints.
- * Updated to use new User model with legacy UserToken fallback.
+ * Uses User model with AuthConnection.
  */
 @RestController
 @RequestMapping("/api/user/smtp")
@@ -31,24 +29,29 @@ public class SmtpConfigController {
     private static final Logger logger = LoggerFactory.getLogger(SmtpConfigController.class);
 
     private final UserRepository userRepository;
-    private final UserTokenRepository userTokenRepository;
     private final EncryptionService encryptionService;
     private final SmtpEmailService smtpEmailService;
     private final SmtpProviderConfig smtpProviderConfig;
     private final DomainDetectionService domainDetectionService;
 
     public SmtpConfigController(UserRepository userRepository,
-            UserTokenRepository userTokenRepository,
             EncryptionService encryptionService,
             SmtpEmailService smtpEmailService,
             SmtpProviderConfig smtpProviderConfig,
             DomainDetectionService domainDetectionService) {
         this.userRepository = userRepository;
-        this.userTokenRepository = userTokenRepository;
         this.encryptionService = encryptionService;
         this.smtpEmailService = smtpEmailService;
         this.smtpProviderConfig = smtpProviderConfig;
         this.domainDetectionService = domainDetectionService;
+    }
+
+    private Optional<User> findUser(String userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(userId);
+        }
+        return userOpt;
     }
 
     /**
@@ -67,64 +70,36 @@ public class SmtpConfigController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "App password is required"));
         }
 
-        // Try new User model first
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            String email = user.getEmail();
-            String domain = SmtpProviderConfig.extractDomain(email);
-
-            if (!smtpProviderConfig.isSupported(domain)) {
-                return ResponseEntity.badRequest().body(Map.of(
-                        "success", false,
-                        "message", "Your email provider is not supported for SMTP sending."));
-            }
-
-            try {
-                smtpEmailService.validateConnection(email, appPassword.trim());
-            } catch (SmtpSendException e) {
-                logger.warn("SMTP validation failed for user {}: {}", userId, e.getMessage());
-                return ResponseEntity.badRequest().body(Map.of(
-                        "success", false, "message", e.getMessage(), "code", e.getCode()));
-            }
-
-            String encrypted = encryptionService.encrypt(appPassword.trim());
-            user.setSmtpPasswordEncrypted(encrypted);
-            user.setSmtpConfigured(true);
-            user.setSmtpSetupSkipped(false);
-            userRepository.save(user);
-
-            logger.info("SMTP configured successfully for user {}", userId);
-            return ResponseEntity.ok(Map.of("success", true, "message", "Email sending configured successfully!"));
-        }
-
-        // Legacy fallback
-        UserToken userToken = userTokenRepository.findByEmail(userId).orElse(null);
-        if (userToken == null) {
+        Optional<User> userOpt = findUser(userId);
+        if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "User record not found."));
         }
 
-        String email = userToken.getEmail();
+        User user = userOpt.get();
+        String email = user.getEmail();
         String domain = SmtpProviderConfig.extractDomain(email);
 
         if (!smtpProviderConfig.isSupported(domain)) {
-            return ResponseEntity.badRequest().body(Map.of("success", false,
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
                     "message", "Your email provider is not supported for SMTP sending."));
         }
 
         try {
             smtpEmailService.validateConnection(email, appPassword.trim());
         } catch (SmtpSendException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("success", false, "message", e.getMessage(), "code", e.getCode()));
+            logger.warn("SMTP validation failed for user {}: {}", userId, e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false, "message", e.getMessage(), "code", e.getCode()));
         }
 
         String encrypted = encryptionService.encrypt(appPassword.trim());
-        userToken.setSmtpPasswordEncrypted(encrypted);
-        userToken.setSmtpConfigured(true);
-        userToken.setSmtpSetupSkipped(false);
-        userTokenRepository.save(userToken);
+        user.setSmtpPasswordEncrypted(encrypted);
+        user.setSmtpConfigured(true);
+        user.setSmtpSetupSkipped(false);
+        userRepository.save(user);
 
+        logger.info("SMTP configured successfully for user {}", userId);
         return ResponseEntity.ok(Map.of("success", true, "message", "Email sending configured successfully!"));
     }
 
@@ -139,27 +114,15 @@ public class SmtpConfigController {
 
         String userId = principal.getName();
 
-        // Try new User model
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (!user.isSmtpConfigured()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                        "success", false, "message", "SMTP is not configured. Please set up your app password first."));
-            }
-            String email = user.getEmail();
-            String password = encryptionService.decrypt(user.getSmtpPasswordEncrypted());
-            return sendTestEmail(email, password);
-        }
-
-        // Legacy fallback
-        UserToken userToken = userTokenRepository.findByEmail(userId).orElse(null);
-        if (userToken == null || !userToken.isSmtpConfigured()) {
+        Optional<User> userOpt = findUser(userId);
+        if (userOpt.isEmpty() || !userOpt.get().isSmtpConfigured()) {
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false, "message", "SMTP is not configured. Please set up your app password first."));
         }
-        String email = userToken.getEmail();
-        String password = encryptionService.decrypt(userToken.getSmtpPasswordEncrypted());
+
+        User user = userOpt.get();
+        String email = user.getEmail();
+        String password = encryptionService.decrypt(user.getSmtpPasswordEncrypted());
         return sendTestEmail(email, password);
     }
 
@@ -189,24 +152,16 @@ public class SmtpConfigController {
 
         String userId = principal.getName();
 
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setSmtpPasswordEncrypted(null);
-            user.setSmtpConfigured(false);
-            userRepository.save(user);
-            logger.info("SMTP configuration removed for user {}", userId);
-            return ResponseEntity.ok(Map.of("success", true, "message", "Email configuration removed."));
-        }
-
-        // Legacy fallback
-        UserToken userToken = userTokenRepository.findByEmail(userId).orElse(null);
-        if (userToken == null) {
+        Optional<User> userOpt = findUser(userId);
+        if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "User record not found"));
         }
-        userToken.setSmtpPasswordEncrypted(null);
-        userToken.setSmtpConfigured(false);
-        userTokenRepository.save(userToken);
+
+        User user = userOpt.get();
+        user.setSmtpPasswordEncrypted(null);
+        user.setSmtpConfigured(false);
+        userRepository.save(user);
+        logger.info("SMTP configuration removed for user {}", userId);
         return ResponseEntity.ok(Map.of("success", true, "message", "Email configuration removed."));
     }
 
@@ -221,20 +176,14 @@ public class SmtpConfigController {
 
         String userId = principal.getName();
 
-        // Try new User model first
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            return buildStatusFromUser(userOpt.get());
-        }
-
-        // Legacy fallback
-        UserToken userToken = userTokenRepository.findByEmail(userId).orElse(null);
-        if (userToken == null) {
+        Optional<User> userOpt = findUser(userId);
+        if (userOpt.isEmpty()) {
             return ResponseEntity.ok(Map.of(
                     "smtpConfigured", false, "smtpSetupSkipped", false,
                     "providerSupported", false, "needsSetup", false));
         }
-        return buildStatusFromUserToken(userToken);
+
+        return buildStatusFromUser(userOpt.get());
     }
 
     private ResponseEntity<?> buildStatusFromUser(User user) {
@@ -303,44 +252,6 @@ public class SmtpConfigController {
     }
 
     /**
-     * Legacy: Build status from UserToken.
-     */
-    private ResponseEntity<?> buildStatusFromUserToken(UserToken userToken) {
-        String email = userToken.getEmail();
-        String domain = SmtpProviderConfig.extractDomain(email);
-        boolean supported = smtpProviderConfig.isSupported(domain);
-        boolean blocked = smtpProviderConfig.isBlocked(domain);
-        String providerName = smtpProviderConfig.getProviderName(domain);
-        boolean isOAuth = "google".equalsIgnoreCase(userToken.getProvider())
-                || "azure".equalsIgnoreCase(userToken.getProvider());
-
-        String hostingProvider = domainDetectionService.detectProvider(email);
-        String hostingProviderName = domainDetectionService.getProviderName(hostingProvider);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("smtpConfigured", userToken.isSmtpConfigured());
-        response.put("smtpSetupSkipped", userToken.isSmtpSetupSkipped());
-        response.put("providerSupported", supported);
-        response.put("providerBlocked", blocked);
-        response.put("providerName", providerName != null ? providerName : "Unknown");
-        response.put("needsSetup", supported && !userToken.isSmtpConfigured()
-                && !userToken.isSmtpSetupSkipped() && !isOAuth && !userToken.hasLinkedProvider());
-        response.put("isOAuth", isOAuth);
-        response.put("hostingProvider", hostingProvider);
-        response.put("hostingProviderName", hostingProviderName != null ? hostingProviderName : "");
-        response.put("linkedProvider", userToken.getLinkedProvider() != null ? userToken.getLinkedProvider() : "");
-        response.put("linkedProviderName",
-                userToken.getLinkedProvider() != null
-                        ? domainDetectionService.getProviderName(userToken.getLinkedProvider())
-                        : "");
-        response.put("linkedProviderEmail",
-                userToken.getLinkedProviderEmail() != null ? userToken.getLinkedProviderEmail() : "");
-        response.put("action", "ready");
-
-        return ResponseEntity.ok(response);
-    }
-
-    /**
      * Skip SMTP setup.
      */
     @PostMapping("/skip-setup")
@@ -351,21 +262,14 @@ public class SmtpConfigController {
 
         String userId = principal.getName();
 
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setSmtpSetupSkipped(true);
-            userRepository.save(user);
-            return ResponseEntity.ok(Map.of("success", true));
-        }
-
-        // Legacy fallback
-        UserToken userToken = userTokenRepository.findByEmail(userId).orElse(null);
-        if (userToken == null) {
+        Optional<User> userOpt = findUser(userId);
+        if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "User record not found"));
         }
-        userToken.setSmtpSetupSkipped(true);
-        userTokenRepository.save(userToken);
+
+        User user = userOpt.get();
+        user.setSmtpSetupSkipped(true);
+        userRepository.save(user);
         return ResponseEntity.ok(Map.of("success", true));
     }
 }

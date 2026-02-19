@@ -1,11 +1,9 @@
 package com.ai.application.Controllers;
 
 import com.ai.application.Repositories.UserRepository;
-import com.ai.application.Repositories.UserTokenRepository;
 import com.ai.application.Services.EncryptionService;
 import com.ai.application.model.Entity.AuthConnection;
 import com.ai.application.model.Entity.User;
-import com.ai.application.model.Entity.UserToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,16 +71,13 @@ public class OAuthLinkingController {
     private String backendUrl;
 
     private final UserRepository userRepository;
-    private final UserTokenRepository userTokenRepository;
     private final EncryptionService encryptionService;
     private final RestTemplate restTemplate;
     private final Gson gson;
 
     public OAuthLinkingController(UserRepository userRepository,
-            UserTokenRepository userTokenRepository,
             EncryptionService encryptionService) {
         this.userRepository = userRepository;
-        this.userTokenRepository = userTokenRepository;
         this.encryptionService = encryptionService;
         this.restTemplate = new RestTemplate();
         this.gson = new Gson();
@@ -169,58 +164,44 @@ public class OAuthLinkingController {
                 return redirectToFrontend("error", "Failed to obtain tokens from provider.");
             }
 
-            // Try new User model first
+            // Find user by ID first, then by email
             Optional<User> userOpt = userRepository.findById(userId);
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-
-                // Create or update AuthConnection for linked provider
-                AuthConnection conn = user.findConnection(provider);
-                if (conn == null) {
-                    conn = new AuthConnection();
-                    conn.setProvider(provider);
-                    conn.setConnectionType("linked");
-                    if (user.getAuthConnections() == null) {
-                        user.setAuthConnections(new java.util.ArrayList<>());
-                    }
-                    user.getAuthConnections().add(conn);
-                }
-
-                conn.setAccessTokenEncrypted(encryptionService.encrypt(tokens.accessToken));
-                if (tokens.refreshToken != null) {
-                    conn.setRefreshTokenEncrypted(encryptionService.encrypt(tokens.refreshToken));
-                }
-                conn.setProviderEmail(linkedEmail);
-                conn.setConnectedAt(LocalDateTime.now());
-                conn.setTokenExpiresAt(LocalDateTime.now().plusHours(1));
-
-                user.setUpdatedAt(LocalDateTime.now());
-                userRepository.save(user);
-
-                System.out.println("[OAuthLinking] Successfully linked " + provider
-                        + " via User model for user: " + userId);
-                return redirectToFrontend("success", null);
+            if (userOpt.isEmpty()) {
+                userOpt = userRepository.findByEmail(userId);
             }
 
-            // Fallback to legacy UserToken model
-            Optional<UserToken> tokenOpt = userTokenRepository.findByEmail(userId);
-            if (tokenOpt.isPresent()) {
-                UserToken userToken = tokenOpt.get();
-                userToken.setLinkedProvider(provider);
-                userToken.setLinkedProviderTokenEncrypted(encryptionService.encrypt(tokens.accessToken));
-                if (tokens.refreshToken != null) {
-                    userToken.setLinkedProviderRefreshToken(encryptionService.encrypt(tokens.refreshToken));
-                }
-                userToken.setLinkedProviderEmail(linkedEmail);
-                userToken.setUpdatedAt(LocalDateTime.now());
-                userTokenRepository.save(userToken);
-
-                System.out.println("[OAuthLinking] Successfully linked " + provider
-                        + " via legacy UserToken for user: " + userId);
-                return redirectToFrontend("success", null);
+            if (userOpt.isEmpty()) {
+                return redirectToFrontend("error", "User account not found.");
             }
 
-            return redirectToFrontend("error", "User account not found.");
+            User user = userOpt.get();
+
+            // Create or update AuthConnection for linked provider
+            AuthConnection conn = user.findConnection(provider);
+            if (conn == null) {
+                conn = new AuthConnection();
+                conn.setProvider(provider);
+                conn.setConnectionType("linked");
+                if (user.getAuthConnections() == null) {
+                    user.setAuthConnections(new java.util.ArrayList<>());
+                }
+                user.getAuthConnections().add(conn);
+            }
+
+            conn.setAccessTokenEncrypted(encryptionService.encrypt(tokens.accessToken));
+            if (tokens.refreshToken != null) {
+                conn.setRefreshTokenEncrypted(encryptionService.encrypt(tokens.refreshToken));
+            }
+            conn.setProviderEmail(linkedEmail);
+            conn.setConnectedAt(LocalDateTime.now());
+            conn.setTokenExpiresAt(LocalDateTime.now().plusHours(1));
+
+            user.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(user);
+
+            System.out.println("[OAuthLinking] Successfully linked " + provider
+                    + " for user: " + userId);
+            return redirectToFrontend("success", null);
 
         } catch (Exception e) {
             System.err.println("[OAuthLinking] Token exchange failed: " + e.getMessage());
