@@ -15,14 +15,14 @@
 
 ### Refresh Tokens
 - **Storage (server)**: bcrypt hash in `sessions` collection
-- **Storage (client)**: httpOnly, Secure, SameSite=Lax cookie
+- **Storage (client)**: httpOnly, Secure, SameSite=None cookie (required for cross-origin OAuth flows)
 - **Rotation**: New refresh token issued on each refresh
 - **Revocation**: Old session invalidated on rotation
 
 ### OAuth Tokens
-- **Encryption**: AES-256 at rest in MongoDB
+- **Encryption**: AES-256 at rest in MongoDB (`AuthConnection` embedded in `User`)
 - **Key**: `encryption.secret.key` in application properties
-- **Scope**: Minimal scopes requested (email, profile, mail send)
+- **Scopes requested**: `openid`, `email`, `profile`, `gmail.send`, `gmail.readonly`, `contacts.readonly` (Google); `Mail.Send`, `User.Read`, `Contacts.Read` (Microsoft)
 
 ## Rate Limiting
 
@@ -63,15 +63,19 @@ Applied to all responses via `SecurityHeadersFilter`:
 
 ## Data Protection
 
-### Encrypted at Rest
-- OAuth access tokens and refresh tokens (`AuthConnection`)
+### Encrypted at Rest (AES-256)
+- OAuth access tokens and refresh tokens (`User.authConnections`)
 - SMTP app-specific passwords (`User.smtpPasswordEncrypted`)
 - MFA TOTP secrets (`User.mfaSecretEncrypted`)
 
 ### Hashed (Irreversible)
 - User passwords (bcrypt, cost 12)
-- Refresh tokens (bcrypt, server-side)
+- Refresh tokens (bcrypt, server-side in `sessions`)
 - MFA recovery codes (bcrypt)
+
+### Not Stored
+- Plain-text passwords (never stored)
+- Plain-text OAuth tokens (always encrypted before persistence)
 
 ## Vulnerability Reporting
 

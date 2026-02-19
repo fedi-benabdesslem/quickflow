@@ -1,14 +1,15 @@
-# API Reference — Authentication Endpoints
+# API Reference
 
-Base URL: `/api/auth`
+Base URL: `http://localhost:8080`
 
+All protected endpoints require `Authorization: Bearer <accessToken>` header.  
 All endpoints return JSON. Errors use `{ "error": "message" }` format.
 
 ---
 
 ## Public Endpoints (no JWT required)
 
-### `POST /signup`
+### `POST /api/auth/signup`
 Create a new account with email/password.
 
 | Field | Type | Required | Description |
@@ -27,7 +28,7 @@ Sets `refreshToken` httpOnly cookie.
 
 ---
 
-### `POST /login`
+### `POST /api/auth/login`
 Authenticate with email/password.
 
 | Field | Type | Required |
@@ -41,7 +42,7 @@ Authenticate with email/password.
 
 ---
 
-### `POST /verify-mfa`
+### `POST /api/auth/verify-mfa`
 Complete MFA verification.
 
 | Field | Type | Required |
@@ -53,60 +54,39 @@ Complete MFA verification.
 
 ---
 
-### `POST /refresh`
-Refresh the access token using httpOnly cookie.
-
-No body required. Refresh token sent automatically via cookie.
+### `POST /api/auth/refresh`
+Refresh the access token using httpOnly cookie. No body required.
 
 **Success (200)**: `{ "accessToken": "..." }` + new cookie  
 **Errors**: `401` invalid/expired refresh token
 
 ---
 
-### `POST /forgot-password`
+### `POST /api/auth/forgot-password`
 Send a password reset email.
 
-| Field | Type | Required |
-|-------|------|----------|
-| `email` | string | ✅ |
+| Field | Type |
+|-------|------|
+| `email` | string |
 
 **Success (200)**: `{ "message": "If the email exists, a reset link was sent." }`  
 Always returns 200 to prevent email enumeration.
 
 ---
 
-### `POST /reset-password`
-Reset password using token from email.
+### `POST /api/auth/reset-password`
 
-| Field | Type | Required |
-|-------|------|----------|
-| `token` | string | ✅ |
-| `newPassword` | string | ✅ |
+| Field | Type |
+|-------|------|
+| `token` | string |
+| `newPassword` | string |
 
-**Success (200)**: `{ "message": "Password updated." }`  
-**Errors**: `400` invalid/expired token
+**Success (200)**: `{ "message": "Password updated." }`
 
 ---
 
-### `POST /verify-email`
-Verify email using token from verification email.
-
-| Field | Type | Required |
-|-------|------|----------|
-| `token` | string | ✅ |
-
-**Success (200)**: `{ "message": "Email verified." }`
-
----
-
-### `POST /send-verification`
-Resend the email verification link.
-
-| Field | Type | Required |
-|-------|------|----------|
-| `email` | string | ✅ |
-
-**Success (200)**: `{ "message": "Verification email sent." }`
+### `POST /api/auth/verify-email` / `POST /api/auth/send-verification`
+Email verification flow. See Auth Architecture doc for details.
 
 ---
 
@@ -114,27 +94,16 @@ Resend the email verification link.
 
 ### `GET /oauth2/authorization/google`
 ### `GET /oauth2/authorization/microsoft`
-Initiates OAuth2 flow. Redirect the browser to this URL.  
-After successful auth, redirects to: `{FRONTEND_URL}/auth/callback?token=<JWT>`
+Redirects browser to provider. After auth: `{FRONTEND_URL}/auth/callback?token=<JWT>`
 
 ---
 
 ## Protected Endpoints (JWT required)
 
-All require `Authorization: Bearer <accessToken>` header.
+### `POST /api/auth/logout`
+**Success (200)**: `{ "message": "Logged out." }` + clears cookie
 
-### `POST /logout`
-Invalidate the current session.
-
-**Success (200)**: `{ "message": "Logged out." }`  
-Clears `refreshToken` cookie.
-
----
-
-### `GET /me`
-Get current user info.
-
-**Success (200)**:
+### `GET /api/auth/me`
 ```json
 {
   "id": "...",
@@ -147,19 +116,10 @@ Get current user info.
 }
 ```
 
----
+### `GET /api/auth/providers`
+`{ "providers": ["google", "microsoft"] }`
 
-### `GET /providers`
-List connected OAuth providers.
-
-**Success (200)**: `{ "providers": ["google", "microsoft"] }`
-
----
-
-### `GET /sessions`
-List all active sessions.
-
-**Success (200)**:
+### `GET /api/auth/sessions`
 ```json
 {
   "sessions": [
@@ -168,29 +128,185 @@ List all active sessions.
 }
 ```
 
----
-
-### `DELETE /sessions/{id}`
-Revoke a specific session.
-
-**Success (200)**: `{ "message": "Session revoked." }`
+### `DELETE /api/auth/sessions/{id}`
+`{ "message": "Session revoked." }`
 
 ---
 
 ## OAuth Account Linking
 
-### `GET /link/{provider}`
-Get OAuth authorization URL for linking. Provider: `google` or `microsoft`.
+### `GET /api/auth/link/{provider}`
+Get OAuth authorization URL for linking. Provider = `google` or `microsoft`.
 
 **Success (200)**: `{ "status": "success", "authorizationUrl": "https://..." }`
 
-### `GET /link/callback`
-OAuth callback for account linking (called by provider redirect, not frontend).
+### `GET /api/auth/link/callback?code=<code>&state=<state>`
+OAuth callback — called by the provider redirect. Stores tokens in `AuthConnection`.
 
-### `DELETE /link`
+### `DELETE /api/auth/link`
 Unlink all linked OAuth providers.
 
 **Success (200)**: `{ "status": "success", "message": "Provider unlinked successfully." }`
+
+---
+
+## SMTP Configuration (`/api/user/smtp`)
+
+### `POST /api/user/smtp/configure`
+Validate and store an SMTP app-specific password.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `appPassword` | string | The app-specific password from the email provider |
+
+**Success (200)**: `{ "success": true, "message": "SMTP configured successfully." }`
+
+### `GET /api/user/smtp/status`
+Get SMTP config status and hosting provider detection result.
+
+**Success (200)**:
+```json
+{
+  "configured": true,
+  "hostingProvider": "gmail",
+  "smtpSupported": true,
+  "action": "configured"
+}
+```
+
+### `POST /api/user/smtp/test`
+Send a test email to the user's own address to verify SMTP config.
+
+**Success (200)**: `{ "success": true, "message": "Test email sent." }`
+
+### `DELETE /api/user/smtp/config`
+Remove SMTP configuration.
+
+**Success (200)**: `{ "success": true }`
+
+### `POST /api/user/smtp/skip`
+Mark SMTP setup as skipped (user acknowledged but didn't configure).
+
+**Success (200)**: `{ "success": true }`
+
+---
+
+## Voice Mode (`/api/minutes/voice`)
+
+### `GET /api/minutes/voice/status`
+Check if the transcription service is available.
+
+**Success (200)**: `{ "available": true }`
+
+### `POST /api/minutes/voice/transcribe`
+Upload an audio file. Returns immediately with a `jobId`.
+
+**Request**: `multipart/form-data` with `file` field.
+
+**Success (200)**:
+```json
+{ "jobId": "abc123", "status": "processing", "audioDuration": 42.5 }
+```
+
+### `GET /api/minutes/voice/progress/{jobId}`
+Poll job progress.
+
+**Success (200)**:
+```json
+{ "jobId": "abc123", "status": "processing", "progress": 65, "stage": "diarizing" }
+```
+
+### `GET /api/minutes/voice/job/{jobId}`
+Get final job status and result.
+
+**Success (200)** (when completed):
+```json
+{
+  "jobId": "abc123",
+  "status": "completed",
+  "segments": [{ "speaker": "SPEAKER_00", "start": 0.0, "end": 5.2, "text": "Hello..." }],
+  "speakers": ["SPEAKER_00", "SPEAKER_01"],
+  "fullText": "...",
+  "processingTimeSeconds": 12.4
+}
+```
+
+### `POST /api/minutes/voice/cancel/{jobId}`
+Cancel a running job.
+
+### `POST /api/minutes/voice/generate`
+Generate meeting minutes from a completed transcript.
+
+| Field | Description |
+|-------|-------------|
+| `transcript` | Full transcript text |
+| `segments` | Array of speaker-labelled segments |
+
+---
+
+## Minutes (`/api/minutes`)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/quick/extract` | Extract structured data from raw text |
+| `POST` | `/quick/extract-file` | Extract from uploaded PDF/DOCX |
+| `POST` | `/quick/generate` | Generate minutes from extracted data |
+| `POST` | `/structured/generate` | Generate minutes from detailed structured form |
+| `POST` | `/send` | Send minutes email with PDF |
+
+---
+
+## Contacts (`/api/contacts`)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | List all contacts |
+| `GET` | `/search?q=&limit=` | Autocomplete search |
+| `GET` | `/recent?limit=` | Recently used contacts |
+| `POST` | `/sync` | Sync from Google/Microsoft |
+| `GET` | `/sync/status` | Sync status + last timestamp |
+| `POST` | `/{id}/usage` | Increment usage counter |
+| `PUT` | `/{id}/favorite` | Toggle favorite |
+
+---
+
+## Email (`/api/email`)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/send` | Generate AI email draft |
+| `POST` | `/send-final` | Send via Gmail/Outlook/SMTP |
+
+---
+
+## Meeting Templates (`/api/meeting-templates`)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/` | Create template |
+| `GET` | `/` | List templates |
+| `GET` | `/{id}` | Get template |
+| `PUT` | `/{id}` | Update template |
+| `DELETE` | `/{id}` | Delete template |
+| `POST` | `/{id}/track-usage` | Increment usage |
+
+---
+
+## PDF (`/api/pdf`)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/generate` | Generate PDF from HTML |
+| `GET` | `/preview/{id}` | Stream inline |
+| `GET` | `/download/{id}` | Download attachment |
+
+---
+
+## System
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/health` | Public | Liveness probe |
 
 ---
 
@@ -198,7 +314,7 @@ Unlink all linked OAuth providers.
 
 | Endpoint | Limit |
 |----------|-------|
-| `/login` | 5 requests/minute per IP |
-| `/signup` | 3 requests/minute per IP |
-| `/forgot-password` | 3 requests/minute per IP |
-| `/send-verification` | 3 requests/minute per IP |
+| `/api/auth/login` | 5 requests/minute per IP |
+| `/api/auth/signup` | 3 requests/minute per IP |
+| `/api/auth/forgot-password` | 3 requests/minute per IP |
+| `/api/auth/send-verification` | 3 requests/minute per IP |
