@@ -24,6 +24,7 @@ export default function ContentEditorPage() {
     const state = location.state as LocationState | null
 
     const [content, setContent] = useState('')
+    const [rawMarkdown, setRawMarkdown] = useState('')
     const [loading, setLoading] = useState(false)
     const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false)
     const [showSidebar, setShowSidebar] = useState(true)
@@ -51,16 +52,20 @@ export default function ContentEditorPage() {
     useEffect(() => {
         const initContent = async () => {
             if (state?.content) {
+                setRawMarkdown(state.content)
                 const html = await processContent(state.content)
                 setContent(html)
                 // Save to localStorage
                 localStorage.setItem('minutesEditorContent', html)
+                localStorage.setItem('minutesEditorMarkdown', state.content)
                 setLastSaved(new Date())
             } else {
                 // Try to restore from localStorage
                 const saved = localStorage.getItem('minutesEditorContent')
+                const savedMarkdown = localStorage.getItem('minutesEditorMarkdown')
                 if (saved) {
                     setContent(saved)
+                    if (savedMarkdown) setRawMarkdown(savedMarkdown)
                 } else {
                     navigate('/minutes/new')
                 }
@@ -105,9 +110,11 @@ export default function ContentEditorPage() {
             }
 
             if (result.status === 'success' && result.content) {
+                setRawMarkdown(result.content)
                 const html = await processContent(result.content)
                 setContent(html)
                 localStorage.setItem('minutesEditorContent', html)
+                localStorage.setItem('minutesEditorMarkdown', result.content)
                 setLastSaved(new Date())
             } else {
                 setError(result.message || 'Regeneration failed. Please try again.')
@@ -165,6 +172,7 @@ export default function ContentEditorPage() {
 
             const result = await generatePdf({
                 htmlContent: content,
+                markdownContent: rawMarkdown || undefined,
                 meetingMetadata: metadata,
                 outputPreferences: preferences
             })

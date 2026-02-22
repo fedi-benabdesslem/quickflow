@@ -297,6 +297,7 @@ export const regenerateMinutes = async (
 
 export interface PdfGenerationRequest {
     htmlContent: string
+    markdownContent?: string
     meetingMetadata: Record<string, string>
     outputPreferences: Record<string, any>
 }

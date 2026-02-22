@@ -31,16 +31,24 @@ public class PdfController {
     @PostMapping("/generate")
     public ResponseEntity<?> generatePdf(@RequestBody PdfGenerationRequest request) {
         try {
-            // Validate input
-            if (request.getHtmlContent() == null || request.getHtmlContent().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "HTML content is required"));
+            // Determine which content to use: prefer raw markdown (preserves tables)
+            String contentForPdf = request.getMarkdownContent();
+            boolean isMarkdown = contentForPdf != null && !contentForPdf.isEmpty();
+
+            if (!isMarkdown) {
+                contentForPdf = request.getHtmlContent();
             }
 
-            // Generate PDF
+            if (contentForPdf == null || contentForPdf.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Content is required"));
+            }
+
+            // Generate PDF - pass isMarkdown flag so service knows to run commonmark
             byte[] pdfBytes = pdfGenerationService.generatePdf(
-                    request.getHtmlContent(),
+                    contentForPdf,
                     request.getMeetingMetadata(),
-                    request.getOutputPreferences());
+                    request.getOutputPreferences(),
+                    isMarkdown);
 
             // Generate filename
             String title = request.getMeetingMetadata().getOrDefault("title", "Meeting_Minutes");

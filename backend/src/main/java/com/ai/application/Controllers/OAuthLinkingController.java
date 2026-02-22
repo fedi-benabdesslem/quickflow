@@ -233,20 +233,9 @@ public class OAuthLinkingController {
                     "message", "Provider unlinked successfully."));
         }
 
-        // Fallback to legacy model
-        return userTokenRepository.findByEmail(userId)
-                .map(userToken -> {
-                    String previousProvider = userToken.getLinkedProvider();
-                    userToken.clearLinkedProvider();
-                    userTokenRepository.save(userToken);
-                    System.out.println("[OAuthLinking] Unlinked " + previousProvider + " for user: " + userId);
-                    return ResponseEntity.ok(Map.of(
-                            "status", "success",
-                            "message", "Provider unlinked successfully."));
-                })
-                .orElse(ResponseEntity.badRequest().body(Map.of(
-                        "status", "error",
-                        "message", "User not found.")));
+        return ResponseEntity.badRequest().body(Map.of(
+                "status", "error",
+                "message", "User not found."));
     }
 
     // ===== Linking Token (HMAC-signed) =====

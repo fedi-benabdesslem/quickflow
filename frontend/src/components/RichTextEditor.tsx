@@ -20,9 +20,11 @@ const modules = {
 
 const formats = ['header', 'bold', 'italic', 'underline', 'list', 'bullet']
 
+
 /**
  * Rich text editor component using React Quill.
  * Styled to match the nebula theme.
+ * Supports table rendering from LLM Markdown output.
  */
 export default function RichTextEditor({
     value,
@@ -116,6 +118,35 @@ export default function RichTextEditor({
 
                 .rich-text-editor .ql-toolbar .ql-picker-item:hover {
                     color: #a855f7;
+                }
+
+                /* Table styling for LLM-generated tables */
+                .rich-text-editor .ql-editor table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 12px 0;
+                    font-size: 0.9rem;
+                }
+
+                .rich-text-editor .ql-editor th,
+                .rich-text-editor .ql-editor td {
+                    border: 1px solid rgba(148, 163, 184, 0.25);
+                    padding: 8px 12px;
+                    text-align: left;
+                }
+
+                .rich-text-editor .ql-editor th {
+                    background: rgba(99, 102, 241, 0.15);
+                    color: #c7d2fe;
+                    font-weight: 600;
+                }
+
+                .rich-text-editor .ql-editor td {
+                    background: rgba(15, 23, 42, 0.4);
+                }
+
+                .rich-text-editor .ql-editor tr:hover td {
+                    background: rgba(99, 102, 241, 0.08);
                 }
             `}</style>
         </div>

@@ -33,6 +33,17 @@ public class PdfGenerationService {
      * Wraps the content in a complete HTML document with styling.
      */
     public byte[] generatePdf(String htmlContent, Map<String, String> metadata, Map<String, Object> preferences) {
+        return generatePdf(htmlContent, metadata, preferences, false);
+    }
+
+    /**
+     * Generates a professional PDF from content.
+     * When isMarkdown is true, the content is raw Markdown and will be converted
+     * via commonmark
+     * (preserving tables). When false, the content is treated as HTML.
+     */
+    public byte[] generatePdf(String content, Map<String, String> metadata, Map<String, Object> preferences,
+            boolean isMarkdown) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(outputStream);
             PdfDocument pdf = new PdfDocument(writer);
@@ -45,7 +56,7 @@ public class PdfGenerationService {
             }
 
             // Build complete HTML document with styling
-            String completeHtml = buildHtmlDocument(htmlContent, metadata);
+            String completeHtml = buildHtmlDocument(content, metadata, isMarkdown);
 
             // Configure converter with font support
             ConverterProperties converterProperties = new ConverterProperties();
@@ -65,6 +76,14 @@ public class PdfGenerationService {
      * Builds a complete HTML document with professional styling.
      */
     private String buildHtmlDocument(String bodyContent, Map<String, String> metadata) {
+        return buildHtmlDocument(bodyContent, metadata, false);
+    }
+
+    /**
+     * Builds a complete HTML document with professional styling.
+     * When forceMarkdown is true, always runs commonmark conversion.
+     */
+    private String buildHtmlDocument(String bodyContent, Map<String, String> metadata, boolean forceMarkdown) {
         String title = metadata != null ? metadata.getOrDefault("title", "Meeting Minutes") : "Meeting Minutes";
         String date = metadata != null ? metadata.getOrDefault("date", "") : "";
         String startTime = metadata != null ? metadata.getOrDefault("startTime", "") : "";
@@ -72,8 +91,11 @@ public class PdfGenerationService {
         String location = metadata != null ? metadata.getOrDefault("location", "") : "";
         String organizer = metadata != null ? metadata.getOrDefault("organizer", "") : "";
 
-        // Convert markdown-style formatting to HTML if present
-        String processedContent = convertMarkdownToHtml(bodyContent);
+        // Convert content: if forceMarkdown, always run commonmark; otherwise use
+        // heuristic
+        String processedContent = forceMarkdown
+                ? forceConvertMarkdownToHtml(bodyContent)
+                : convertMarkdownToHtml(bodyContent);
 
         StringBuilder html = new StringBuilder();
         html.append("<!DOCTYPE html>\n");
@@ -140,55 +162,45 @@ public class PdfGenerationService {
     }
 
     /**
-     * Converts markdown-style formatting to HTML.
-     * Handles **bold**, *italic*, and basic structures.
+     * Converts Markdown to HTML using commonmark, but skips if content looks like
+     * HTML already.
      */
     private String convertMarkdownToHtml(String content) {
         if (content == null || content.isEmpty()) {
             return "<p>No content provided.</p>";
         }
 
-        String result = content;
-
         // If content already has proper HTML tags, return as-is
-        if (result.contains("<p>") || result.contains("<div>") || result.contains("<h1>")) {
-            return result;
+        if (content.contains("<p>") || content.contains("<div>") || content.contains("<h1>")) {
+            return content;
         }
 
-        // Convert markdown bold **text** to <strong>text</strong>
-        result = result.replaceAll("\\*\\*([^*]+)\\*\\*", "<strong>$1</strong>");
+        return forceConvertMarkdownToHtml(content);
+    }
 
-        // Convert markdown italic *text* to <em>text</em>
-        result = result.replaceAll("\\*([^*]+)\\*", "<em>$1</em>");
-
-        // Convert markdown headers
-        result = result.replaceAll("(?m)^### (.+)$", "<h3>$1</h3>");
-        result = result.replaceAll("(?m)^## (.+)$", "<h2>$1</h2>");
-        result = result.replaceAll("(?m)^# (.+)$", "<h1>$1</h1>");
-
-        // Convert bullet points
-        result = result.replaceAll("(?m)^[•\\-\\*] (.+)$", "<li>$1</li>");
-
-        // Wrap consecutive <li> items in <ul>
-        result = result.replaceAll("((?:<li>[^<]+</li>\\s*)+)", "<ul>$1</ul>");
-
-        // Convert line breaks to paragraphs for remaining text
-        String[] lines = result.split("\n");
-        StringBuilder processed = new StringBuilder();
-        for (String line : lines) {
-            line = line.trim();
-            if (line.isEmpty()) {
-                continue;
-            }
-            // Don't double-wrap already tagged content
-            if (line.startsWith("<h") || line.startsWith("<ul") || line.startsWith("<li") || line.startsWith("<p")) {
-                processed.append(line).append("\n");
-            } else {
-                processed.append("<p>").append(line).append("</p>\n");
-            }
+    /**
+     * Unconditionally converts Markdown to HTML using the commonmark parser.
+     * Always runs the conversion — used when we know the input is raw Markdown.
+     * Supports GFM tables.
+     */
+    private String forceConvertMarkdownToHtml(String content) {
+        if (content == null || content.isEmpty()) {
+            return "<p>No content provided.</p>";
         }
 
-        return processed.toString();
+        // Parse Markdown with GFM tables extension
+        org.commonmark.parser.Parser parser = org.commonmark.parser.Parser.builder()
+                .extensions(java.util.List.of(
+                        org.commonmark.ext.gfm.tables.TablesExtension.create()))
+                .build();
+
+        org.commonmark.renderer.html.HtmlRenderer renderer = org.commonmark.renderer.html.HtmlRenderer.builder()
+                .extensions(java.util.List.of(
+                        org.commonmark.ext.gfm.tables.TablesExtension.create()))
+                .build();
+
+        org.commonmark.node.Node document = parser.parse(content);
+        return renderer.render(document);
     }
 
     /**
