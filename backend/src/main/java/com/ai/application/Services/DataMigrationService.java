@@ -92,7 +92,7 @@ public class DataMigrationService {
         user.setName(token.getEmail().split("@")[0]); // default name from email
         user.setLocalAuthEnabled(false); // OAuth-only users from Supabase
         user.setEmailVerified(true); // Supabase users were verified
-        user.setRole("user");
+        user.setRole("USER");
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 

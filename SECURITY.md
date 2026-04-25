@@ -9,8 +9,8 @@
 ### JWT Tokens
 - **Algorithm**: HMAC-SHA256
 - **Access token lifetime**: 15 minutes
-- **Refresh token lifetime**: 7 days
-- **Secret**: 256-bit, configured via `jwt.secret` property
+- **Refresh token lifetime**: 30 days
+- **Secret**: 256-bit, configured via `app.jwt.secret` property
 - **Claims**: `sub` (userId), `email`, `role`, `iat`, `exp`
 
 ### Refresh Tokens
@@ -21,7 +21,7 @@
 
 ### OAuth Tokens
 - **Encryption**: AES-256 at rest in MongoDB (`AuthConnection` embedded in `User`)
-- **Key**: `encryption.secret.key` in application properties
+- **Key**: `token.encryption.key` in application properties (set via `TOKEN_ENCRYPTION_KEY` env var)
 - **Scopes requested**: `openid`, `email`, `profile`, `gmail.send`, `gmail.readonly`, `contacts.readonly` (Google); `Mail.Send`, `User.Read`, `Contacts.Read` (Microsoft)
 
 ## Rate Limiting

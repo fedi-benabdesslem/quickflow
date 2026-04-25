@@ -36,7 +36,7 @@ Download and install from [ngrok.com/download](https://ngrok.com/download), then
 
 #### Add Auth Token
 ```bash
-ngrok config add-authtoken 39r0M6Xe2xmZhGhOeoO0rLzfLVr_2gv5EKqLuZ31GVU86XPsp
+ngrok config add-authtoken YOUR_NGROK_AUTHTOKEN
 ```
 
 #### Run Ngrok (keep this terminal open)

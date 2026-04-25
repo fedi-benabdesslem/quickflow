@@ -16,8 +16,9 @@ const api = axios.create({
 // Request interceptor — attach access token and auto-refresh if expiring
 api.interceptors.request.use(
     async (config) => {
-        // Try to refresh if token is expiring
-        if (isTokenExpiring()) {
+        // Try to refresh only when a token exists and is nearing expiry
+        const existingToken = getAccessToken()
+        if (existingToken && isTokenExpiring()) {
             const newToken = await refreshAccessToken(BACKEND_URL)
             if (newToken) {
                 config.headers.Authorization = `Bearer ${newToken}`

@@ -38,6 +38,18 @@ export function clearTokens(): void {
 }
 
 /**
+ * Decode a Base64URL-encoded JWT segment to a plain string.
+ * JWT payloads use Base64URL (RFC 4648 §5) which uses `-`/`_` instead of
+ * `+`/`/` and omits `=` padding.  `atob` only understands standard Base64,
+ * so we must normalise before decoding.
+ */
+function decodeJwtSegment(segment: string): string {
+    const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
+    return atob(padded);
+}
+
+/**
  * Check if the token is expired or about to expire (within 60 seconds).
  */
 export function isTokenExpiring(): boolean {
@@ -45,7 +57,7 @@ export function isTokenExpiring(): boolean {
     if (!token) return true;
 
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = JSON.parse(decodeJwtSegment(token.split('.')[1]));
         const exp = payload.exp * 1000; // Convert to ms
         const now = Date.now();
         return now >= exp - 60_000; // 60s buffer
@@ -64,7 +76,7 @@ export function extractUserFromToken(token: string): {
     role: string;
 } | null {
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = JSON.parse(decodeJwtSegment(token.split('.')[1]));
         return {
             userId: payload.sub,
             email: payload.email,

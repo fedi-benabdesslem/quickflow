@@ -52,13 +52,13 @@ public class OAuthLinkingController {
     @Value("${google.oauth.client-secret:}")
     private String googleClientSecret;
 
-    @Value("${spring.security.oauth2.client.registration.microsoft.client-id:}")
+    @Value("${microsoft.oauth.client-id:}")
     private String microsoftClientId;
 
-    @Value("${spring.security.oauth2.client.registration.microsoft.client-secret:}")
+    @Value("${microsoft.oauth.client-secret:}")
     private String microsoftClientSecret;
 
-    @Value("${spring.security.oauth2.client.provider.microsoft.tenant-id:common}")
+    @Value("${microsoft.oauth.tenant-id:common}")
     private String microsoftTenantId;
 
     @Value("${app.jwt.secret}")

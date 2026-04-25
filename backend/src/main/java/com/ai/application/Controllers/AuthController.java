@@ -236,7 +236,7 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String token = body.get("token");
-        String newPassword = body.get("password");
+        String newPassword = body.get("newPassword");
 
         if (token == null || newPassword == null) {
             return error("Token and new password are required", 400);
@@ -299,6 +299,25 @@ public class AuthController {
 
     // NOTE: OAuth linking endpoints are handled by OAuthLinkingController
     // (/api/auth/link)
+
+    // ── Email Capability (legacy endpoint kept for frontend compatibility) ──
+
+    @GetMapping("/email-capability")
+    public ResponseEntity<?> getEmailCapability(Principal principal) {
+        if (principal == null)
+            return error("Not authenticated", 401);
+
+        Optional<User> userOpt = userRepository.findById(principal.getName());
+        if (userOpt.isEmpty())
+            return error("User not found", 404);
+
+        User user = userOpt.get();
+        String provider = user.getConnectedProviderNames().isEmpty() ? "none"
+                : user.getConnectedProviderNames().get(0);
+        return ResponseEntity.ok(Map.of(
+                "canSendEmail", user.canSendEmail(),
+                "provider", provider));
+    }
 
     // ── Providers ──
 
