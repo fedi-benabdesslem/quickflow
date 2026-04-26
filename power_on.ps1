@@ -144,7 +144,14 @@ else {
 # -- 3. Ngrok Tunnel ----------------------------------------------
 Write-Banner "3/4  Ngrok Tunnel"
 
-$ngrokDomain = "undefinitively-dramatic-terrell.ngrok-free.dev"
+$ngrokDomain = $env:NGROK_DOMAIN
+if ([string]::IsNullOrEmpty($ngrokDomain)) {
+    Write-Err "[NGROK] NGROK_DOMAIN environment variable is not set."
+    Write-Err "Set it to your ngrok static domain, e.g.:"
+    Write-Err "  `$env:NGROK_DOMAIN = 'your-domain.ngrok-free.dev'"
+    Stop-AllServices
+    exit 1
+}
 
 try {
     $null = Get-Command ngrok -ErrorAction Stop

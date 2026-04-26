@@ -41,12 +41,14 @@ ngrok config add-authtoken YOUR_NGROK_AUTHTOKEN
 
 #### Run Ngrok (keep this terminal open)
 ```bash
-ngrok http --url=undefinitively-dramatic-terrell.ngrok-free.dev 8080
+export NGROK_DOMAIN=your-domain.ngrok-free.dev   # set to your own ngrok static domain
+ngrok http --url=$NGROK_DOMAIN 8080
 ```
 
-This exposes your local backend at `https://undefinitively-dramatic-terrell.ngrok-free.dev`.
+This exposes your local backend at `https://your-domain.ngrok-free.dev`.
 
 > **Note:** The ngrok tunnel must be running before you attempt any OAuth login (Google/Microsoft sign-in).
+> Set the same domain in `BACKEND_URL` (environment variable for `application.properties`).
 
 ---
 

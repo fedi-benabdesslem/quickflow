@@ -136,7 +136,14 @@ fi
 # ── 3. Ngrok Tunnel ──────────────────────────────────────────
 banner "3/4  Ngrok Tunnel"
 
-NGROK_DOMAIN="undefinitively-dramatic-terrell.ngrok-free.dev"
+NGROK_DOMAIN="${NGROK_DOMAIN:-}"
+
+if [ -z "$NGROK_DOMAIN" ]; then
+    err "[NGROK] NGROK_DOMAIN environment variable is not set."
+    err "Set it to your ngrok static domain, e.g.:"
+    err "  export NGROK_DOMAIN=your-domain.ngrok-free.dev"
+    exit 1
+fi
 
 if ! command -v ngrok &> /dev/null; then
     err "[NGROK] ngrok is not installed or not in PATH."
