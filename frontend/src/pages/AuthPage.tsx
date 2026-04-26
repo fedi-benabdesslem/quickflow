@@ -1,7 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
-import { isSupabaseConfigured } from '../lib/supabase'
 
 type AuthMode = 'signin' | 'signup' | 'forgot'
 
@@ -137,15 +136,6 @@ export default function AuthPage() {
                         {mode === 'forgot' && 'Enter your email to reset password'}
                     </p>
 
-                    {/* Demo Mode Warning */}
-                    {!isSupabaseConfigured && (
-                        <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs">
-                            <p className="font-medium">⚠️ Demo Mode</p>
-                            <p className="mt-1 text-amber-300/80">
-                                Configure <code className="bg-amber-500/20 px-1 rounded">src/lib/supabase.ts</code> to enable auth.
-                            </p>
-                        </div>
-                    )}
                 </div>
 
                 {/* Form */}

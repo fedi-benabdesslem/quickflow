@@ -4,6 +4,7 @@ import java.util.Map;
 
 public class PdfGenerationRequest {
     private String htmlContent;
+    private String markdownContent;
     private Map<String, String> meetingMetadata;
     private Map<String, Object> outputPreferences;
 
@@ -14,6 +15,14 @@ public class PdfGenerationRequest {
 
     public void setHtmlContent(String htmlContent) {
         this.htmlContent = htmlContent;
+    }
+
+    public String getMarkdownContent() {
+        return markdownContent;
+    }
+
+    public void setMarkdownContent(String markdownContent) {
+        this.markdownContent = markdownContent;
     }
 
     public Map<String, String> getMeetingMetadata() {

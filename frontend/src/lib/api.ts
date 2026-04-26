@@ -1,33 +1,63 @@
 import axios from 'axios'
 import type { ApiResponse, MeetingFormData } from '../types'
+import { getAccessToken, isTokenExpiring, refreshAccessToken, setAccessToken } from './tokenManager'
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || ''
 
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: `${BACKEND_URL}/api`,
     headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
     },
+    withCredentials: true, // Send httpOnly refresh token cookie
 })
 
-// Request interceptor - token is set synchronously via setAuthToken() from AuthContext
-// NOTE: We removed the async getSession() call here because it was causing race conditions
-// during app initialization, leading to infinite loading states on page refresh.
+// Request interceptor — attach access token and auto-refresh if expiring
 api.interceptors.request.use(
-    (config) => {
-        // Token is already set in defaults.headers via setAuthToken()
+    async (config) => {
+        // Try to refresh only when a token exists and is nearing expiry
+        const existingToken = getAccessToken()
+        if (existingToken && isTokenExpiring()) {
+            const newToken = await refreshAccessToken(BACKEND_URL)
+            if (newToken) {
+                config.headers.Authorization = `Bearer ${newToken}`
+                return config
+            }
+        }
+
+        const token = getAccessToken()
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`
+        }
         return config
     },
-    (error) => {
+    (error) => Promise.reject(error)
+)
+
+// Response interceptor — retry on 401 after refreshing token
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true
+            const newToken = await refreshAccessToken(BACKEND_URL)
+            if (newToken) {
+                originalRequest.headers.Authorization = `Bearer ${newToken}`
+                return api(originalRequest)
+            }
+            // Refresh failed — let the caller handle the 401.
+            // Don't clear tokens or redirect here; the access token may still be valid
+            // for other endpoints, and AuthContext manages session lifecycle.
+        }
         return Promise.reject(error)
     }
 )
 
-// Add auth token to requests (kept for backwards compatibility)
+// Legacy compat — still used by AuthContext to set token after login
 export const setAuthToken = (token: string | null) => {
-    if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    } else {
-        delete api.defaults.headers.common['Authorization']
-    }
+    setAccessToken(token)
 }
 
 // API methods
@@ -268,6 +298,7 @@ export const regenerateMinutes = async (
 
 export interface PdfGenerationRequest {
     htmlContent: string
+    markdownContent?: string
     meetingMetadata: Record<string, string>
     outputPreferences: Record<string, any>
 }

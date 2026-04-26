@@ -5,6 +5,10 @@ import { useEffect } from 'react'
 import NebulaBackground from './components/NebulaBackground'
 import { ToastProvider } from './components/Toast'
 import AuthPage from './pages/AuthPage'
+import AuthCallbackPage from './pages/AuthCallbackPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import HomePage from './pages/HomePage'
 import MeetingPage from './pages/MeetingPage'
 import EmailPage from './pages/EmailPage'
@@ -76,9 +80,11 @@ function RootRedirect() {
 function App() {
     const { session } = useAuth()
 
-    // Set auth token whenever session changes
+    // Set auth token whenever session changes (but don't clear on initial null)
     useEffect(() => {
-        setAuthToken(session?.access_token || null)
+        if (session?.accessToken) {
+            setAuthToken(session.accessToken)
+        }
     }, [session])
 
     return (
@@ -95,6 +101,10 @@ function App() {
                         </PublicRoute>
                     }
                 />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route
                     path="/home"
                     element={

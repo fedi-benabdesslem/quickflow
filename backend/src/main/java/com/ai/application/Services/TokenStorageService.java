@@ -1,114 +1,148 @@
 package com.ai.application.Services;
 
-import com.ai.application.Repositories.UserTokenRepository;
-import com.ai.application.model.Entity.UserToken;
+import com.ai.application.Repositories.UserRepository;
+import com.ai.application.model.Entity.AuthConnection;
+import com.ai.application.model.Entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Service for storing and retrieving encrypted OAuth tokens.
  * 
- * Handles the storage lifecycle of user OAuth tokens in MongoDB,
- * ensuring tokens are encrypted at rest.
+ * Uses the User.authConnections model to find and manage OAuth tokens.
  */
 @Service
 public class TokenStorageService {
 
-    private final UserTokenRepository userTokenRepository;
+    private static final Logger logger = LoggerFactory.getLogger(TokenStorageService.class);
+
+    private final UserRepository userRepository;
     private final EncryptionService encryptionService;
 
     @Autowired
-    public TokenStorageService(UserTokenRepository userTokenRepository, EncryptionService encryptionService) {
-        this.userTokenRepository = userTokenRepository;
+    public TokenStorageService(UserRepository userRepository,
+            EncryptionService encryptionService) {
+        this.userRepository = userRepository;
         this.encryptionService = encryptionService;
     }
 
     /**
-     * Stores OAuth tokens for a user, encrypting them before storage.
-     * Updates existing record if user already has tokens stored.
-     */
-    public UserToken storeTokens(String supabaseId, String email, String provider,
-            String accessToken, String refreshToken, long expiresInSeconds) {
-
-        // Encrypt tokens before storage
-        String encryptedAccessToken = encryptionService.encrypt(accessToken);
-        String encryptedRefreshToken = encryptionService.encrypt(refreshToken);
-
-        // Calculate expiration time
-        LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(expiresInSeconds);
-
-        // Find existing or create new
-        UserToken userToken = userTokenRepository.findBySupabaseId(supabaseId)
-                .orElse(new UserToken(supabaseId, email, provider));
-
-        // Update token info
-        userToken.setEmail(email);
-        userToken.setProvider(provider);
-        userToken.setAccessToken(encryptedAccessToken);
-        userToken.setRefreshToken(encryptedRefreshToken);
-        userToken.setExpiresAt(expiresAt);
-        userToken.setUpdatedAt(LocalDateTime.now());
-
-        return userTokenRepository.save(userToken);
-    }
-
-    /**
      * Retrieves and decrypts OAuth tokens for a user.
+     * Looks up User by email (primary) or by ID (fallback).
      * Returns null if no tokens found.
      */
-    public DecryptedTokens getDecryptedTokens(String supabaseId) {
-        Optional<UserToken> tokenOpt = userTokenRepository.findBySupabaseId(supabaseId);
+    public DecryptedTokens getDecryptedTokens(String userId) {
+        Optional<User> userOpt = userRepository.findByEmail(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findById(userId);
+        }
 
-        if (tokenOpt.isEmpty()) {
+        if (userOpt.isEmpty()) {
+            logger.debug("No User found for '{}'", userId);
             return null;
         }
 
-        UserToken userToken = tokenOpt.get();
+        User user = userOpt.get();
+        List<AuthConnection> connections = user.getAuthConnections();
 
-        return new DecryptedTokens(
-                encryptionService.decrypt(userToken.getAccessToken()),
-                encryptionService.decrypt(userToken.getRefreshToken()),
-                userToken.getExpiresAt(),
-                userToken.getProvider(),
-                userToken.getEmail());
-    }
+        if (connections == null || connections.isEmpty()) {
+            logger.debug("User '{}' has no auth connections", userId);
+            return null;
+        }
 
-    /**
-     * Gets the UserToken entity without decrypting tokens.
-     * Useful for checking provider type or expiration.
-     */
-    public Optional<UserToken> getUserToken(String supabaseId) {
-        return userTokenRepository.findBySupabaseId(supabaseId);
+        // Find the best connection with tokens (prefer primary OAuth provider)
+        AuthConnection tokenConnection = null;
+
+        String primaryProvider = user.getPrimaryOAuthProvider();
+        if (primaryProvider != null) {
+            tokenConnection = connections.stream()
+                    .filter(c -> primaryProvider.equalsIgnoreCase(c.getProvider()))
+                    .filter(c -> c.getAccessTokenEncrypted() != null)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        // If no primary, take any connection with tokens
+        if (tokenConnection == null) {
+            tokenConnection = connections.stream()
+                    .filter(c -> c.getAccessTokenEncrypted() != null)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (tokenConnection == null) {
+            logger.debug("User '{}' has connections but none with stored tokens", userId);
+            return null;
+        }
+
+        try {
+            String accessToken = encryptionService.decrypt(tokenConnection.getAccessTokenEncrypted());
+            String refreshToken = tokenConnection.getRefreshTokenEncrypted() != null
+                    ? encryptionService.decrypt(tokenConnection.getRefreshTokenEncrypted())
+                    : null;
+
+            logger.info("Found OAuth tokens for user '{}' (provider: {})",
+                    userId, tokenConnection.getProvider());
+
+            return new DecryptedTokens(
+                    accessToken,
+                    refreshToken,
+                    tokenConnection.getTokenExpiresAt(),
+                    tokenConnection.getProvider(),
+                    tokenConnection.getProviderEmail() != null
+                            ? tokenConnection.getProviderEmail()
+                            : user.getEmail());
+        } catch (Exception e) {
+            logger.error("Failed to decrypt tokens for user '{}'", userId, e);
+            return null;
+        }
     }
 
     /**
      * Updates tokens after a refresh operation.
      */
-    public void updateTokensAfterRefresh(String supabaseId, String newAccessToken, long expiresInSeconds) {
-        userTokenRepository.findBySupabaseId(supabaseId).ifPresent(userToken -> {
-            userToken.setAccessToken(encryptionService.encrypt(newAccessToken));
-            userToken.setExpiresAt(LocalDateTime.now().plusSeconds(expiresInSeconds));
-            userToken.setUpdatedAt(LocalDateTime.now());
-            userTokenRepository.save(userToken);
-        });
+    public void updateTokensAfterRefresh(String userId, String newAccessToken, long expiresInSeconds) {
+        Optional<User> userOpt = userRepository.findByEmail(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findById(userId);
+        }
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            List<AuthConnection> connections = user.getAuthConnections();
+            if (connections != null) {
+                String primaryProvider = user.getPrimaryOAuthProvider();
+                AuthConnection conn = connections.stream()
+                        .filter(c -> primaryProvider != null && primaryProvider.equalsIgnoreCase(c.getProvider()))
+                        .findFirst()
+                        .orElse(connections.stream()
+                                .filter(c -> c.getAccessTokenEncrypted() != null)
+                                .findFirst()
+                                .orElse(null));
+
+                if (conn != null) {
+                    conn.setAccessTokenEncrypted(encryptionService.encrypt(newAccessToken));
+                    conn.setTokenExpiresAt(LocalDateTime.now().plusSeconds(expiresInSeconds));
+                    conn.setLastUsedAt(LocalDateTime.now());
+                    userRepository.save(user);
+                    logger.info("Updated access token for user '{}'", userId);
+                }
+            }
+        }
     }
 
     /**
      * Checks if a user has valid OAuth tokens stored.
      */
-    public boolean hasValidTokens(String supabaseId) {
-        Optional<UserToken> tokenOpt = userTokenRepository.findBySupabaseId(supabaseId);
-        return tokenOpt.isPresent() && tokenOpt.get().getAccessToken() != null;
-    }
-
-    /**
-     * Deletes all tokens for a user (e.g., on logout or token revocation).
-     */
-    public void deleteTokens(String supabaseId) {
-        userTokenRepository.deleteBySupabaseId(supabaseId);
+    public boolean hasValidTokens(String userId) {
+        DecryptedTokens tokens = getDecryptedTokens(userId);
+        return tokens != null && tokens.getAccessToken() != null;
     }
 
     /**

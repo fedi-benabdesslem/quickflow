@@ -1,7 +1,9 @@
 package com.ai.application.Services;
 
 import com.ai.application.Config.SmtpProviderConfig;
-import com.ai.application.model.Entity.UserToken;
+import com.ai.application.Repositories.UserRepository;
+import com.ai.application.model.Entity.AuthConnection;
+import com.ai.application.model.Entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,7 +12,8 @@ import java.util.Optional;
  * Facade service that routes email sending to the appropriate provider.
  * 
  * Determines if user authenticated via Google, Microsoft, or email/password,
- * and routes email sending accordingly.
+ * and routes email sending accordingly using the new User + AuthConnection
+ * model.
  */
 @Service
 public class EmailProviderService {
@@ -18,20 +21,20 @@ public class EmailProviderService {
     private final GmailService gmailService;
     private final MicrosoftGraphService microsoftGraphService;
     private final SmtpEmailService smtpEmailService;
-    private final TokenStorageService tokenStorageService;
+    private final UserRepository userRepository;
     private final EncryptionService encryptionService;
     private final SmtpProviderConfig smtpProviderConfig;
 
     public EmailProviderService(GmailService gmailService,
             MicrosoftGraphService microsoftGraphService,
             SmtpEmailService smtpEmailService,
-            TokenStorageService tokenStorageService,
+            UserRepository userRepository,
             EncryptionService encryptionService,
             SmtpProviderConfig smtpProviderConfig) {
         this.gmailService = gmailService;
         this.microsoftGraphService = microsoftGraphService;
         this.smtpEmailService = smtpEmailService;
-        this.tokenStorageService = tokenStorageService;
+        this.userRepository = userRepository;
         this.encryptionService = encryptionService;
         this.smtpProviderConfig = smtpProviderConfig;
     }
@@ -39,88 +42,76 @@ public class EmailProviderService {
     /**
      * Sends an email using the appropriate provider for the user.
      */
-    public SendResult sendEmail(String supabaseId, String to, String subject, String htmlBody) {
-        return sendEmailWithAttachment(supabaseId, to, subject, htmlBody, null, null);
+    public SendResult sendEmail(String userId, String to, String subject, String htmlBody) {
+        return sendEmailWithAttachment(userId, to, subject, htmlBody, null, null);
     }
 
     /**
      * Sends an email with optional PDF attachment using the appropriate provider.
+     * Now uses the new User model with AuthConnection for provider resolution.
      */
-    public SendResult sendEmailWithAttachment(String supabaseId, String to, String subject,
+    public SendResult sendEmailWithAttachment(String userId, String to, String subject,
             String htmlBody, byte[] pdfBytes, String pdfFilename) {
-        System.out.println("[EmailProviderService] sendEmail called for user: " + supabaseId);
+        System.out.println("[EmailProviderService] sendEmail called for user: " + userId);
 
-        // Get user's token record
-        Optional<UserToken> userTokenOpt = tokenStorageService.getUserToken(supabaseId);
-
-        if (userTokenOpt.isEmpty()) {
-            System.err.println("[EmailProviderService] ERROR: No tokens found for user: " + supabaseId);
-            return new SendResult(false, "No account found. Please sign in again.", "no_tokens");
+        // Try finding user by ID first, then by email
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(userId);
         }
 
-        UserToken userToken = userTokenOpt.get();
-        String provider = userToken.getProvider();
-        System.out.println(
-                "[EmailProviderService] Provider: " + provider + ", smtpConfigured: " + userToken.isSmtpConfigured());
+        if (userOpt.isPresent()) {
+            return sendUsingUserModel(userOpt.get(), to, subject, htmlBody, pdfBytes, pdfFilename);
+        }
 
+        System.err.println("[EmailProviderService] ERROR: No user found for: " + userId);
+        return new SendResult(false, "No account found. Please sign in again.", "no_tokens");
+    }
+
+    /**
+     * Send email using the new User + AuthConnection model.
+     */
+    private SendResult sendUsingUserModel(User user, String to, String subject,
+            String htmlBody, byte[] pdfBytes, String pdfFilename) {
         try {
-            // Priority 1: Google OAuth (direct sign-in)
-            if ("google".equalsIgnoreCase(provider)) {
-                System.out.println("[EmailProviderService] Using Gmail service...");
+            // Priority 1: Google OAuth connection
+            AuthConnection googleConn = user.findConnection("google");
+            if (googleConn != null && googleConn.getAccessTokenEncrypted() != null) {
+                System.out.println("[EmailProviderService] Using Gmail service via AuthConnection...");
+                String accessToken = encryptionService.decrypt(googleConn.getAccessTokenEncrypted());
+                String senderEmail = googleConn.getProviderEmail() != null
+                        ? googleConn.getProviderEmail()
+                        : user.getEmail();
+
                 boolean success = pdfBytes != null
-                        ? gmailService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes, pdfFilename)
-                        : gmailService.sendEmail(supabaseId, to, subject, htmlBody);
+                        ? gmailService.sendEmailWithAccessToken(accessToken, senderEmail,
+                                to, subject, htmlBody, pdfBytes, pdfFilename)
+                        : gmailService.sendEmailWithAccessToken(accessToken, senderEmail,
+                                to, subject, htmlBody);
                 return success ? new SendResult(true, "Email sent successfully!", "success")
                         : new SendResult(false, "Failed to send email.", "send_failed");
             }
 
-            // Priority 2: Microsoft OAuth (direct sign-in)
-            if ("azure".equalsIgnoreCase(provider)) {
-                System.out.println("[EmailProviderService] Using Microsoft Graph service...");
+            // Priority 2: Microsoft OAuth connection
+            AuthConnection msConn = user.findConnection("microsoft");
+            if (msConn != null && msConn.getAccessTokenEncrypted() != null) {
+                System.out.println("[EmailProviderService] Using Microsoft Graph service via AuthConnection...");
+                String accessToken = encryptionService.decrypt(msConn.getAccessTokenEncrypted());
+
                 boolean success = pdfBytes != null
-                        ? microsoftGraphService.sendEmailWithAttachment(supabaseId, to, subject, htmlBody, pdfBytes,
-                                pdfFilename)
-                        : microsoftGraphService.sendEmail(supabaseId, to, subject, htmlBody);
+                        ? microsoftGraphService.sendEmailWithAccessToken(accessToken,
+                                to, subject, htmlBody, pdfBytes, pdfFilename)
+                        : microsoftGraphService.sendEmailWithAccessToken(accessToken,
+                                to, subject, htmlBody);
                 return success ? new SendResult(true, "Email sent successfully!", "success")
                         : new SendResult(false, "Failed to send email.", "send_failed");
             }
 
-            // Priority 3: Linked OAuth provider (email/password user who linked
-            // Google/Microsoft)
-            if (userToken.hasLinkedProvider()) {
-                String linkedProvider = userToken.getLinkedProvider();
-                System.out.println("[EmailProviderService] Using linked " + linkedProvider + " provider...");
-
-                // Decrypt the linked provider's access token
-                String linkedAccessToken = encryptionService.decrypt(userToken.getLinkedProviderTokenEncrypted());
-
-                if ("google".equals(linkedProvider)) {
-                    // Store the linked token temporarily for GmailService to use
-                    boolean success = pdfBytes != null
-                            ? gmailService.sendEmailWithAccessToken(linkedAccessToken,
-                                    userToken.getLinkedProviderEmail(),
-                                    to, subject, htmlBody, pdfBytes, pdfFilename)
-                            : gmailService.sendEmailWithAccessToken(linkedAccessToken,
-                                    userToken.getLinkedProviderEmail(),
-                                    to, subject, htmlBody);
-                    return success ? new SendResult(true, "Email sent successfully!", "success")
-                            : new SendResult(false, "Failed to send email.", "send_failed");
-                } else if ("microsoft".equals(linkedProvider)) {
-                    boolean success = pdfBytes != null
-                            ? microsoftGraphService.sendEmailWithAccessToken(linkedAccessToken,
-                                    to, subject, htmlBody, pdfBytes, pdfFilename)
-                            : microsoftGraphService.sendEmailWithAccessToken(linkedAccessToken,
-                                    to, subject, htmlBody);
-                    return success ? new SendResult(true, "Email sent successfully!", "success")
-                            : new SendResult(false, "Failed to send email.", "send_failed");
-                }
-            }
-
-            // Priority 4: SMTP (configured with app password)
-            if (userToken.isSmtpConfigured()) {
+            // Priority 3: SMTP (configured with app password)
+            if (user.isSmtpConfigured() && user.getSmtpPasswordEncrypted() != null) {
                 System.out.println("[EmailProviderService] Using SMTP service...");
-                String email = userToken.getEmail();
-                String password = encryptionService.decrypt(userToken.getSmtpPasswordEncrypted());
+                String email = user.getEmail();
+                String password = encryptionService.decrypt(user.getSmtpPasswordEncrypted());
 
                 boolean success = pdfBytes != null
                         ? smtpEmailService.sendEmailWithAttachment(email, password, to, subject, htmlBody, pdfBytes,
@@ -130,8 +121,8 @@ public class EmailProviderService {
                         : new SendResult(false, "Failed to send email.", "send_failed");
             }
 
-            // Priority 5: SMTP domain supported but not configured
-            String domain = SmtpProviderConfig.extractDomain(userToken.getEmail());
+            // Priority 4: SMTP domain supported but not configured
+            String domain = SmtpProviderConfig.extractDomain(user.getEmail());
             if (smtpProviderConfig.isSupported(domain)) {
                 String providerName = smtpProviderConfig.getProviderName(domain);
                 return new SendResult(false,
@@ -139,7 +130,7 @@ public class EmailProviderService {
                         "smtp_not_configured");
             }
 
-            // Priority 6: Unsupported provider
+            // Priority 5: Unsupported provider
             return new SendResult(false,
                     "Email sending is not available for your provider. You can download the PDF and send it manually.",
                     "unsupported_provider");
@@ -160,21 +151,35 @@ public class EmailProviderService {
     }
 
     /**
-     * Checks if a user can send emails via OAuth.
+     * Checks if a user can send emails.
      */
-    public boolean canUserSendEmail(String supabaseId) {
-        return tokenStorageService.getUserToken(supabaseId)
-                .map(UserToken::canSendEmail)
-                .orElse(false);
+    public boolean canUserSendEmail(String userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(userId);
+        }
+        return userOpt.map(User::canSendEmail).orElse(false);
     }
 
     /**
      * Gets the provider type for a user.
      */
-    public String getUserProvider(String supabaseId) {
-        return tokenStorageService.getUserToken(supabaseId)
-                .map(UserToken::getProvider)
-                .orElse("none");
+    public String getUserProvider(String userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(userId);
+        }
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.hasProvider("google"))
+                return "google";
+            if (user.hasProvider("microsoft"))
+                return "azure";
+            if (user.isSmtpConfigured())
+                return "smtp";
+            return "email";
+        }
+        return "none";
     }
 
     /**

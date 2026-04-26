@@ -21,3 +21,5 @@ TECHNICAL_AUDIT_REPORT.md
 /transcription-service/venv
 /transcription-service/temp
 /transcription-service/__pycache__
+transcription-service/ts_stderr.log
+backend/backend_stderr.log

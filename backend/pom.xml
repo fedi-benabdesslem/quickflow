@@ -78,7 +78,12 @@
           <artifactId>spring-boot-starter-security</artifactId>
       </dependency>
 
-      <!-- JWT Library for Supabase token validation -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-oauth2-client</artifactId>
+      </dependency>
+
+      <!-- JWT Library for self-hosted token generation/validation -->
       <dependency>
           <groupId>com.auth0</groupId>
           <artifactId>java-jwt</artifactId>
@@ -136,6 +141,18 @@
           <groupId>com.itextpdf</groupId>
           <artifactId>html2pdf</artifactId>
           <version>5.0.3</version>
+      </dependency>
+
+      <!-- Commonmark for robust Markdown-to-HTML conversion -->
+      <dependency>
+          <groupId>org.commonmark</groupId>
+          <artifactId>commonmark</artifactId>
+          <version>0.22.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.commonmark</groupId>
+          <artifactId>commonmark-ext-gfm-tables</artifactId>
+          <version>0.22.0</version>
       </dependency>
 
       <!-- JSON processing -->

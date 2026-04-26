@@ -1,9 +1,9 @@
 package com.ai.application.Services;
 
 import com.ai.application.Repositories.ContactRepository;
-import com.ai.application.Repositories.UserTokenRepository;
+import com.ai.application.Repositories.UserRepository;
 import com.ai.application.model.Entity.Contact;
-import com.ai.application.model.Entity.UserToken;
+import com.ai.application.model.Entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class QuickFlowDetectionService {
     private ContactRepository contactRepository;
 
     @Autowired
-    private UserTokenRepository userTokenRepository;
+    private UserRepository userRepository;
 
     /**
      * Scheduled job to detect QuickFlow users among contacts.
@@ -38,10 +38,10 @@ public class QuickFlowDetectionService {
         logger.info("Starting QuickFlow user detection job...");
 
         try {
-            // Get all registered QuickFlow user emails from UserToken collection
-            List<UserToken> allUserTokens = userTokenRepository.findAll();
-            Set<String> quickFlowEmails = allUserTokens.stream()
-                    .map(UserToken::getEmail)
+            // Get all registered QuickFlow user emails from User collection
+            List<User> allUsers = userRepository.findAll();
+            Set<String> quickFlowEmails = allUsers.stream()
+                    .map(User::getEmail)
                     .filter(email -> email != null && !email.isEmpty())
                     .map(String::toLowerCase)
                     .collect(Collectors.toSet());
@@ -65,10 +65,10 @@ public class QuickFlowDetectionService {
 
                     // Find the QuickFlow user ID if they're a user
                     if (isQuickFlowUser) {
-                        allUserTokens.stream()
+                        allUsers.stream()
                                 .filter(u -> contactEmail.equalsIgnoreCase(u.getEmail()))
                                 .findFirst()
-                                .ifPresent(userToken -> contact.setQuickflowUserId(userToken.getSupabaseId()));
+                                .ifPresent(user -> contact.setQuickflowUserId(user.getId()));
                     } else {
                         contact.setQuickflowUserId(null);
                     }
@@ -92,9 +92,9 @@ public class QuickFlowDetectionService {
         logger.info("Detecting QuickFlow users for user {}", userId);
 
         // Get QuickFlow user emails
-        List<UserToken> allUserTokens = userTokenRepository.findAll();
-        Set<String> quickFlowEmails = allUserTokens.stream()
-                .map(UserToken::getEmail)
+        List<User> allUsers = userRepository.findAll();
+        Set<String> quickFlowEmails = allUsers.stream()
+                .map(User::getEmail)
                 .filter(email -> email != null && !email.isEmpty())
                 .map(String::toLowerCase)
                 .collect(Collectors.toSet());
@@ -114,10 +114,10 @@ public class QuickFlowDetectionService {
                 contact.setUsesQuickFlow(isQuickFlowUser);
 
                 if (isQuickFlowUser) {
-                    allUserTokens.stream()
+                    allUsers.stream()
                             .filter(u -> contactEmail.equalsIgnoreCase(u.getEmail()))
                             .findFirst()
-                            .ifPresent(userToken -> contact.setQuickflowUserId(userToken.getSupabaseId()));
+                            .ifPresent(user -> contact.setQuickflowUserId(user.getId()));
                 } else {
                     contact.setQuickflowUserId(null);
                 }

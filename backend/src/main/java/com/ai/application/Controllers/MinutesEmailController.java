@@ -41,7 +41,7 @@ public class MinutesEmailController {
                     "code", "unauthorized",
                     "message", "Not authenticated"));
         }
-        String supabaseId = principal.getName();
+        String userId = principal.getName();
 
         // 2. Validate request
         if (request.getRecipients() == null || request.getRecipients().isEmpty()) {
@@ -95,7 +95,7 @@ public class MinutesEmailController {
         // 5. Send email
         String recipientsStr = String.join(",", request.getRecipients());
         EmailProviderService.SendResult result = emailProviderService.sendEmailWithAttachment(
-                supabaseId,
+                userId,
                 recipientsStr,
                 subject,
                 htmlBody,
@@ -112,7 +112,7 @@ public class MinutesEmailController {
                 meeting.setSentAt(LocalDateTime.now());
                 meeting.setStatus("sent");
                 meeting.setPeople(request.getRecipients());
-                meeting.setUserId(supabaseId); // NEW: Save user ID
+                meeting.setUserId(userId); // Save user ID
 
                 // Parse date if available
                 if (request.getMeetingMetadata() != null && request.getMeetingMetadata().containsKey("date")) {

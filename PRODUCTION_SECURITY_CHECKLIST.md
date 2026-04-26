@@ -1,97 +1,92 @@
 # Production Security Checklist
 
 ## Overview
-This document lists all exposed secrets and credentials in the QuickFlow codebase that **MUST** be externalized before deploying to production. During development, these values are shared for contributor convenience, but they represent critical security risks in production.
+This document describes the required environment variables for QuickFlow's self-hosted JWT + OAuth2 authentication system and lists all security steps needed before deploying to production.
+
+> **Note:** All secrets have been removed from `application.properties`. Every sensitive value is now read exclusively from environment variables. The properties listed below must be set in your deployment environment (shell, `.env` file not committed to git, Docker secret, or a secrets manager).
 
 ---
 
-## 1. Secrets in `backend/src/main/resources/application.properties`
+## 1. Required Environment Variables
 
-### 1.1 Gemini API Key (OpenAI-compatible)
-- **Property:** `spring.ai.openai.api-key`
-- **Current Value:** Hardcoded Google AI API key
+### 1.1 Gemini API Key
+- **Environment variable:** `GEMINI_API_KEY`
+- **Property:** `spring.ai.openai.api-key=${GEMINI_API_KEY:}`
 - **Risk:** API abuse, unexpected billing charges
-- **Action:** Externalize via environment variable
-  ```properties
-  spring.ai.openai.api-key=${GEMINI_API_KEY}
-  ```
+- **Action:** Obtain a new key from [Google AI Studio](https://aistudio.google.com/), set the variable, revoke any previously committed key
+
+### 1.2 JWT Signing Secret
+- **Environment variable:** `JWT_SECRET`
+- **Property:** `app.jwt.secret=${JWT_SECRET}` (no fallback — application will not start if missing)
+- **Risk:** JWT forgery, authentication bypass
+- **Action:** Generate a new 256-bit secret and rotate the previously committed key:
   ```bash
-  export GEMINI_API_KEY=your-production-api-key
+  openssl rand -base64 32   # generate new JWT_SECRET
   ```
 
-### 1.2 Supabase JWT Secret
-- **Property:** `supabase.jwt.secret`
-- **Current Value:** Uses `${SUPABASE_JWT_SECRET:...}` with hardcoded fallback
-- **Risk:** JWT token forgery, authentication bypass
-- **Action:** Remove the hardcoded fallback in production
-  ```properties
-  supabase.jwt.secret=${SUPABASE_JWT_SECRET}
-  ```
+### 1.3 Token Encryption Key (AES-256)
+- **Environment variable:** `TOKEN_ENCRYPTION_KEY`
+- **Property:** `token.encryption.key=${TOKEN_ENCRYPTION_KEY}` (no fallback — application will not start if missing)
+- **Risk:** Decryption of stored OAuth access/refresh tokens; account takeover
+- **Action:** Generate a new 32-byte key and rotate the previously committed key:
   ```bash
-  export SUPABASE_JWT_SECRET=your-production-jwt-secret
+  openssl rand -base64 32   # generate new TOKEN_ENCRYPTION_KEY
   ```
 
-### 1.3 Token Encryption Key
-- **Property:** `token.encryption.key`
-- **Current Value:** Uses `${TOKEN_ENCRYPTION_KEY:...}` with hardcoded fallback
-- **Risk:** OAuth token decryption, account takeover
-- **Action:** Remove the hardcoded fallback in production; generate a new key
-  ```properties
-  token.encryption.key=${TOKEN_ENCRYPTION_KEY}
-  ```
-  ```bash
-  # Generate a new 32-byte key:
-  openssl rand -base64 32
-  export TOKEN_ENCRYPTION_KEY=your-new-base64-key
-  ```
+### 1.4 Resend Email API Key
+- **Environment variable:** `RESEND_API_KEY`
+- **Property:** `app.resend.api-key=${RESEND_API_KEY:}`
+- **Risk:** Sending emails on behalf of your domain, billing abuse
+- **Action:** Revoke the previously committed key at [resend.com](https://resend.com) and issue a new one
 
-### 1.4 Google OAuth Client ID & Secret
-- **Property:** `google.oauth.client-id`, `google.oauth.client-secret`
-- **Current Value:** Uses `${GOOGLE_OAUTH_CLIENT_ID:...}` and `${GOOGLE_OAUTH_CLIENT_SECRET:...}` with hardcoded fallbacks
-- **Risk:** OAuth credential theft, impersonation
-- **Action:** Remove hardcoded fallbacks in production
-  ```properties
-  google.oauth.client-id=${GOOGLE_OAUTH_CLIENT_ID}
-  google.oauth.client-secret=${GOOGLE_OAUTH_CLIENT_SECRET}
-  ```
-  ```bash
-  export GOOGLE_OAUTH_CLIENT_ID=your-production-client-id
-  export GOOGLE_OAUTH_CLIENT_SECRET=your-production-client-secret
-  ```
+### 1.5 Google OAuth Client ID & Secret
+- **Environment variables:** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- **Properties:** `google.oauth.client-id`, `google.oauth.client-secret`
+- **Risk:** OAuth credential impersonation, unauthorised login
+- **Action:** Revoke the previously committed client secret in [Google Cloud Console](https://console.cloud.google.com/) and create new credentials for the production redirect URI
 
-### 1.5 Microsoft OAuth Configuration
-- **Property:** `microsoft.oauth.client-id`, `microsoft.oauth.client-secret`, `microsoft.oauth.tenant-id`
-- **Current Value:** Already externalized via `${MICROSOFT_CLIENT_ID:}` etc.
-- **Status:** ✅ Properly configured (no hardcoded fallback)
-- **Action:** Ensure environment variables are set in production
+### 1.6 Microsoft OAuth Configuration (optional)
+- **Environment variables:** `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_TENANT_ID`
+- **Properties:** `microsoft.oauth.client-id`, `microsoft.oauth.client-secret`, `microsoft.oauth.tenant-id`
+- **Status:** ✅ Properly configured (no hardcoded values; empty defaults are safe when Microsoft OAuth is not in use)
+- **Action:** Set the variables when Microsoft OAuth is enabled in production
+
+### 1.7 Application URLs
+- **Environment variables:** `FRONTEND_URL`, `BACKEND_URL`
+- **Properties:** `app.frontend.url`, `app.backend.url`
+- **Status:** Defaults to `localhost` — must be overridden for production
+
+### 1.8 MongoDB URI
+- **Environment variable:** `MONGODB_URI`
+- **Property:** `spring.data.mongodb.uri=${MONGODB_URI:mongodb://localhost:27017/electrodb}`
+- **Action:** Supply a connection string with authentication for production (do not use the unauthenticated localhost default)
+
+### 1.9 Ngrok Domain (development scripts only)
+- **Environment variable:** `NGROK_DOMAIN`
+- **Used by:** `power_on.sh`, `power_on.ps1`
+- **Risk:** The domain is tied to a specific developer's ngrok account; hardcoding it would expose account identity
+- **Action:** Each developer sets their own static domain:
+  ```bash
+  export NGROK_DOMAIN=your-domain.ngrok-free.dev
+  ```
 
 ---
 
-## 2. Secrets in Frontend Code
+## 2. Git History — Credential Rotation Required
 
-### 2.1 Supabase URL and Anonymous Key
-- **File:** `frontend/src/lib/supabase.ts` (lines 9-10)
-- **Current Value:** Hardcoded Supabase project URL and anonymous key
-- **Risk:** The anon key is designed to be public (client-side), but the URL should be configurable
-- **Note:** Supabase anon keys are safe for client-side use by design (Row Level Security enforces access control). However, for multi-environment deployment, externalize these:
-  ```typescript
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co'
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
-  ```
-  Then set in `.env.production`:
-  ```
-  VITE_SUPABASE_URL=https://your-production-project.supabase.co
-  VITE_SUPABASE_ANON_KEY=your-production-anon-key
-  ```
+The following secrets were committed in earlier commits of this branch and **must be rotated/revoked immediately**, even though they have since been removed from the file:
 
-### 2.2 Supabase URL and Anon Key in Backend JWT Filter
-- **File:** `backend/src/main/java/com/ai/application/Config/SupabaseJwtFilter.java` (lines 35-38)
-- **Current Value:** Hardcoded defaults in `@Value` annotations
-- **Action:** Remove hardcoded defaults in production
-  ```properties
-  supabase.url=${SUPABASE_URL}
-  supabase.anon.key=${SUPABASE_ANON_KEY}
-  ```
+| Secret | Type | Committed in |
+|--------|------|--------------|
+| `AIzaSy…Hi8Q` | Gemini API key | `application.properties` (commit `5728938`) |
+| `AcdmhqxqAg2T…` | JWT signing secret | `application.properties` (commit `5728938`) |
+| `GmXA9DC0KtUL…` | AES-256 encryption key | `application.properties` (commit `5728938`) |
+| `re_MTesD6…` | Resend email API key | `application.properties` (commit `5728938`) |
+| `GOCSPX-wOJlO…` | Google OAuth client secret | `application.properties` (commit `5728938`) |
+| `253550165766-…` | Google OAuth client ID | `application.properties` (commit `5728938`) |
+| `39r0…` | Ngrok authtoken | `SETUP.md` (commit `83af87f`) |
+
+> These values are still visible in git history. Run `git filter-repo` or BFG Repo Cleaner to scrub history, then force-push and rotate each credential.
 
 ---
 
@@ -99,27 +94,31 @@ This document lists all exposed secrets and credentials in the QuickFlow codebas
 
 ### Option A: Environment Variables (Simplest)
 ```bash
-# Add to your deployment environment or .env file (not committed to git)
-export GEMINI_API_KEY=...
-export SUPABASE_JWT_SECRET=...
+# Add to your deployment environment or a local .env file (never committed to git)
+export JWT_SECRET=...
 export TOKEN_ENCRYPTION_KEY=...
-export GOOGLE_OAUTH_CLIENT_ID=...
-export GOOGLE_OAUTH_CLIENT_SECRET=...
+export GEMINI_API_KEY=...
+export RESEND_API_KEY=...
+export GOOGLE_CLIENT_ID=...
+export GOOGLE_CLIENT_SECRET=...
 export MICROSOFT_CLIENT_ID=...
 export MICROSOFT_CLIENT_SECRET=...
 export MICROSOFT_TENANT_ID=...
-export SUPABASE_URL=...
-export SUPABASE_ANON_KEY=...
+export MONGODB_URI=mongodb+srv://user:pass@cluster/db
+export FRONTEND_URL=https://app.example.com
+export BACKEND_URL=https://api.example.com
 ```
 
 ### Option B: Spring Boot Profile-Based Configuration
-Create `application-prod.properties` (not committed to git):
+Create `application-prod.properties` (not committed to git, listed in `.gitignore`):
 ```properties
-spring.ai.openai.api-key=${GEMINI_API_KEY}
-supabase.jwt.secret=${SUPABASE_JWT_SECRET}
+app.jwt.secret=${JWT_SECRET}
 token.encryption.key=${TOKEN_ENCRYPTION_KEY}
-google.oauth.client-id=${GOOGLE_OAUTH_CLIENT_ID}
-google.oauth.client-secret=${GOOGLE_OAUTH_CLIENT_SECRET}
+spring.ai.openai.api-key=${GEMINI_API_KEY}
+app.resend.api-key=${RESEND_API_KEY}
+google.oauth.client-id=${GOOGLE_CLIENT_ID}
+google.oauth.client-secret=${GOOGLE_CLIENT_SECRET}
+spring.data.mongodb.uri=${MONGODB_URI}
 ```
 Run with: `java -jar app.jar --spring.profiles.active=prod`
 
@@ -129,12 +128,16 @@ Run with: `java -jar app.jar --spring.profiles.active=prod`
 services:
   backend:
     environment:
-      - GEMINI_API_KEY_FILE=/run/secrets/gemini_api_key
+      - JWT_SECRET_FILE=/run/secrets/jwt_secret
+      - TOKEN_ENCRYPTION_KEY_FILE=/run/secrets/token_key
     secrets:
-      - gemini_api_key
+      - jwt_secret
+      - token_key
 secrets:
-  gemini_api_key:
-    file: ./secrets/gemini_api_key.txt
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt
+  token_key:
+    file: ./secrets/token_key.txt
 ```
 
 ### Option D: HashiCorp Vault / AWS Secrets Manager
@@ -149,31 +152,37 @@ spring.cloud.vault.authentication=token
 
 ## 4. Pre-Production Checklist
 
-- [ ] Generate new API keys for production (do NOT reuse dev keys)
-- [ ] Generate a new AES-256 encryption key for `TOKEN_ENCRYPTION_KEY`
-- [ ] Create new Google OAuth credentials for production redirect URIs
-- [ ] Create new Microsoft OAuth credentials for production
-- [ ] Create a new Supabase project (or rotate keys) for production
-- [ ] Set all secrets via environment variables or secret manager
-- [ ] Remove hardcoded fallback values from `application.properties`
-- [ ] Verify `application.properties` contains NO plaintext secrets
-- [ ] Add `.env` and `application-prod.properties` to `.gitignore`
+### Credential Rotation (URGENT — values appeared in git history)
+- [ ] Revoke and reissue Gemini API key
+- [ ] Generate a new JWT signing secret (`openssl rand -base64 32`)
+- [ ] Generate a new AES-256 token encryption key (`openssl rand -base64 32`)
+- [ ] Revoke and reissue Resend email API key
+- [ ] Revoke and reissue Google OAuth client secret (create new production credentials)
+- [ ] Revoke leaked ngrok authtoken in the ngrok dashboard
+
+### Configuration
+- [ ] Set all required environment variables listed in Section 1
+- [ ] Verify `application.properties` contains NO plaintext secrets (`grep -v '\${' application.properties`)
+- [ ] Add `application-prod.properties` and `.env` to `.gitignore`
 - [ ] Update CORS origins from `localhost:5173` to production domain
 - [ ] Enable HTTPS/TLS for all endpoints
-- [ ] Review and restrict MongoDB access (authentication + network binding)
+
+### Infrastructure
+- [ ] Enable MongoDB authentication and restrict network access
 - [ ] Set `logging.level.org.springframework.data.mongodb.core.MongoTemplate` to `WARN` or `ERROR`
-- [ ] Rotate the Supabase JWT secret in the Supabase dashboard
+- [ ] Run `git filter-repo` or BFG to scrub leaked secrets from git history, then force-push
 - [ ] Test the application with all externalized secrets before go-live
 
 ---
 
 ## 5. Additional Security Recommendations
 
-1. **CORS Configuration**: Update `WebConfig.java` and `SecurityConfig.java` to use production domain instead of `localhost:5173`
+1. **CORS Configuration**: Update `WebConfig.java` and `SecurityConfig.java` to use the production domain instead of `localhost:5173`
 2. **CSRF Protection**: Re-evaluate CSRF disable; consider enabling for browser-based requests
-3. **Rate Limiting**: Add rate limiting to authentication and email endpoints
-4. **HTTPS**: Enforce HTTPS in production (add `server.ssl.*` properties)
+3. **Rate Limiting**: Rate limiting is already applied to auth endpoints; verify limits are appropriate for production traffic
+4. **HTTPS**: Enforce HTTPS in production (add `server.ssl.*` properties or terminate at a reverse proxy)
 5. **MongoDB Security**: Enable MongoDB authentication and restrict network access
-6. **Logging**: Replace `System.out.println` with a proper logging framework (SLF4J/Logback) throughout the codebase
+6. **Logging**: Replace `System.out.println` calls with SLF4J/Logback throughout the codebase
 7. **Dependency Scanning**: Run OWASP dependency-check regularly
-8. **Session Management**: Verify JWT token expiration settings are appropriate for production
+8. **Session Management**: Verify JWT access token (15 min) and refresh token (30 day) expiration settings are appropriate for your use case
+
